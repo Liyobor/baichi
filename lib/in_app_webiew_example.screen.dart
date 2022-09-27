@@ -12,6 +12,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:untitled/converter.dart';
+import 'package:untitled/ui_detector.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -52,6 +53,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   String url = "";
   double progress = 0;
   final urlController = TextEditingController();
+  CardDetector cardDetector = CardDetector();
+  UIDetector uiDetector = UIDetector();
+
+  ScreenshotConfiguration config = ScreenshotConfiguration();
+
+  bool isUIDetectorRunning = false;
+
+
 
 
 
@@ -60,7 +69,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   @override
   void initState() {
+
     super.initState();
+    config.compressFormat = CompressFormat.JPEG;
+
 
     contextMenu = ContextMenu(
         menuItems: [
@@ -70,7 +82,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               title: "Special",
               action: () async {
                 debugPrint("Menu item Special clicked!");
-                debugPrint(await webViewController?.getSelectedText());
+                // debugPrint(await webViewController?.getSelectedText());
                 await webViewController?.clearFocus();
               })
         ],
@@ -290,54 +302,120 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       progress < 1.0
                           ? LinearProgressIndicator(value: progress)
                           : Container(),
-                      Align(
-                        alignment:Alignment.bottomCenter,
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height*0.9,
+                        child: Align(
+                          alignment:Alignment.bottomCenter,
 
-                        child: ButtonBar(
+                          child: ButtonBar(
 
-                          alignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            ElevatedButton(
-                              child: const Icon(Icons.arrow_back),
-                              onPressed: () {
-                                webViewController?.goBack();
-                              },
-                            ),
-                            ElevatedButton(
-                              child: const Icon(Icons.not_started),
-                              onPressed: () async {
-                                CardDetector detector = CardDetector();
-                                // Uint8List? data = await webViewController?.takeScreenshot();
-                                final ByteData bytes = await rootBundle.load('assets/images/img1.png');
-                                final Uint8List data = bytes.buffer.asUint8List();
-                                Fimber.i("width = ${MediaQuery.of(context).size.width}");
-                                Fimber.i("height = ${MediaQuery.of(context).size.height}");
+                            alignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ElevatedButton(
+                                child: const Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  webViewController?.goBack();
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Icon(Icons.refresh),
+                                onPressed: () async {
+                                  bool isShowProgress = true;
 
-                                if(data!=null){
-                                  Fimber.i("data len = ${data.length}");
-                                  image.Image? imageData = image.decodeImage(data);
-                                  if(imageData!=null){
-                                    Fimber.i("len = ${imageData.length}");
-                                    detector.putImageIntoModel(imageData);
+
+                                  isUIDetectorRunning = !isUIDetectorRunning;
+                                  if(!isUIDetectorRunning) {
+                                    showRecognizeResult(context, "停止辨識ui", 2000);
                                   }
-                                  // detector.putImageIntoModel(image.decodeImage(data));
+                                  while(isUIDetectorRunning){
+                                    if(isShowProgress) {
+                                      showRecognizeResult(
+                                          context, "開始辨識ui!", 2000);
+                                    }
+                                    isShowProgress = false;
+                                    var start = DateTime.now();
+                                    config.quality = 50;
+                                    Uint8List? data = await webViewController?.takeScreenshot(screenshotConfiguration: config);
+                                    var end = DateTime.now();
+                                    Fimber.i("time of take screen shot : ${end.difference(start).inMilliseconds/1000}s");
+                                    // final ByteData bytes = await rootBundle.load('assets/images/img1.png');
+                                    // final Uint8List data = bytes.buffer.asUint8List();
+
+                                    Fimber.i("width = ${MediaQuery.of(context).size.width}");
+                                    Fimber.i("height = ${MediaQuery.of(context).size.height}");
+                                    webViewController?.getContentHeight().then((value) => Fimber.i("web view height = $value}"));
 
 
-                                  // Fimber.i("height = ${Converter().convertUInt8List2Image(data).height}");
-                                  // Fimber.i("width = ${Converter().convertUInt8List2Image(data).width}");
-                                }
+                                    //position =
+                                    if(data!=null){
+                                      // Fimber.i("data len = ${data.length}");
+                                      start = DateTime.now();
+                                      image.Image? imageData = image.decodeImage(data);
+                                      end = DateTime.now();
+                                      Fimber.i("time of decodeImage : ${end.difference(start).inMilliseconds/1000}s");
+                                      if(imageData!=null){
+                                        // Fimber.i("len = ${imageData.length}");
+                                        start = DateTime.now();
+                                        String resultStr = uiDetector.putImageIntoModel(imageData);
+                                        end = DateTime.now();
+                                        Fimber.i("time of putImageIntoModel : ${end.difference(start).inMilliseconds/1000}s");
+                                        showRecognizeResult(context, resultStr,2000);
+                                      }
+                                      // detector.putImageIntoModel(image.decodeImage(data));
 
 
-                              },
-                            ),
-                            ElevatedButton(
-                              child: const Icon(Icons.refresh),
-                              onPressed: () {
-                                // webViewController?.reload();
-                                CardDetector detector = CardDetector();
-                              },
-                            ),
-                          ],
+                                      // Fimber.i("height = ${Converter().convertUInt8List2Image(data).height}");
+                                      // Fimber.i("width = ${Converter().convertUInt8List2Image(data).width}");
+                                    }
+                                    await Future.delayed(const Duration(seconds: 5));
+                                  }
+
+
+                              // webViewController?.reload();
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Icon(Icons.not_started),
+                                onPressed: () async {
+                                  var start = DateTime.now();
+
+                                  config.quality = 30;
+                                  Uint8List? data = await webViewController?.takeScreenshot(screenshotConfiguration: config);
+                                  var end = DateTime.now();
+                                  Fimber.i("time of take screen shot : ${end.difference(start).inMilliseconds/1000}s");
+                                  // final ByteData bytes = await rootBundle.load('assets/images/img1.png');
+                                  // final Uint8List data = bytes.buffer.asUint8List();
+                                  Fimber.i("web view height = ${webViewController?.getContentHeight()}");
+
+                                  Fimber.i("width = ${MediaQuery.of(context).size.width}");
+                                  Fimber.i("height = ${MediaQuery.of(context).size.height}");
+
+                                  if(data!=null){
+                                    Fimber.i("data len = ${data.length}");
+                                    start = DateTime.now();
+                                    image.Image? imageData = image.decodeImage(data);
+                                    end = DateTime.now();
+                                    Fimber.i("time of decodeImage : ${end.difference(start).inMilliseconds/1000}s");
+                                    if(imageData!=null){
+                                      Fimber.i("len = ${imageData.length}");
+                                      start = DateTime.now();
+                                      String resultStr = cardDetector.putImageIntoModel(imageData);
+                                      end = DateTime.now();
+                                      Fimber.i("time of putImageIntoModel : ${end.difference(start).inMilliseconds/1000}s");
+                                      showRecognizeResult(context, resultStr,3500);
+                                    }
+                                    // detector.putImageIntoModel(image.decodeImage(data));
+
+
+                                    // Fimber.i("height = ${Converter().convertUInt8List2Image(data).height}");
+                                    // Fimber.i("width = ${Converter().convertUInt8List2Image(data).width}");
+                                  }
+
+
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -373,6 +451,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
           ],
         );
       },
+    );
+  }
+  void showRecognizeResult(BuildContext context,String text,int milliseconds) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(text),
+        duration: Duration(milliseconds: milliseconds),
+        action: SnackBarAction(label: '關閉', onPressed: scaffold.hideCurrentSnackBar),
+      ),
     );
   }
 
