@@ -19,6 +19,7 @@ class CardDetector{
   late TfLiteType _inputType;
   late TfLiteType _outputType;
   late TensorImage _inputImage;
+  String resultStr = "";
 
 
   List output0 = List<double>.filled(2535*4, 0.0);
@@ -79,7 +80,7 @@ class CardDetector{
         .process(_inputImage);
   }
 
-  String putImageIntoModel(img.Image image)  {
+  List putImageIntoModel(img.Image image)  {
     _inputImage = TensorImage(_inputType);
 
     _inputImage.loadImage(image);
@@ -138,11 +139,11 @@ class CardDetector{
 
 
 
-        Fimber.i('---');
-        Fimber.i('class = $cardClass');
-        Fimber.i('score = $score');
-        Fimber.i('x = $x');
-        Fimber.i('y = $y');
+        // Fimber.i('---');
+        // Fimber.i('class = $cardClass');
+        // Fimber.i('score = $score');
+        // Fimber.i('x = $x');
+        // Fimber.i('y = $y');
 
 
         var isDuplicate = false;
@@ -170,27 +171,32 @@ class CardDetector{
 
     }
 
-    String resultStr ;
+    List result = [];
+
     if(xList.isEmpty){
       Fimber.i("didn't find card");
       resultStr = "didn't find card";
       // showRecognizeResult(ctx,"didn't find card");
     }else{
+      resultStr = "";
       String cardClass = "";
-      String carPos = "";
+      // String carPos = "";
       for(int i = 0;i<classList.length;i++){
 
+        result.add(classList[i]);
+
+
         cardClass += classList[i].toString()+",";
-        carPos += xList[i].toString().substring(0,4)+",";
+        // carPos += xList[i].toString().substring(0,4)+",";
       }
 
       // showRecognizeResult(ctx,"偵測到撲克牌:$cardClass  x位置分別在$carPos");
-      resultStr = "偵測到撲克牌:$cardClass  x位置分別在$carPos";
+      resultStr = "偵測到撲克牌:$cardClass";
 
 
     }
 
-    return resultStr;
+    return result;
 
 
 

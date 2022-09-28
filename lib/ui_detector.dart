@@ -20,9 +20,19 @@ class UIDetector{
   late TfLiteType _outputType;
   late TensorImage _inputImage;
 
+  double playerButtonX = -1.0;
+  double playerButtonY = -1.0;
+  double bankButtonX = -1.0;
+  double bankButtonY = -1.0;
+  double confirmButtonX = -1.0;
+  double confirmButtonY = -1.0;
+
 
   List output0 = List<double>.filled(2535*4, 0.0);
   List output1 = List<double>.filled(2535*8, 0.0);
+
+  String resultStr = "";
+
 
   List label = [
     "莊家",
@@ -35,6 +45,15 @@ class UIDetector{
     "非下注時間",
   ];
 
+  /*
+  state
+  0 = 辨識牌
+  1 = 下注
+  2 = 洗牌
+  出現 莊勝或是閒勝時候 切換state = 0
+  計算完再下注期間進行操作
+   */
+  int _state = 0;
 
 
   late TensorBuffer _outputBuffer;
@@ -90,7 +109,7 @@ class UIDetector{
         .process(_inputImage);
   }
 
-  String putImageIntoModel(img.Image image)  {
+  bool putImageIntoModel(img.Image image)  {
     _inputImage = TensorImage(_inputType);
 
     _inputImage.loadImage(image);
@@ -144,17 +163,17 @@ class UIDetector{
         final double w = bboxes[0][i][2];
         final double h = bboxes[0][i][3];
 
-        final buttonClass = detectedClass+1;
+        final buttonClass = detectedClass;
         final x = ((max(0, xPos - w / 2)/416)+(min(_inputImage.width - 1, xPos + w / 2)/416))/2;
         final y = ((max(0, yPos - h / 2)/416)+(min(_inputImage.height - 1, yPos + h / 2)/416))/2;
 
 
 
-        Fimber.i('---');
-        Fimber.i('class = $buttonClass');
-        Fimber.i('score = $score');
-        Fimber.i('x = $x');
-        Fimber.i('y = $y');
+        // Fimber.i('---');
+        // Fimber.i('class = $buttonClass');
+        // Fimber.i('score = $score');
+        // Fimber.i('x = $x');
+        // Fimber.i('y = $y');
 
 
         // var isDuplicate = false;
@@ -170,18 +189,49 @@ class UIDetector{
         yList.add(y);
         classList.add(buttonClass);
 
+        if(buttonClass==0){
+          bankButtonX = x;
+          bankButtonY = y;
+        }else if(buttonClass==3){
+          playerButtonX = x;
+          playerButtonY = y;
+        }
+
+        if(buttonClass == 2){
+          confirmButtonX = x;
+          confirmButtonY = y;
+        }
+
+
 
         // resultList.add([detectedClass+1,])
-        Fimber.i('X MIN = ${min(_inputImage.width - 1, xPos + w / 2)/416}');
-        Fimber.i('Y MIN = ${min(_inputImage.height - 1, yPos + h / 2)/416}');
+        // Fimber.i('X MIN = ${min(_inputImage.width - 1, xPos + w / 2)/416}');
+        // Fimber.i('Y MIN = ${min(_inputImage.height - 1, yPos + h / 2)/416}');
       }
+
 
 
 
 
     }
 
-    String resultStr ;
+    if(classList.contains(7)){
+      _state = 0;
+    }else if(classList.contains(6)){
+      _state = 2;
+    }else{
+      _state = 1;
+    }
+
+    if(classList.contains(1) || classList.contains(4)){
+      return true;
+    }
+
+
+
+
+
+
     if(xList.isEmpty){
       Fimber.i("didn't find button");
       resultStr = "didn't find button";
@@ -189,7 +239,7 @@ class UIDetector{
     }else{
       resultStr = "";
       for(int i = 0;i<classList.length;i++){
-        resultStr += "${label[classList[i]-1]} x:${xList[i].toString().substring(0,4)} y:${yList[i].toString().substring(0,4)}\n";
+        resultStr += "${label[classList[i]]} x:${xList[i].toString().substring(0,4)} y:${yList[i].toString().substring(0,4)}\n";
         // Fimber.i('${classList.length}');
         // Fimber.i(resultStr);
       }
@@ -198,11 +248,16 @@ class UIDetector{
 
     }
 
-    return resultStr;
+    return false;
 
 
 
   }
+
+  int getCalculatorState(){
+    return _state;
+  }
+
 
 
 
