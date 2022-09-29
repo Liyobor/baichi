@@ -93,6 +93,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
 
     super.initState();
+
     config.compressFormat = CompressFormat.JPEG;
     snackBarController = SnackBarController(context: context);
 
@@ -160,18 +161,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 debugPrint("${details.globalPosition}");
               },
               child: Column(children: <Widget>[
-                // TextField(
-                //   decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-                //   controller: urlController,
-                //   keyboardType: TextInputType.url,
-                //   onSubmitted: (value) {
-                //     var url = Uri.parse(value);
-                //     if (url.scheme.isEmpty) {
-                //       url = Uri.parse("https://www.google.com/search?q=" + value);
-                //     }
-                //     webViewController?.loadUrl(urlRequest: URLRequest(url: url));
-                //   },
-                // ),
+                TextField(
+                  decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+                  controller: urlController,
+                  keyboardType: TextInputType.url,
+                  onSubmitted: (value) {
+                    var url = Uri.parse(value);
+                    if (url.scheme.isEmpty) {
+                      url = Uri.parse("https://www.google.com/search?q=" + value);
+                    }
+                    webViewController?.loadUrl(urlRequest: URLRequest(url: url));
+                  },
+                ),
                 Expanded(
                   child: Stack(
                     children: [
@@ -375,7 +376,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                                       //position =
                                       if(data!=null){
-                                        // Fimber.i("data len = ${data.length}");
+
+
+                                        // final result = await ImageGallerySaver.saveImage(data,quality: 100);
+
+                                        // Fimber.i("result  = $result");
                                         start = DateTime.now();
                                         image.Image? imageData = image.decodeImage(data);
                                         end = DateTime.now();
@@ -390,20 +395,22 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                           cardCalculator.playerButtonX = MediaQuery.of(context).size.width * uiDetector.playerButtonX;
                                           cardCalculator.playerButtonY = MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.playerButtonY));
 
-                                          playerButtonX = uiDetector.playerButtonX;
-                                          playerButtonY = uiDetector.playerButtonY;
+                                          // playerButtonX = uiDetector.playerButtonX;
+                                          // playerButtonY = uiDetector.playerButtonY;
 
                                           cardCalculator.bankButtonX = MediaQuery.of(context).size.width * uiDetector.bankButtonX;
                                           cardCalculator.bankButtonY = MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.bankButtonY));
 
-                                          bankButtonX = uiDetector.bankButtonX;
-                                          bankButtonY = uiDetector.bankButtonY;
+                                          // bankButtonX = uiDetector.bankButtonX;
+                                          // bankButtonY = uiDetector.bankButtonY;
 
-                                          cardCalculator.confirmButtonX = uiDetector.confirmButtonX;
-                                          cardCalculator.confirmButtonY = uiDetector.confirmButtonY;
+                                          cardCalculator.confirmButtonX = MediaQuery.of(context).size.width * uiDetector.confirmButtonX;
+                                          cardCalculator.confirmButtonY =  MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.confirmButtonY));
 
-                                          confirmButtonX = MediaQuery.of(context).size.width * uiDetector.confirmButtonX;
-                                          confirmButtonY =  MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.confirmButtonY));
+                                          // cardCalculator.confirmButtonX = uiDetector.confirmButtonX;
+                                          // cardCalculator.confirmButtonY = uiDetector.confirmButtonY;
+
+
 
                                           // if(cardCalculator.playerButtonY<0 || cardCalculator.playerButtonX<0){
                                           //   cardCalculator.playerButtonX = uiDetector.playerButtonX;
@@ -425,8 +432,20 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                           // snackBarController.showRecognizeResult(resultStr, 2000);
 
                                           if(isLaunchCardDetector && !cardDetectLock){
+                                            if(uiDetector.winSide == "bank"){
+                                              snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+                                            }
+                                            if(uiDetector.winSide == "player"){
+                                              snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+                                            }
+                                            if(uiDetector.winSide == "draw"){
+                                              snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+                                            }
 
-                                            snackBarController.showRecognizeResult("偵測到莊或閒勝，開始辨識撲克牌", 1200);
+                                            cardCalculator.checkWinOrLose(uiDetector.winSide);
+                                            uiDetector.winSide = null;
+
+
                                             List results = cardDetector.putImageIntoModel(imageData);
                                             String cardResult = cardDetector.resultStr;
                                             cardCalculator.insertCard(results);

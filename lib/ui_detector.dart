@@ -32,6 +32,8 @@ class UIDetector{
   List output1 = List<double>.filled(2535*8, 0.0);
 
   String resultStr = "";
+  String? winSide;
+
 
 
   List label = [
@@ -223,9 +225,20 @@ class UIDetector{
       _state = 1;
     }
 
-    if(classList.contains(1) || classList.contains(4)){
+    if(classList.contains(1)){
+      winSide = "bank";
       return true;
     }
+    if(classList.contains(4)){
+      winSide = "player";
+      return true;
+    }
+
+    if(classList.contains(5)){
+      winSide = "draw";
+      return true;
+    }
+
 
 
 
@@ -257,6 +270,7 @@ class UIDetector{
   int getCalculatorState(){
     return _state;
   }
+
 
 
 

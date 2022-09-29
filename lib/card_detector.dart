@@ -23,7 +23,7 @@ class CardDetector{
 
 
   List output0 = List<double>.filled(2535*4, 0.0);
-  List output1 = List<double>.filled(2535*13, 0.0);
+  List output1 = List<double>.filled(2535*10, 0.0);
 
 
 
@@ -59,7 +59,7 @@ class CardDetector{
     _inputType = _interpreter.getInputTensor(0).type;
     _outputType = _interpreter.getOutputTensor(0).type;
     output0 = output0.reshape([1,2535,4]);
-    output1 = output1.reshape([1,2535,13]);
+    output1 = output1.reshape([1,2535,10]);
     // Fimber.i('_inputType = $_inputType');
     // Fimber.i('_inputShape = $_inputShape');
     // Fimber.i('_outputShape0 = $_outputShape0');
@@ -114,11 +114,11 @@ class CardDetector{
     for(int i =0;i<2535;i++){
       double maxClass = 0;
       int detectedClass = -1;
-      final classes = List<double>.filled(13, 0.0);
-      for (int c = 0;c< 13;c++){
+      final classes = List<double>.filled(10, 0.0);
+      for (int c = 0;c< 10;c++){
         classes [c] = outScore[0][i][c];
       }
-      for (int c = 0;c<13;++c){
+      for (int c = 0;c<10;++c){
         if (classes[c] > maxClass){
           detectedClass = c;
           maxClass = classes[c];
@@ -133,7 +133,7 @@ class CardDetector{
         final double w = bboxes[0][i][2];
         final double h = bboxes[0][i][3];
 
-        final cardClass = detectedClass+1;
+        final cardClass = detectedClass;
         final x = max(0, xPos - w / 2)/416;
         final y = max(0, yPos - h / 2)/416;
 

@@ -19,6 +19,10 @@ class CardCalculator{
   double mobileWidth = -1.0;
   double webViewHeight = -1.0;
 
+  String? betSide;
+  String? winSide;
+  int betTimes = 1 ;
+
 
   bool isBetting = false;
   int _point = 0;
@@ -34,6 +38,7 @@ class CardCalculator{
   int _state = -1;
 
   var pointMap = <int,int>{
+    0:0,
     1:1,
     2:1,
     3:2,
@@ -43,10 +48,6 @@ class CardCalculator{
     7:-2,
     8:-1,
     9:0,
-    10:0,
-    11:0,
-    12:0,
-    13:0,
   };
 
   CardCalculator();
@@ -74,8 +75,12 @@ class CardCalculator{
     if(_state==2){
       _reset();
     }else if(_state ==1){
+
+
+
       _bet();
     }else if(_state==0){
+
       Fimber.i("stop betting!");
     }
     return true;
@@ -84,6 +89,7 @@ class CardCalculator{
   Future<void> _bet() async {
     Fimber.i("bet");
     if(bankButtonY < 0 || bankButtonX<0 ||playerButtonY<0 || playerButtonX<0 || confirmButtonX<0 || confirmButtonY<0 || webViewHeight<0 || mobileHeight<0 || mobileWidth<0){
+      Fimber.i("Button pos error!");
       return;
     }
     if(_state == 1){
@@ -91,63 +97,107 @@ class CardCalculator{
 
       isBetting = true;
 
-      await Future.delayed(const Duration(milliseconds: 1000));
+
+      await Future.delayed(const Duration(milliseconds: 100));
       if(_point>0){
         Fimber.i('betBank');
-        await betBank();
+        for (int i = 0; i < betTimes; i++){
+          await betBank();
+        }
       }else if(_point<0){
         Fimber.i('betPlayer');
-        await betPlayer();
+        for (int i = 0; i < betTimes; i++) {
+          await betPlayer();
+        }
       }
-      await bettingConfirm();
+      // await bettingConfirm();
+
+      betTimes = 31;
       isBetting = false;
     }
   }
   void _reset(){
     Fimber.i("reset");
     _point = 0;
+    betTimes=1;
   }
   void reset(){
     Fimber.i("public reset");
+    _reset();
     _state = -1;
   }
 
   Future<void> betBank() async {
     Fimber.i("betBank");
-    await Future.delayed(const Duration(milliseconds: 500));
+    Fimber.i("bankButton pos :$bankButtonX,$bankButtonY");
+    await Future.delayed(const Duration(milliseconds: 100));
     taper.handlePointerEvent(PointerDownEvent(
       position: Offset(bankButtonX, bankButtonY),
     ));
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 100));
     taper.handlePointerEvent(PointerUpEvent(
       position: Offset(bankButtonX, bankButtonY),
     ));
+    betSide = "bank";
 
   }
 
   Future<void> betPlayer() async {
     Fimber.i("betPlayer");
 
+    Fimber.i("playerButton pos :$playerButtonX,$playerButtonY");
+    await Future.delayed(const Duration(milliseconds: 100));
     taper.handlePointerEvent(PointerDownEvent(
       position: Offset(playerButtonX, playerButtonY),
     ));
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 100));
     taper.handlePointerEvent( PointerUpEvent(
       position: Offset(playerButtonX, playerButtonY),
     ));
+    betSide = "player";
   }
 
   Future<void> bettingConfirm() async {
     Fimber.i("bettingConfirm");
 
+    Fimber.i("confirmButton pos :$confirmButtonX,$confirmButtonY");
     taper.handlePointerEvent(PointerDownEvent(
       position: Offset(confirmButtonX, confirmButtonY),
     ));
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 200));
     taper.handlePointerEvent(PointerUpEvent(
       position: Offset(confirmButtonX, confirmButtonY),
     ));
+
   }
+
+  void checkWinOrLose(String? winSide){
+    if(winSide==null || betSide==null){
+      Fimber.i("winSide or betSide = null");
+      Fimber.i("betTimes didn't change!");
+      Fimber.i("betTimes = $betTimes");
+      return;
+    }
+    Fimber.i("winSide = $winSide");
+    Fimber.i("betSide = $betSide");
+
+    if(winSide == "draw"){
+      winSide = null;
+      betSide = null;
+      return;
+    }
+
+
+    if(winSide == betSide || betTimes > 32){
+      betTimes = 1;
+      Fimber.i("betTimes = 1");
+    }else{
+
+      Fimber.i("betTimes = ${betTimes * 2 + 1}");
+      betTimes = betTimes*2+1;
+    }
+  }
+
 
   void noBet(){
     return;
