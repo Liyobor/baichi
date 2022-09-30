@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 // import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -17,7 +16,7 @@ class UIDetector{
   late List<int> _outputShape0;
   late List<int> _outputShape1;
   late TfLiteType _inputType;
-  late TfLiteType _outputType;
+  // late TfLiteType _outputType;
   late TensorImage _inputImage;
 
   double playerButtonX = -1.0;
@@ -58,7 +57,7 @@ class UIDetector{
   int _state = 0;
 
 
-  late TensorBuffer _outputBuffer;
+  // late TensorBuffer _outputBuffer;
   // CardDetector({required this.ctx}) {
   //   _loadModel();
   //   if (kDebugMode) {
@@ -88,7 +87,7 @@ class UIDetector{
     _outputShape0 = _interpreter.getOutputTensor(0).shape;
     _outputShape1 = _interpreter.getOutputTensor(1).shape;
     _inputType = _interpreter.getInputTensor(0).type;
-    _outputType = _interpreter.getOutputTensor(0).type;
+    // _outputType = _interpreter.getOutputTensor(0).type;
     output0 = output0.reshape([1,2535,4]);
     output1 = output1.reshape([1,2535,8]);
     Fimber.i('_inputType = $_inputType');
@@ -100,27 +99,28 @@ class UIDetector{
 
   }
 
-  TensorImage _preProcess() {
-    // int cropSize = min(_inputImage.height, _inputImage.width);
-    return ImageProcessorBuilder()
-    // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
-        .add(ResizeOp(
-        _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
-        .add(NormalizeOp(0, 255))
-        .build()
-        .process(_inputImage);
-  }
+  // TensorImage _preProcess() {
+  //   // int cropSize = min(_inputImage.height, _inputImage.width);
+  //   return ImageProcessorBuilder()
+  //   // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+  //       .add(ResizeOp(
+  //       _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
+  //       .add(NormalizeOp(0, 255))
+  //       .build()
+  //       .process(_inputImage);
+  // }
 
-  bool putImageIntoModel(img.Image image)  {
-    _inputImage = TensorImage(_inputType);
+  Future<bool> putImageIntoModel(img.Image image)  async {
+    // _inputImage = TensorImage(_inputType);
 
-    _inputImage.loadImage(image);
+    // _inputImage.loadImage(image);
     // Fimber.i("_inputImage.height = ${_inputImage.height}");
     // Fimber.i("_inputImage.width = ${_inputImage.width}");
     // Fimber.i("_inputImage.image len= ${_inputImage.image.getBytes().length}");
     // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
 
-    _inputImage = _preProcess();
+    // _inputImage = _preProcess();
+    _inputImage = await compute(preProcess,[_inputShape[1], _inputShape[2],_inputType,image]);
     // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
 
 
@@ -143,6 +143,7 @@ class UIDetector{
     _interpreter.runForMultipleInputs([_inputImage.buffer], outputs);
     List bboxes = outputs[0]!;
     List outScore  = outputs[1]!;
+
     for(int i =0;i<2535;i++){
       double maxClass = 0;
       int detectedClass = -1;
@@ -277,4 +278,20 @@ class UIDetector{
 
 
 
+}
+
+TensorImage preProcess(List param) {
+  final _inputShape1 = param[0];
+  final _inputShape2 = param[1];
+  final inputImage = TensorImage(param[2]);
+  inputImage.loadImage(param[3]);
+
+  // int cropSize = min(_inputImage.height, _inputImage.width);
+  return ImageProcessorBuilder()
+  // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+      .add(ResizeOp(
+      _inputShape1, _inputShape2, ResizeMethod.NEAREST_NEIGHBOUR))
+      .add(NormalizeOp(0, 255))
+      .build()
+      .process(inputImage);
 }

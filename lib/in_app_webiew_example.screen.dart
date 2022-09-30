@@ -1,9 +1,6 @@
 import 'dart:collection';
-import 'dart:ffi';
 // import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:typed_data';
 
 // import 'dart:typed_data';
 import 'package:fimber/fimber.dart';
@@ -12,33 +9,24 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:untitled/card_calculator.dart';
-import 'package:untitled/converter.dart';
-import 'package:untitled/main.dart';
+import 'package:untitled/data_handler.dart';
 import 'package:untitled/snackbar_controller.dart';
 import 'package:untitled/ui_detector.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'card_detector.dart';
 import 'package:image/image.dart' as image;
 
-Future<void> isolateFun(SendPort p) async {
-  Fimber.clearAll();
-  Fimber.plantTree(DebugTree());
-  Fimber.i("zzz8787");
+Future<Uint8List?> takeScreenShot(List config) async {
+  return null;
 
-  final port =ReceivePort();
-  p.send(port.sendPort);
-  final message = await port.first as List;
-  final str = message[0] as UIDetector;
-  // final uiDetector = message[1];
-  final send = message[1] as SendPort;
-  send.send("QQ MENTAL");
-  // Isolate.exit(p,"zzz");
+  // var id = (Platform.isAndroid) ? contextMenuItemClicked.androidId : contextMenuItemClicked.iosId;
+
+  // InAppWebViewController webViewController = config[0];
+  // final screenshotConfiguration = config[1];
+  // return await webViewController.takeScreenshot(screenshotConfiguration: screenshotConfiguration);
 }
+
 
 class InAppWebViewExampleScreen extends StatefulWidget {
   const InAppWebViewExampleScreen({Key? key}) : super(key: key);
@@ -76,7 +64,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   final urlController = TextEditingController();
   CardDetector cardDetector = CardDetector();
   UIDetector uiDetector = UIDetector();
-  CardCalculator cardCalculator = CardCalculator();
+  DataHandler dataHandler = DataHandler();
 
   ScreenshotConfiguration config = ScreenshotConfiguration();
   late SnackBarController snackBarController;
@@ -84,6 +72,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   bool isUIDetectorRunning = false;
   bool isShowProgress = true;
   bool cardDetectLock = false;
+  String? html;
 
 
 
@@ -293,6 +282,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                           });
                         },
                         onConsoleMessage: (controller, consoleMessage) {
+                          html=null;
                           debugPrint('onConsoleMessage');
                           debugPrint("$consoleMessage");
                         },
@@ -324,14 +314,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                 onPressed: () async {
 
 
-
                                   isShowProgress = true;
                                   cardDetectLock = false;
 
                                   isUIDetectorRunning = !isUIDetectorRunning;
                                   if(!isUIDetectorRunning) {
                                     snackBarController.showRecognizeResult("停止辨識ui", 2000);
-                                    cardCalculator.reset();
+                                    dataHandler.reset();
                                   }
 
 
@@ -352,14 +341,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                     }
                                     isShowProgress = false;
 
-                                    if(!cardCalculator.isBetting){
-                                      var start = DateTime.now();
+                                    if(!dataHandler.isBetting){
+                                      // var start = DateTime.now();
                                       config.quality = 50;
 
 
+
+                                      // final setting = [webViewController.,config];
+                                      // final data = await compute(takeScreenShot,setting);
                                       Uint8List? data = await webViewController?.takeScreenshot(screenshotConfiguration: config);
 
-                                      var end = DateTime.now();
+                                      // var end = DateTime.now();
                                       // Fimber.i("time of take screen shot : ${end.difference(start).inMilliseconds/1000}s");
                                       // final ByteData bytes = await rootBundle.load('assets/images/img1.png');
                                       // final Uint8List data = bytes.buffer.asUint8List();
@@ -368,9 +360,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                       // Fimber.i("width = ${MediaQuery.of(context).size.width}");
                                       // Fimber.i("height = ${MediaQuery.of(context).size.height}");
                                       await webViewController?.getContentHeight().then((value) => {
-                                        cardCalculator.mobileWidth = MediaQuery.of(context).size.width,
-                                        cardCalculator.mobileHeight = MediaQuery.of(context).size.height,
-                                        cardCalculator.webViewHeight = value!.toDouble(),
+                                        dataHandler.mobileWidth = MediaQuery.of(context).size.width,
+                                        dataHandler.mobileHeight = MediaQuery.of(context).size.height,
+                                        dataHandler.webViewHeight = value!.toDouble(),
                                       });
 
 
@@ -381,31 +373,36 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                         // final result = await ImageGallerySaver.saveImage(data,quality: 100);
 
                                         // Fimber.i("result  = $result");
-                                        start = DateTime.now();
-                                        image.Image? imageData = image.decodeImage(data);
-                                        end = DateTime.now();
+                                        // start = DateTime.now();
+
+
+                                        // image.Image? imageData = image.decodeImage(data);
+
+                                        image.Image? imageData = await compute(decodeImage,data);
+                                        // end = DateTime.now();
                                         // Fimber.i("time of decodeImage : ${end.difference(start).inMilliseconds/1000}s");
                                         if(imageData!=null){
                                           // Fimber.i("len = ${imageData.length}");
-                                          start = DateTime.now();
+                                          // start = DateTime.now();
 
 
-                                          bool isLaunchCardDetector = uiDetector.putImageIntoModel(imageData);
-                                          String resultStr = uiDetector.resultStr;
-                                          cardCalculator.playerButtonX = MediaQuery.of(context).size.width * uiDetector.playerButtonX;
-                                          cardCalculator.playerButtonY = MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.playerButtonY));
+                                          bool isLaunchCardDetector = await uiDetector.putImageIntoModel(imageData);
+
+                                          // String resultStr = uiDetector.resultStr;
+                                          dataHandler.playerButtonX = MediaQuery.of(context).size.width * uiDetector.playerButtonX;
+                                          dataHandler.playerButtonY = MediaQuery.of(context).size.height - (dataHandler.webViewHeight*(1-uiDetector.playerButtonY));
 
                                           // playerButtonX = uiDetector.playerButtonX;
                                           // playerButtonY = uiDetector.playerButtonY;
 
-                                          cardCalculator.bankButtonX = MediaQuery.of(context).size.width * uiDetector.bankButtonX;
-                                          cardCalculator.bankButtonY = MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.bankButtonY));
+                                          dataHandler.bankButtonX = MediaQuery.of(context).size.width * uiDetector.bankButtonX;
+                                          dataHandler.bankButtonY = MediaQuery.of(context).size.height - (dataHandler.webViewHeight*(1-uiDetector.bankButtonY));
 
                                           // bankButtonX = uiDetector.bankButtonX;
                                           // bankButtonY = uiDetector.bankButtonY;
 
-                                          cardCalculator.confirmButtonX = MediaQuery.of(context).size.width * uiDetector.confirmButtonX;
-                                          cardCalculator.confirmButtonY =  MediaQuery.of(context).size.height - (cardCalculator.webViewHeight*(1-uiDetector.confirmButtonY));
+                                          dataHandler.confirmButtonX = MediaQuery.of(context).size.width * uiDetector.confirmButtonX;
+                                          dataHandler.confirmButtonY = MediaQuery.of(context).size.height - (dataHandler.webViewHeight*(1-uiDetector.confirmButtonY));
 
                                           // cardCalculator.confirmButtonX = uiDetector.confirmButtonX;
                                           // cardCalculator.confirmButtonY = uiDetector.confirmButtonY;
@@ -420,11 +417,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                           //   cardCalculator.bankButtonY = uiDetector.bankButtonY;
                                           // }
 
-                                          end = DateTime.now();
+                                          // end = DateTime.now();
                                           // Fimber.i("time of putImageIntoModel : ${end.difference(start).inMilliseconds/1000}s");
                                           int state = uiDetector.getCalculatorState();
                                           // Fimber.i("state = $state");
-                                          cardCalculator.refreshState(state);
+                                          dataHandler.refreshState(state);
                                           if(state == 1 && cardDetectLock){
                                             cardDetectLock = false;
                                           }
@@ -442,16 +439,21 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                               snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
                                             }
 
-                                            cardCalculator.checkWinOrLose(uiDetector.winSide);
+                                            dataHandler.checkWinOrLose(uiDetector.winSide);
                                             uiDetector.winSide = null;
 
-
-                                            List results = cardDetector.putImageIntoModel(imageData);
+                                            List value = await cardDetector.putImageIntoModel(imageData);
                                             String cardResult = cardDetector.resultStr;
-                                            cardCalculator.insertCard(results);
-                                            // await Future.delayed(const Duration(milliseconds: 1500));
+                                            dataHandler.insertCard(value);
                                             snackBarController.showRecognizeResult(cardResult, 2000);
                                             cardDetectLock = true;
+
+
+                                            // String cardResult = cardDetector.resultStr;
+                                            // cardCalculator.insertCard(results);
+                                            // // await Future.delayed(const Duration(milliseconds: 1500));
+                                            // snackBarController.showRecognizeResult(cardResult, 2000);
+                                            // cardDetectLock = true;
 
 
                                           }
@@ -480,55 +482,20 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                               ElevatedButton(
                                 child: const Icon(Icons.not_started),
                                 onPressed: () async {
-
-
-                                  // final p = ReceivePort();
-                                  // await Isolate.spawn(isolateFun,p.sendPort);
-                                  // final sendPort = await p.first as SendPort;
-                                  // final answer = ReceivePort();
-                                  // sendPort.send([uiDetector,answer.sendPort]);
-                                  // Fimber.i(await answer.first);
-
-                                  await Future.delayed(const Duration(milliseconds: 1000));
-                                  betBank();
-                                  bettingConfirm();
-
-
-                                  // var start = DateTime.now();
-                                  //
-                                  // config.quality = 30;
-                                  // Uint8List? data = await webViewController?.takeScreenshot(screenshotConfiguration: config);
-                                  // var end = DateTime.now();
-                                  // Fimber.i("time of take screen shot : ${end.difference(start).inMilliseconds/1000}s");
-                                  // // final ByteData bytes = await rootBundle.load('assets/images/img1.png');
-                                  // // final Uint8List data = bytes.buffer.asUint8List();
-                                  // Fimber.i("web view height = ${webViewController?.getContentHeight()}");
-                                  //
-                                  // Fimber.i("width = ${MediaQuery.of(context).size.width}");
-                                  // Fimber.i("height = ${MediaQuery.of(context).size.height}");
-                                  //
-                                  // if(data!=null){
-                                  //   Fimber.i("data len = ${data.length}");
-                                  //   start = DateTime.now();
-                                  //   image.Image? imageData = image.decodeImage(data);
-                                  //   end = DateTime.now();
-                                  //   Fimber.i("time of decodeImage : ${end.difference(start).inMilliseconds/1000}s");
-                                  //   if(imageData!=null){
-                                  //     Fimber.i("len = ${imageData.length}");
-                                  //     start = DateTime.now();
-                                  //     String resultStr = cardDetector.putImageIntoModel(imageData);
-                                  //     end = DateTime.now();
-                                  //     Fimber.i("time of putImageIntoModel : ${end.difference(start).inMilliseconds/1000}s");
-                                  //     showRecognizeResult(context, resultStr,3500);
-                                  //   }
-                                  //   // detector.putImageIntoModel(image.decodeImage(data));
-                                  //
-                                  //
-                                  //   // Fimber.i("height = ${Converter().convertUInt8List2Image(data).height}");
-                                  //   // Fimber.i("width = ${Converter().convertUInt8List2Image(data).width}");
-                                  // }
-
-
+                                  if(html==null){
+                                    webViewController?.getHtml().then((value) async {
+                                      // html = value;
+                                      if(value !=null){
+                                        final double? dollar = await compute(getMoneyInIsolate,value);
+                                        if (dollar!=null){
+                                          dataHandler.dollar = dollar;
+                                          snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+                                        }else{
+                                          snackBarController.showRecognizeResult("讀取不到金額", 1500);
+                                        }
+                                      }
+                                    });
+                                  }
                                 },
                               ),
                             ],
@@ -601,41 +568,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
 
 
-
-
-
-
-
-
-  Future<void> _showMyDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('AlertDialog Title'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text('This is a demo alert dialog.'),
-                Text('Would you like to approve of this message?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Approve'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-
-
 }
 
+
+image.Image? decodeImage(Uint8List data){
+  return image.decodeImage(data);
+}

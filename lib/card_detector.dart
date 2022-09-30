@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 // import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -10,14 +10,37 @@ import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
 // import 'package:image_gallery_saver/image_gallery_saver.dart';
 
+
+TensorImage preProcess(List param) {
+  final _inputShape1 = param[0];
+  final _inputShape2 = param[1];
+  final inputImage = TensorImage(param[2]);
+  inputImage.loadImage(param[3]);
+
+  // int cropSize = min(_inputImage.height, _inputImage.width);
+  return ImageProcessorBuilder()
+  // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+      .add(ResizeOp(
+      _inputShape1, _inputShape2, ResizeMethod.NEAREST_NEIGHBOUR))
+      .add(NormalizeOp(0, 255))
+      .build()
+      .process(inputImage);
+}
+
+
+
+
+
+
+
 class CardDetector{
   final _modelFile = 'card_detection.tflite';
   late Interpreter _interpreter;
   late List<int> _inputShape;
-  late List<int> _outputShape0;
-  late List<int> _outputShape1;
+  // late List<int> _outputShape0;
+  // late List<int> _outputShape1;
   late TfLiteType _inputType;
-  late TfLiteType _outputType;
+  // late TfLiteType _outputType;
   late TensorImage _inputImage;
   String resultStr = "";
 
@@ -27,7 +50,8 @@ class CardDetector{
 
 
 
-  late TensorBuffer _outputBuffer;
+  // late TensorBuffer _outputBuffer;
+
   // CardDetector({required this.ctx}) {
   //   _loadModel();
   //   if (kDebugMode) {
@@ -54,10 +78,10 @@ class CardDetector{
     // outputTensors = _interpreter.getOutputTensors();
 
     _inputShape = _interpreter.getInputTensor(0).shape;
-    _outputShape0 = _interpreter.getOutputTensor(0).shape;
-    _outputShape1 = _interpreter.getOutputTensor(1).shape;
+    // _outputShape0 = _interpreter.getOutputTensor(0).shape;
+    // _outputShape1 = _interpreter.getOutputTensor(1).shape;
     _inputType = _interpreter.getInputTensor(0).type;
-    _outputType = _interpreter.getOutputTensor(0).type;
+    // _outputType = _interpreter.getOutputTensor(0).type;
     output0 = output0.reshape([1,2535,4]);
     output1 = output1.reshape([1,2535,10]);
     // Fimber.i('_inputType = $_inputType');
@@ -69,27 +93,32 @@ class CardDetector{
 
   }
 
-  TensorImage _preProcess() {
-    // int cropSize = min(_inputImage.height, _inputImage.width);
-    return ImageProcessorBuilder()
-        // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
-        .add(ResizeOp(
-        _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
-        .add(NormalizeOp(0, 255))
-        .build()
-        .process(_inputImage);
-  }
+  // TensorImage _preProcess() {
+  //   // int cropSize = min(_inputImage.height, _inputImage.width);
+  //   return ImageProcessorBuilder()
+  //       // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+  //       .add(ResizeOp(
+  //       _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
+  //       .add(NormalizeOp(0, 255))
+  //       .build()
+  //       .process(_inputImage);
+  // }
 
-  List putImageIntoModel(img.Image image)  {
-    _inputImage = TensorImage(_inputType);
+  Future<List> putImageIntoModel(img.Image image)  async {
+    // _inputImage = TensorImage(_inputType);
 
-    _inputImage.loadImage(image);
+    // _inputImage.loadImage(image);
     // Fimber.i("_inputImage.height = ${_inputImage.height}");
     // Fimber.i("_inputImage.width = ${_inputImage.width}");
     // Fimber.i("_inputImage.image len= ${_inputImage.image.getBytes().length}");
     // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
 
-    _inputImage = _preProcess();
+    // _inputImage = _preProcess();
+
+
+    _inputImage = await compute(preProcess,[_inputShape[1], _inputShape[2],_inputType,image]);
+
+
     // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
 
 

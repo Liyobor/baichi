@@ -4,7 +4,7 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/gestures.dart';
 
-class CardCalculator{
+class DataHandler{
 
 
   double playerButtonX = -1.0;
@@ -26,6 +26,8 @@ class CardCalculator{
 
   bool isBetting = false;
   int _point = 0;
+
+  double dollar = -1;
 
   /*
   state
@@ -50,7 +52,7 @@ class CardCalculator{
     9:0,
   };
 
-  CardCalculator();
+  DataHandler();
 
   void insertCard(List cardList){
     for(var card in cardList){
@@ -112,7 +114,7 @@ class CardCalculator{
       }
       // await bettingConfirm();
 
-      betTimes = 31;
+      // betTimes = 31;
       isBetting = false;
     }
   }
@@ -130,11 +132,11 @@ class CardCalculator{
   Future<void> betBank() async {
     Fimber.i("betBank");
     Fimber.i("bankButton pos :$bankButtonX,$bankButtonY");
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 50));
     taper.handlePointerEvent(PointerDownEvent(
       position: Offset(bankButtonX, bankButtonY),
     ));
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 50));
     taper.handlePointerEvent(PointerUpEvent(
       position: Offset(bankButtonX, bankButtonY),
     ));
@@ -146,11 +148,11 @@ class CardCalculator{
     Fimber.i("betPlayer");
 
     Fimber.i("playerButton pos :$playerButtonX,$playerButtonY");
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 50));
     taper.handlePointerEvent(PointerDownEvent(
       position: Offset(playerButtonX, playerButtonY),
     ));
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 50));
     taper.handlePointerEvent( PointerUpEvent(
       position: Offset(playerButtonX, playerButtonY),
     ));
@@ -198,8 +200,24 @@ class CardCalculator{
     }
   }
 
-
   void noBet(){
     return;
   }
+}
+
+
+double? getMoneyInIsolate(String html) {
+  try{
+    int index = html.indexOf("userBalance");
+    String clip = html.substring(index);
+    int startIndex = clip.indexOf("NTD")+4;
+    String dollarStr = clip.substring(startIndex,clip.indexOf("</spa"));
+    dollarStr = dollarStr.replaceAll(",", "");
+    double dollar = double.parse(dollarStr);
+    return dollar;
+  }catch(e){
+    Fimber.i("error :$e");
+    return null;
+  }
+
 }
