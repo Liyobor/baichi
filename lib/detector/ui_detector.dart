@@ -2,7 +2,6 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
-import 'dart:math';
 import 'package:fimber/fimber.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
@@ -145,79 +144,91 @@ class UIDetector{
     List bboxes = outputs[0]!;
     List outScore  = outputs[1]!;
 
-    for(int i =0;i<2535;i++){
-      double maxClass = 0;
-      int detectedClass = -1;
-      final classes = List<double>.filled(8, 0.0);
-      for (int c = 0;c< 8;c++){
-        classes [c] = outScore[0][i][c];
-      }
-      for (int c = 0;c<8;++c){
-        if (classes[c] > maxClass){
-          detectedClass = c;
-          maxClass = classes[c];
-        }
-      }
-      final double score = maxClass;
-      if(score>0.7){
+    Map processedOutput = await compute(uiOutputProcess,[bboxes,outScore,_inputImage.width,_inputImage.height]);
 
+    classList = processedOutput['classList'];
+    xList = processedOutput['xList'];
+    yList = processedOutput['yList'];
+    bankButtonX = processedOutput['bankButtonX'];
+    bankButtonY = processedOutput['bankButtonY'];
+    playerButtonX = processedOutput['playerButtonX'];
+    playerButtonY = processedOutput['playerButtonY'];
+    confirmButtonX = processedOutput['confirmButtonX'];
+    confirmButtonY = processedOutput['confirmButtonY'];
 
-        final double xPos = bboxes[0][i][0];
-        final double yPos = bboxes[0][i][1];
-        final double w = bboxes[0][i][2];
-        final double h = bboxes[0][i][3];
-
-        final buttonClass = detectedClass;
-        final x = ((max(0, xPos - w / 2)/416)+(min(_inputImage.width - 1, xPos + w / 2)/416))/2;
-        final y = ((max(0, yPos - h / 2)/416)+(min(_inputImage.height - 1, yPos + h / 2)/416))/2;
-
-
-
-        // Fimber.i('---');
-        // Fimber.i('class = $buttonClass');
-        // Fimber.i('score = $score');
-        // Fimber.i('x = $x');
-        // Fimber.i('y = $y');
-
-
-        // var isDuplicate = false;
-        //
-        // for(var value in xList){
-        //   if(x - value <=0.02){
-        //     isDuplicate = true;
-        //   }
-        // }
-
-
-        xList.add(x);
-        yList.add(y);
-        classList.add(buttonClass);
-
-        if(buttonClass==0){
-          bankButtonX = x;
-          bankButtonY = y;
-        }else if(buttonClass==3){
-          playerButtonX = x;
-          playerButtonY = y;
-        }
-
-        if(buttonClass == 2){
-          confirmButtonX = x;
-          confirmButtonY = y;
-        }
-
-
-
-        // resultList.add([detectedClass+1,])
-        // Fimber.i('X MIN = ${min(_inputImage.width - 1, xPos + w / 2)/416}');
-        // Fimber.i('Y MIN = ${min(_inputImage.height - 1, yPos + h / 2)/416}');
-      }
-
-
-
-
-
-    }
+    // for(int i =0;i<2535;i++){
+    //   double maxClass = 0;
+    //   int detectedClass = -1;
+    //   final classes = List<double>.filled(8, 0.0);
+    //   for (int c = 0;c< 8;c++){
+    //     classes [c] = outScore[0][i][c];
+    //   }
+    //   for (int c = 0;c<8;++c){
+    //     if (classes[c] > maxClass){
+    //       detectedClass = c;
+    //       maxClass = classes[c];
+    //     }
+    //   }
+    //   final double score = maxClass;
+    //   if(score>0.7){
+    //
+    //
+    //     final double xPos = bboxes[0][i][0];
+    //     final double yPos = bboxes[0][i][1];
+    //     final double w = bboxes[0][i][2];
+    //     final double h = bboxes[0][i][3];
+    //
+    //     final buttonClass = detectedClass;
+    //     final x = ((max(0, xPos - w / 2)/416)+(min(_inputImage.width - 1, xPos + w / 2)/416))/2;
+    //     final y = ((max(0, yPos - h / 2)/416)+(min(_inputImage.height - 1, yPos + h / 2)/416))/2;
+    //
+    //
+    //
+    //     // Fimber.i('---');
+    //     // Fimber.i('class = $buttonClass');
+    //     // Fimber.i('score = $score');
+    //     // Fimber.i('x = $x');
+    //     // Fimber.i('y = $y');
+    //
+    //
+    //     // var isDuplicate = false;
+    //     //
+    //     // for(var value in xList){
+    //     //   if(x - value <=0.02){
+    //     //     isDuplicate = true;
+    //     //   }
+    //     // }
+    //
+    //
+    //     xList.add(x);
+    //     yList.add(y);
+    //     classList.add(buttonClass);
+    //
+    //     if(buttonClass==0){
+    //       bankButtonX = x;
+    //       bankButtonY = y;
+    //     }else if(buttonClass==3){
+    //       playerButtonX = x;
+    //       playerButtonY = y;
+    //     }
+    //
+    //     if(buttonClass == 2){
+    //       confirmButtonX = x;
+    //       confirmButtonY = y;
+    //     }
+    //
+    //
+    //
+    //     // resultList.add([detectedClass+1,])
+    //     // Fimber.i('X MIN = ${min(_inputImage.width - 1, xPos + w / 2)/416}');
+    //     // Fimber.i('Y MIN = ${min(_inputImage.height - 1, yPos + h / 2)/416}');
+    //   }
+    //
+    //
+    //
+    //
+    //
+    // }
 
     if(classList.contains(7)){
       _state = 0;

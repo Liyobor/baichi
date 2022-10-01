@@ -103,38 +103,6 @@ Drawer myDrawer({required BuildContext context}) {
   );
 }
 
-// class MyApp extends StatefulWidget {
-//   const MyApp({Key? key}) : super(key: key);
-//
-//
-//
-//   @override
-//   _MyAppState createState() => _MyAppState();
-// }
-//
-// class _MyAppState extends State<MyApp> {
-//   @override
-//   void initState() {
-//     super.initState();
-//   }
-//
-//   @override
-//   void dispose() {
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider(
-//       child: MaterialApp(
-//         debugShowCheckedModeBanner: false,
-//           initialRoute: '/', routes: {
-//         '/': (context) => const InAppWebViewExampleScreen(),
-//       }),
-//     );
-//   }
-// }
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -147,11 +115,6 @@ class MyApp extends StatelessWidget {
           initialRoute: '/', routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
       }
-        // title: 'Flutter Timer Demo',
-        // theme: ThemeData(
-        //   primarySwatch: Colors.blue,
-        // ),
-        // home: InAppWebViewExampleScreen(),
       ),
     );
   }

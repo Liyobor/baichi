@@ -21,16 +21,6 @@ import 'package:untitled/detector/card_detector.dart';
 import 'package:image/image.dart' as image;
 import 'package:provider/provider.dart';
 
-Future<Uint8List?> takeScreenShot(List config) async {
-  return null;
-
-  // var id = (Platform.isAndroid) ? contextMenuItemClicked.androidId : contextMenuItemClicked.iosId;
-
-  // InAppWebViewController webViewController = config[0];
-  // final screenshotConfiguration = config[1];
-  // return await webViewController.takeScreenshot(screenshotConfiguration: screenshotConfiguration);
-}
-
 class InAppWebViewExampleScreen extends StatefulWidget {
   const InAppWebViewExampleScreen({Key? key}) : super(key: key);
 
@@ -216,22 +206,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     },
                     onLoadStop: (controller, url) async {
                       Fimber.i("finished");
-                      // Fimber.i("width = ${MediaQuery.of(context).size.width}");
-                      // Fimber.i("height = ${MediaQuery.of(context).size.height}");
-                      Fimber.i("url = ${url.toString()}");
-                      // if(url.toString() == "https://www.bl868.net/mobile/"){
 
-                      // GestureBinding taper = GestureBinding.instance;
-                      // await Future.delayed(const Duration(milliseconds: 1000));
-                      // Fimber.i("tap");
-                      // taper.handlePointerEvent(const PointerDownEvent(
-                      //   position: Offset(285.4, 425.7),
-                      // ));
-                      // await Future.delayed(const Duration(milliseconds: 300));
-                      // taper.handlePointerEvent(const PointerUpEvent(
-                      //   position: Offset(285.4, 425.7),
-                      // ));
-                      // }
+                      Fimber.i("url = ${url.toString()}");
 
                       setState(() {
                         this.url = url.toString();
@@ -304,9 +280,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                 dataHandler.reset();
                               }
 
-                              // final port = ReceivePort();
-                              // final message = await port.first as List;
-
                               while (isUIDetectorRunning) {
                                 if (isShowProgress) {
                                   snackBarController.showRecognizeResult(
@@ -315,22 +288,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                 isShowProgress = false;
 
                                 if (!dataHandler.isBetting) {
-                                  // var start = DateTime.now();
                                   config.quality = 50;
 
-                                  // final setting = [webViewController.,config];
-                                  // final data = await compute(takeScreenShot,setting);
+                                  Fimber.i("take screen shot");
+
                                   Uint8List? data =
                                       await webViewController?.takeScreenshot(
                                           screenshotConfiguration: config);
 
-                                  // var end = DateTime.now();
-                                  // Fimber.i("time of take screen shot : ${end.difference(start).inMilliseconds/1000}s");
-                                  // final ByteData bytes = await rootBundle.load('assets/images/img1.png');
-                                  // final Uint8List data = bytes.buffer.asUint8List();
-
-                                  // Fimber.i("width = ${MediaQuery.of(context).size.width}");
-                                  // Fimber.i("height = ${MediaQuery.of(context).size.height}");
+                                  Fimber.i("screen shot finished");
                                   await webViewController
                                       ?.getContentHeight()
                                       .then((value) => {
@@ -346,28 +312,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                                 value!.toDouble(),
                                           });
 
-                                  //position =
                                   if (data != null) {
-                                    // final result = await ImageGallerySaver.saveImage(data,quality: 100);
-
-                                    // Fimber.i("result  = $result");
-                                    // start = DateTime.now();
-
-                                    // image.Image? imageData = image.decodeImage(data);
-
                                     image.Image? imageData =
                                         await compute(decodeImage, data);
-                                    // end = DateTime.now();
-                                    // Fimber.i("time of decodeImage : ${end.difference(start).inMilliseconds/1000}s");
-                                    if (imageData != null) {
-                                      // Fimber.i("len = ${imageData.length}");
-                                      // start = DateTime.now();
 
+                                    if (imageData != null) {
                                       bool isLaunchCardDetector =
                                           await uiDetector
                                               .putImageIntoModel(imageData);
 
-                                      // String resultStr = uiDetector.resultStr;
                                       dataHandler.playerButtonX =
                                           MediaQuery.of(context).size.width *
                                               uiDetector.playerButtonX;
@@ -378,9 +331,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                                       uiDetector
                                                           .playerButtonY));
 
-                                      // playerButtonX = uiDetector.playerButtonX;
-                                      // playerButtonY = uiDetector.playerButtonY;
-
                                       dataHandler.bankButtonX =
                                           MediaQuery.of(context).size.width *
                                               uiDetector.bankButtonX;
@@ -388,9 +338,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                           MediaQuery.of(context).size.height -
                                               (dataHandler.webViewHeight *
                                                   (1 - uiDetector.bankButtonY));
-
-                                      // bankButtonX = uiDetector.bankButtonX;
-                                      // bankButtonY = uiDetector.bankButtonY;
 
                                       dataHandler.confirmButtonX =
                                           MediaQuery.of(context).size.width *
@@ -401,29 +348,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                                   (1 -
                                                       uiDetector
                                                           .confirmButtonY));
-
-                                      // cardCalculator.confirmButtonX = uiDetector.confirmButtonX;
-                                      // cardCalculator.confirmButtonY = uiDetector.confirmButtonY;
-
-                                      // if(cardCalculator.playerButtonY<0 || cardCalculator.playerButtonX<0){
-                                      //   cardCalculator.playerButtonX = uiDetector.playerButtonX;
-                                      //   cardCalculator.playerButtonY = uiDetector.playerButtonY;
-                                      // }else if(cardCalculator.bankButtonX<0 || cardCalculator.bankButtonY<0){
-                                      //   cardCalculator.bankButtonX = uiDetector.bankButtonX;
-                                      //   cardCalculator.bankButtonY = uiDetector.bankButtonY;
-                                      // }
-
-                                      // end = DateTime.now();
-                                      // Fimber.i("time of putImageIntoModel : ${end.difference(start).inMilliseconds/1000}s");
                                       int state =
                                           uiDetector.getCalculatorState();
-                                      // Fimber.i("state = $state");
+
                                       dataHandler.refreshState(state);
                                       if (state == 1 && cardDetectLock) {
                                         cardDetectLock = false;
                                       }
-
-                                      // snackBarController.showRecognizeResult(resultStr, 2000);
 
                                       if (isLaunchCardDetector &&
                                           !cardDetectLock) {
@@ -458,19 +389,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                                         await ImageGallerySaver.saveImage(data,
                                             quality: 100);
-
-                                        // String cardResult = cardDetector.resultStr;
-                                        // cardCalculator.insertCard(results);
-                                        // // await Future.delayed(const Duration(milliseconds: 1500));
-                                        // snackBarController.showRecognizeResult(cardResult, 2000);
-                                        // cardDetectLock = true;
-
                                       }
                                     }
-                                    // detector.putImageIntoModel(image.decodeImage(data));
-
-                                    // Fimber.i("height = ${Converter().convertUInt8List2Image(data).height}");
-                                    // Fimber.i("width = ${Converter().convertUInt8List2Image(data).width}");
                                   }
                                 }
                                 await Future.delayed(
@@ -501,6 +421,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                     }
                                   }
                                 });
+                                html = null;
                               }
 
                               if (timer == null) {
@@ -542,7 +463,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                 fontSize: 20.0)),
                       ),
                     ],
-
                   ),
                 ],
               ),
