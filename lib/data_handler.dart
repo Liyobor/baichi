@@ -111,8 +111,11 @@ class DataHandler{
         for (int i = 0; i < betTimes; i++) {
           await betPlayer();
         }
+      }else{
+        Fimber.i("_point = 0");
+        betSide = null;
       }
-      // await bettingConfirm();
+      await bettingConfirm();
 
       // betTimes = 31;
       isBetting = false;
@@ -206,18 +209,3 @@ class DataHandler{
 }
 
 
-double? getMoneyInIsolate(String html) {
-  try{
-    int index = html.indexOf("userBalance");
-    String clip = html.substring(index);
-    int startIndex = clip.indexOf("NTD")+4;
-    String dollarStr = clip.substring(startIndex,clip.indexOf("</spa"));
-    dollarStr = dollarStr.replaceAll(",", "");
-    double dollar = double.parse(dollarStr);
-    return dollar;
-  }catch(e){
-    Fimber.i("error :$e");
-    return null;
-  }
-
-}

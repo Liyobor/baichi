@@ -4,7 +4,10 @@ import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/in_app_webiew_example.screen.dart';
+
+import 'utils/counter.dart';
 Future<void> _checkPermissions() async {
   if (Platform.isAndroid) {
     Map<Permission, PermissionStatus> statuses = await [
@@ -100,32 +103,56 @@ Drawer myDrawer({required BuildContext context}) {
   );
 }
 
-class MyApp extends StatefulWidget {
+// class MyApp extends StatefulWidget {
+//   const MyApp({Key? key}) : super(key: key);
+//
+//
+//
+//   @override
+//   _MyAppState createState() => _MyAppState();
+// }
+//
+// class _MyAppState extends State<MyApp> {
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
+//
+//   @override
+//   void dispose() {
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ChangeNotifierProvider(
+//       child: MaterialApp(
+//         debugShowCheckedModeBanner: false,
+//           initialRoute: '/', routes: {
+//         '/': (context) => const InAppWebViewExampleScreen(),
+//       }),
+//     );
+//   }
+// }
+
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
-
-
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-        initialRoute: '/', routes: {
-      '/': (context) => const InAppWebViewExampleScreen(),
-    });
+    return ChangeNotifierProvider(
+      create: (_) => Counter(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+          initialRoute: '/', routes: {
+        '/': (context) => const InAppWebViewExampleScreen(),
+      }
+        // title: 'Flutter Timer Demo',
+        // theme: ThemeData(
+        //   primarySwatch: Colors.blue,
+        // ),
+        // home: InAppWebViewExampleScreen(),
+      ),
+    );
   }
 }

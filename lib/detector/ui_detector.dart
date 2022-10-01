@@ -1,4 +1,3 @@
-
 // import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -7,51 +6,59 @@ import 'dart:math';
 import 'package:fimber/fimber.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
+import 'package:untitled/utils/isolate_function.dart';
 
 // import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-
-TensorImage preProcess(List param) {
-  final _inputShape1 = param[0];
-  final _inputShape2 = param[1];
-  final inputImage = TensorImage(param[2]);
-  inputImage.loadImage(param[3]);
-
-  // int cropSize = min(_inputImage.height, _inputImage.width);
-  return ImageProcessorBuilder()
-  // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
-      .add(ResizeOp(
-      _inputShape1, _inputShape2, ResizeMethod.NEAREST_NEIGHBOUR))
-      .add(NormalizeOp(0, 255))
-      .build()
-      .process(inputImage);
-}
-
-
-
-
-
-
-
-class CardDetector{
-  final _modelFile = 'card_detection.tflite';
+class UIDetector{
+  final _modelFile = 'ui_detection.tflite';
   late Interpreter _interpreter;
   late List<int> _inputShape;
-  // late List<int> _outputShape0;
-  // late List<int> _outputShape1;
+  late List<int> _outputShape0;
+  late List<int> _outputShape1;
   late TfLiteType _inputType;
   // late TfLiteType _outputType;
   late TensorImage _inputImage;
-  String resultStr = "";
+
+  double playerButtonX = -1.0;
+  double playerButtonY = -1.0;
+  double bankButtonX = -1.0;
+  double bankButtonY = -1.0;
+  double confirmButtonX = -1.0;
+  double confirmButtonY = -1.0;
 
 
   List output0 = List<double>.filled(2535*4, 0.0);
-  List output1 = List<double>.filled(2535*10, 0.0);
+  List output1 = List<double>.filled(2535*8, 0.0);
 
+  String resultStr = "";
+  String? winSide;
+
+
+
+  List label = [
+    "莊家",
+    "莊家勝",
+    "確定",
+    "閒家",
+    "閒家勝",
+    "平手",
+    "洗牌中",
+    "非下注時間",
+  ];
+
+  /*
+  state
+  0 = 辨識牌
+  1 = 下注
+  2 = 洗牌
+  出現 莊勝或是閒勝時候 切換state = 0
+  計算完再下注期間進行操作
+   */
+  int _state = 0;
 
 
   // late TensorBuffer _outputBuffer;
-
   // CardDetector({required this.ctx}) {
   //   _loadModel();
   //   if (kDebugMode) {
@@ -60,10 +67,10 @@ class CardDetector{
   //   // debugPrint("model init");
   // }
 
-  CardDetector() {
+  UIDetector() {
     _loadModel();
 
-    Fimber.i("CardDetector init");
+    Fimber.i("UIDetector init");
 
     // debugPrint("model init");
   }
@@ -71,23 +78,23 @@ class CardDetector{
   void _loadModel() async {
     _interpreter = await Interpreter.fromAsset(_modelFile);
     // debugPrint('Interpreter loaded successfully');
-    if (kDebugMode) {
-      print('Interpreter loaded successfully');
-    }
+
+    Fimber.i('Interpreter loaded successfully');
+
     // inputTensors = _interpreter.getInputTensors();
     // outputTensors = _interpreter.getOutputTensors();
 
     _inputShape = _interpreter.getInputTensor(0).shape;
-    // _outputShape0 = _interpreter.getOutputTensor(0).shape;
-    // _outputShape1 = _interpreter.getOutputTensor(1).shape;
+    _outputShape0 = _interpreter.getOutputTensor(0).shape;
+    _outputShape1 = _interpreter.getOutputTensor(1).shape;
     _inputType = _interpreter.getInputTensor(0).type;
     // _outputType = _interpreter.getOutputTensor(0).type;
     output0 = output0.reshape([1,2535,4]);
-    output1 = output1.reshape([1,2535,10]);
-    // Fimber.i('_inputType = $_inputType');
-    // Fimber.i('_inputShape = $_inputShape');
-    // Fimber.i('_outputShape0 = $_outputShape0');
-    // Fimber.i('_outputShape1 = $_outputShape1');
+    output1 = output1.reshape([1,2535,8]);
+    Fimber.i('_inputType = $_inputType');
+    Fimber.i('_inputShape = $_inputShape');
+    Fimber.i('_outputShape0 = $_outputShape0');
+    Fimber.i('_outputShape1 = $_outputShape1');
 
     // _outputBuffer = TensorBuffer.createFixedSize(_outputShape, _outputType);
 
@@ -96,7 +103,7 @@ class CardDetector{
   // TensorImage _preProcess() {
   //   // int cropSize = min(_inputImage.height, _inputImage.width);
   //   return ImageProcessorBuilder()
-  //       // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+  //   // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
   //       .add(ResizeOp(
   //       _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
   //       .add(NormalizeOp(0, 255))
@@ -104,7 +111,7 @@ class CardDetector{
   //       .process(_inputImage);
   // }
 
-  Future<List> putImageIntoModel(img.Image image)  async {
+  Future<bool> putImageIntoModel(img.Image image)  async {
     // _inputImage = TensorImage(_inputType);
 
     // _inputImage.loadImage(image);
@@ -114,11 +121,7 @@ class CardDetector{
     // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
 
     // _inputImage = _preProcess();
-
-
     _inputImage = await compute(preProcess,[_inputShape[1], _inputShape[2],_inputType,image]);
-
-
     // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
 
 
@@ -136,18 +139,20 @@ class CardDetector{
 
     var classList = [];
     var xList = [];
+    var yList = [];
     // _interpreter.run(_inputImage.buffer, _outputBuffer.getBuffer());
     _interpreter.runForMultipleInputs([_inputImage.buffer], outputs);
     List bboxes = outputs[0]!;
     List outScore  = outputs[1]!;
+
     for(int i =0;i<2535;i++){
       double maxClass = 0;
       int detectedClass = -1;
-      final classes = List<double>.filled(10, 0.0);
-      for (int c = 0;c< 10;c++){
+      final classes = List<double>.filled(8, 0.0);
+      for (int c = 0;c< 8;c++){
         classes [c] = outScore[0][i][c];
       }
-      for (int c = 0;c<10;++c){
+      for (int c = 0;c<8;++c){
         if (classes[c] > maxClass){
           detectedClass = c;
           maxClass = classes[c];
@@ -162,77 +167,113 @@ class CardDetector{
         final double w = bboxes[0][i][2];
         final double h = bboxes[0][i][3];
 
-        final cardClass = detectedClass;
-        final x = max(0, xPos - w / 2)/416;
-        final y = max(0, yPos - h / 2)/416;
+        final buttonClass = detectedClass;
+        final x = ((max(0, xPos - w / 2)/416)+(min(_inputImage.width - 1, xPos + w / 2)/416))/2;
+        final y = ((max(0, yPos - h / 2)/416)+(min(_inputImage.height - 1, yPos + h / 2)/416))/2;
 
 
 
         // Fimber.i('---');
-        // Fimber.i('class = $cardClass');
+        // Fimber.i('class = $buttonClass');
         // Fimber.i('score = $score');
         // Fimber.i('x = $x');
         // Fimber.i('y = $y');
 
 
-        var isDuplicate = false;
-        if(y>0.63 && y<0.65){
+        // var isDuplicate = false;
+        //
+        // for(var value in xList){
+        //   if(x - value <=0.02){
+        //     isDuplicate = true;
+        //   }
+        // }
 
 
-          for(var value in xList){
-            if(x - value <=0.02){
-              isDuplicate = true;
-            }
-          }
+        xList.add(x);
+        yList.add(y);
+        classList.add(buttonClass);
 
-          if(!isDuplicate) {
-            xList.add(x);
-            classList.add(cardClass);
-          }
+        if(buttonClass==0){
+          bankButtonX = x;
+          bankButtonY = y;
+        }else if(buttonClass==3){
+          playerButtonX = x;
+          playerButtonY = y;
         }
+
+        if(buttonClass == 2){
+          confirmButtonX = x;
+          confirmButtonY = y;
+        }
+
+
+
         // resultList.add([detectedClass+1,])
-        // Fimber.i('${min(_inputImage.width - 1, xPos + w / 2)/416}');
-        // Fimber.i('${min(_inputImage.height - 1, yPos + h / 2)/416}');
+        // Fimber.i('X MIN = ${min(_inputImage.width - 1, xPos + w / 2)/416}');
+        // Fimber.i('Y MIN = ${min(_inputImage.height - 1, yPos + h / 2)/416}');
       }
+
 
 
 
 
     }
 
-    List result = [];
+    if(classList.contains(7)){
+      _state = 0;
+    }else if(classList.contains(6)){
+      _state = 2;
+    }else{
+      _state = 1;
+    }
+
+    if(classList.contains(1)){
+      winSide = "bank";
+      return true;
+    }
+    if(classList.contains(4)){
+      winSide = "player";
+      return true;
+    }
+
+    if(classList.contains(5)){
+      winSide = "draw";
+      return true;
+    }
+
+
+
+
+
+
 
     if(xList.isEmpty){
-      Fimber.i("didn't find card");
-      resultStr = "didn't find card";
+      Fimber.i("didn't find button");
+      resultStr = "didn't find button";
       // showRecognizeResult(ctx,"didn't find card");
     }else{
       resultStr = "";
-      String cardClass = "";
-      // String carPos = "";
       for(int i = 0;i<classList.length;i++){
-
-        result.add(classList[i]);
-
-
-        cardClass += classList[i].toString()+",";
-        // carPos += xList[i].toString().substring(0,4)+",";
+        resultStr += "${label[classList[i]]} x:${xList[i].toString().substring(0,4)} y:${yList[i].toString().substring(0,4)}\n";
+        // Fimber.i('${classList.length}');
+        // Fimber.i(resultStr);
       }
 
-      // showRecognizeResult(ctx,"偵測到撲克牌:$cardClass  x位置分別在$carPos");
-      resultStr = "偵測到撲克牌:$cardClass";
 
 
     }
 
-    return result;
+    return false;
 
 
 
   }
 
-
+  int getCalculatorState(){
+    return _state;
+  }
 
 
 
 }
+
