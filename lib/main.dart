@@ -6,8 +6,11 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/in_app_webiew_example.screen.dart';
-
+import 'package:untitled/utils/api_handler.dart';
+import 'package:workmanager/workmanager.dart';
 import 'utils/counter.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 Future<void> _checkPermissions() async {
   if (Platform.isAndroid) {
     Map<Permission, PermissionStatus> statuses = await [
@@ -25,14 +28,15 @@ Future<void> _checkPermissions() async {
 
 
 
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Permission.camera.request();
   // await Permission.microphone.request();
   // await Permission.storage.request();
-  await _checkPermissions();
   Fimber.clearAll();
   Fimber.plantTree(DebugTree());
+  await _checkPermissions();
 
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
@@ -56,11 +60,27 @@ Future main() async {
     }
   }
 
-
+  //
+  // Workmanager().initialize(
+  //     callbackDispatcher, // The top level function, aka callbackDispatcher
+  //     isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+  // );
 
   runApp(const MyApp());
 }
 
+// void callbackDispatcher() {
+//   ApiHandler apiHandler = ApiHandler();
+//   Workmanager().executeTask((task, inputData) async {
+//     switch(task){
+//       case "callApiWhenDispose" :
+//         debugPrint("callApiWhenDispose");
+//         apiHandler.check2WhenDispose();
+//         apiHandler.debtApiWhenDispose();
+//     }
+//     return Future.value(true);
+//   });
+// }
 
 
 Drawer myDrawer({required BuildContext context}) {
@@ -111,6 +131,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => Counter(),
       child: MaterialApp(
+        builder: EasyLoading.init(),
         debugShowCheckedModeBanner: false,
           initialRoute: '/', routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
