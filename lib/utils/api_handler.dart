@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:fimber/fimber.dart';
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:untitled/utils/counter.dart';
+import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+
+
 class ApiHandler{
 
   final _httpClient = HttpClient();
@@ -17,6 +19,11 @@ class ApiHandler{
   String returnMsg = "請聯繫客服" ;
 
   bool isRoutineCheckRunning = false;
+  Counter counter = Counter();
+
+
+  EncryptedSharedPreferences encryptedSharedPreferences = EncryptedSharedPreferences();
+  dynamic pref;
 
 
   // 1 is running,0 is stop
@@ -28,13 +35,24 @@ class ApiHandler{
     return uuidGenerator.v4().toString();
   }
 
-  Future<void> getUuid() async {
-    final prefs = await SharedPreferences.getInstance();
+  ApiHandler()  {
+    encryptedSharedPreferences.getInstance().then((value) => pref=value);
+}
 
-    uuid = prefs.getString('uuid');
+  Future<void> getUuid() async {
+
+    if(!pref.containsKey('uuid')){
+      uuid = _generateUuid();
+      await encryptedSharedPreferences.setString('uuid', uuid!);
+    }else{
+      uuid = await encryptedSharedPreferences.getString('uuid');
+    }
+    // uuid = await encryptedSharedPreferences.getString('uuid');
+    // uuid = prefs.getString('uuid');
     if(uuid==null){
       uuid = _generateUuid();
-      await prefs.setString('uuid', uuid!);
+      await encryptedSharedPreferences.setString('uuid', uuid!);
+      // await prefs.setString('uuid', uuid!);
     }
     Fimber.i("uuid = $uuid");
   }
@@ -109,6 +127,7 @@ class ApiHandler{
   }
 
   Future<bool?> routineCheck() async{
+    Fimber.i("counter.count = ${counter.count}");
     int timestamp = DateTime.now().millisecondsSinceEpoch~/1000;
     await getUuid();
     final jwt = JWT(
@@ -120,6 +139,7 @@ class ApiHandler{
           'exps': 120,
           'act': isCalculatorRunning
         });
+    Fimber.i("isCalculatorRunning = $isCalculatorRunning");
     final token = jwt.sign(SecretKey(r'G"cUpXG*2s}~&XLg$Bo#h8wnwl!>r7sX2vC('));
     var uri = Uri.http('bigwinners.cc', '/api/baccarat/check2', {'d': token});
     var request = await _httpClient.getUrl(uri);
@@ -129,9 +149,12 @@ class ApiHandler{
     try {
       // Verify a token
       final jwt = JWT.verify(data['data']['d'], SecretKey(r'G"cUpXG*2s}~&XLg$Bo#h8wnwl!>r7sX2vC('));
+      code = jwt.payload["response_code"];
       // final jwt = JWT.verify(data['data']['d'],);
       // Fimber.i("SecretKey = ${SecretKey(r'G"cUpXG*2s}~&XLg$Bo#h8wnwl!>r7sX2vC(').key}");
       Fimber.i('Payload: ${jwt.payload}');
+
+      Fimber.i("${jwt.payload["response_code"]}");
       // if(jwt)
     } on JWTExpiredError {
       Fimber.i('jwt expired');

@@ -9,6 +9,7 @@ class SnackBarController{
 
   void showRecognizeResult(String text,int milliseconds) {
     final scaffold = ScaffoldMessenger.of(context);
+    scaffold.clearSnackBars();
     scaffold.showSnackBar(
       SnackBar(
         content: Text(text),

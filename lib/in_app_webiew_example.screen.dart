@@ -23,6 +23,7 @@ import 'package:image/image.dart' as image;
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+
 var _snackBarPresenting = false;
 
 class InAppWebViewExampleScreen extends StatefulWidget {
@@ -72,6 +73,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   bool isShowProgress = true;
   bool cardDetectLock = false;
   String? html;
+
+  double money = -1;
+
+  int paidTime = 5;
 
   @override
   void initState() {
@@ -148,11 +153,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           },
           child: WillPopScope(
             onWillPop: () async {
-              if (_snackBarPresenting){
+              if (_snackBarPresenting) {
                 EasyLoading.show(status: '與伺服器同步狀態中...');
                 await apiHandler.check2WhenCloseApp();
                 await apiHandler.debtApiWhenCloseApp();
-                EasyLoading.dismiss();
+                // EasyLoading.dismiss();
                 return true;
               }
               _snackBarPresenting = true;
@@ -289,7 +294,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         ? LinearProgressIndicator(value: progress)
                         : Container(),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.83,
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: ButtonBar(
@@ -301,25 +306,87 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                 webViewController?.goBack();
                               },
                             ),
+                            SizedBox(
+                              height: 35,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(3),
+                                child: Stack(
+                                  children: [
+                                    if(counter.count>=paidTime)
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(color: Colors.blue),
+                                      ),
+                                    )else Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(color: Colors.grey),
+                                      ),
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          if(counter.count>=paidTime){
+                                            //do operation that calculate fee then call api to generate bills
+                                            catchMoney();
+                                            counter.resetTimer();
+                                          }
+                                        },
+                                        child:const Text("繳費",style: TextStyle(color: Colors.white),))
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 35,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(3),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(color: Colors.blue),
+
+                                      ),
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+
+                                            if (apiHandler.userPassCode != null) {
+                                              if (apiHandler.code == 1) {
+                                                Fimber.i("code = ${apiHandler.code}");
+                                                wmProcess();
+                                              } else {
+                                                Fimber.i("code = ${apiHandler.code}");
+                                                apiHandler.checkServeState().then((value) {
+                                                  Fimber.i("value = $value");
+                                                  if(value == "clear"){
+                                                  wmProcess();
+                                                  }else{
+                                                    snackBarController.showRecognizeResult(
+                                                        apiHandler.returnMsg, 3000);
+                                                  }
+
+                                                });
+
+                                              }
+                                            } else {
+                                              _displayTextInputDialog(context);
+                                            }
+                                          });
+
+
+                                        }, child:
+                                        (isUIDetectorRunning) ? const Text("停止辨識",style: TextStyle(color: Colors.white)) : const Text("開始辨識",style: TextStyle(color: Colors.white))
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
                             ElevatedButton(
                               child: const Icon(Icons.refresh),
                               onPressed: () async {
-                                if (apiHandler.userPassCode != null) {
-                                  if (apiHandler.code == 1) {
-                                    Fimber.i("code = ${apiHandler.code}");
-                                    wmProcess();
-                                  } else {
-                                    Fimber.i("code = ${apiHandler.code}");
-                                    // apiHandler.checkServeState().then((value) {
-                                    //   Fimber.i("value = $value");
-                                    //   if(value == "clear"){
-                                    //   wmProcess();
-                                    // }});
-                                    snackBarController.showRecognizeResult(apiHandler.returnMsg, 3000);
-                                  }
-                                } else {
-                                  _displayTextInputDialog(context);
-                                }
+
+
 
                                 // webViewController?.reload();
                               },
@@ -327,6 +394,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             ElevatedButton(
                               child: const Icon(Icons.not_started),
                               onPressed: () async {
+
                                 apiHandler.routineCheck();
                               },
                             ),
@@ -334,25 +402,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         ),
                       ),
                     ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Text('時間剩餘:xx - ${counter.count}秒',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
-                                  fontSize: 20.0)),
-                        ),
-                        const Align(
-                          alignment: Alignment.topRight,
-                          child: Text('服務費:xx',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
-                                  fontSize: 20.0)),
-                        ),
-                      ],
+                    IgnorePointer (
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child:
+                        // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                          Text('使用時間剩餘:${(7200- counter.count)}秒',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                                fontSize: 20.0)),
+                      ),
                     ),
                   ],
                 ),
@@ -362,15 +422,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         )));
   }
 
-  void startTimer(){
+  void startTimer() {
     if (timer == null) {
       Fimber.i('Start Timer');
-      timer = Timer.periodic(
-          const Duration(seconds: 1), (_) {
+      timer = Timer.periodic(const Duration(seconds: 1), (_) {
         setState(() {
-          Provider.of<Counter>(context,
-              listen: false)
-              .addCount();
+          Provider.of<Counter>(context, listen: false).addCount();
         });
       });
     } else {
@@ -380,43 +437,94 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     }
   }
 
-  void catchMoney(){
+  void stopTimer(){
+    if(timer!=null){
+      Fimber.i('Stop Timer');
+      timer?.cancel();
+      timer = null;
+    }
+  }
+
+
+
+
+  void calculateFee(){
+
+  }
+
+  Future<double> catchMoney() {
     if (html == null) {
-      webViewController
-          ?.getHtml()
-          .then((value) async {
+      webViewController?.getHtml().then((value) async {
         // html = value;
         if (value != null) {
-          final double? dollar = await compute(
-              getMoneyInIsolate, value);
+          final double? dollar = await compute(getMoneyInIsolate, value);
           if (dollar != null) {
-            dataHandler.dollar = dollar;
-            snackBarController.showRecognizeResult(
-                "現在金額:$dollar", 1500);
+            // dataHandler.dollar = dollar;
+            snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+            html = null;
+            return dollar;
           } else {
-            snackBarController.showRecognizeResult(
-                "讀取不到金額", 1500);
+            snackBarController.showRecognizeResult("讀取不到金額", 1500);
+            html = null;
+            return -1;
           }
         }
       });
-      html = null;
+    }
+    return Future.value(-1.0);
+  }
+
+  Future<void> startRoutineCheck() async {
+    while(isUIDetectorRunning){
+      apiHandler.routineCheck();
+      await Future.delayed(const Duration(seconds: 10));
     }
   }
 
   void wmProcess() async {
     isShowProgress = true;
     cardDetectLock = false;
-
     isUIDetectorRunning = !isUIDetectorRunning;
     if (!isUIDetectorRunning) {
       apiHandler.isCalculatorRunning = 0;
-      snackBarController.showRecognizeResult("停止辨識ui", 2000);
-      dataHandler.reset();
-    }
-
-    while (isUIDetectorRunning) {
       apiHandler.routineCheck();
+      snackBarController.showRecognizeResult("停止辨識ui", 2000);
+      stopTimer();
+      dataHandler.reset();
+    }else{
       apiHandler.isCalculatorRunning = 1;
+      startRoutineCheck();
+      startTimer();
+      // apiHandler.routineCheck();
+    }
+    while (isUIDetectorRunning) {
+
+      if(apiHandler.code != 1){
+        apiHandler.isCalculatorRunning = 0;
+        apiHandler.routineCheck();
+        setState(() {
+          isUIDetectorRunning = false;
+        });
+
+        snackBarController.showRecognizeResult("response_code !=1\n停止辨識ui", 2000);
+        stopTimer();
+        dataHandler.reset();
+        break;
+      }
+      Counter counter = Counter();
+      if(counter.count>=7200){
+        apiHandler.isCalculatorRunning = 0;
+        apiHandler.routineCheck();
+        setState(() {
+          isUIDetectorRunning = false;
+        });
+        snackBarController.showRecognizeResult("使用時間到!\n停止辨識ui", 2000);
+        stopTimer();
+        dataHandler.reset();
+        break;
+      }
+
+
       if (isShowProgress) {
         snackBarController.showRecognizeResult("開始辨識ui!", 2000);
       }
@@ -523,11 +631,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 onPressed: () {
                   setState(() {
                     apiHandler.userPassCode = valueText;
-
                     Navigator.pop(context);
                     apiHandler.checkServeState().then((value) {
-                      if(apiHandler.code == 0){
-                        snackBarController.showRecognizeResult(apiHandler.returnMsg, 3000);
+                      if (apiHandler.code == 0) {
+                        snackBarController.showRecognizeResult(
+                            apiHandler.returnMsg, 3000);
                       }
 
                       if (value == "clear") {

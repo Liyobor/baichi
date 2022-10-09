@@ -24,7 +24,6 @@ class DataHandler{
   bool isBetting = false;
   int _point = 0;
 
-  double dollar = -1;
 
   /*
   state
