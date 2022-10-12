@@ -25,6 +25,7 @@ class DataHandler{
   int _point = 0;
 
 
+
   /*
   state
   0 = 辨識牌
