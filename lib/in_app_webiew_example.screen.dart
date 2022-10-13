@@ -273,24 +273,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                         return NavigationActionPolicy.ALLOW;
                       },
-                      // onAjaxReadyStateChange: (controller, ajaxRequest) async {
-                      //   if (ajaxRequest.url.toString().contains('php')) {
-                      //     final title = await controller.getTitle();
-                      //     Fimber.i("AJAX DONE");
-                      //     Fimber.i("title = $title");
-                      //     catchMoney();
-                      //   }
-                      //   return AjaxRequestAction.PROCEED;
-                      // },
-                      onLoadStop: (controller, url) async {
-                        // Fimber.i("onLoadStop");
 
-                        // Fimber.i("url = ${url.toString()}");
-                        // controller.getTitle().then((value) {
-                        //   if (value == "WM") {
-                        //     catchMoney().then((value) => money = value);
-                        //   }
-                        // });
+                      onLoadStop: (controller, url) async {
+
 
                         setState(() {
                           this.url = url.toString();
@@ -389,12 +374,48 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                         ),
                                       ),
                                     TextButton(
-                                        onPressed: () {
+                                        onPressed: () async {
                                           if (counter.count >= paidTime) {
 
-                                            //do operation that calculate fee then call api to generate bills
-                                            counter.resetTimer();
-                                            selfEncryptedSharedPreference.saveRemainTime();
+                                            catchMoney().then((value) async {
+                                              if(value <0){
+                                                final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                if(tempFee != null){
+                                                  double lastFee = double.parse(tempFee);
+                                                  Fimber.i("lastFee = $lastFee");
+                                                  fee += lastFee;
+                                                }
+                                              } else {
+                                                fee += (value - money) / 10;
+                                                final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                Fimber.i("Fee = $fee");
+                                                if(tempFee != null){
+                                                  double lastFee = double.parse(tempFee);
+                                                  Fimber.i("lastFee = $lastFee");
+                                                  fee += lastFee;
+                                                }
+                                              }
+
+
+
+
+                                              if(fee>=1000){
+                                                _stopWmProcess();
+                                                await apiHandler.debtApi(fee.toInt());
+                                                selfEncryptedSharedPreference.setFee(0.0);
+                                              }else if (fee<=0){
+                                                counter.resetTimer();
+                                                selfEncryptedSharedPreference.setFee(0.0);
+                                                selfEncryptedSharedPreference.saveRemainTime();
+                                              }else{
+                                                counter.resetTimer();
+                                                selfEncryptedSharedPreference.setFee(fee);
+                                                Fimber.i("setFee = $fee");
+                                                selfEncryptedSharedPreference.saveRemainTime();
+                                              }
+                                              fee = 0;
+                                              money = value;
+                                            });
                                           }
                                         },
                                         child: const Text(
@@ -543,41 +564,32 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   }
 
   Future<void> startRoutineCheck() async {
+    var timeCount = 579;
     while (isUIDetectorRunning) {
-      apiHandler.routineCheck();
-      catchMoney().then((value) async {
-        if(value <0){
-          _stopWmProcess();
-          return;
-        }
-        fee += (value - money) / 10;
-        final tempFee = await selfEncryptedSharedPreference.getFee();
-        Fimber.i("Fee = $fee");
-        if(tempFee != null){
-          double lastFee = double.parse(tempFee);
-          Fimber.i("lastFee = $lastFee");
-          fee += lastFee;
-        }
-        selfEncryptedSharedPreference.setFee(fee);
-        Fimber.i("setFee = $fee");
-
-        // if (!pref.containsKey('fee')) {
-        //   encryptedSharedPreferences.setString('fee', fee.toString());
-        // } else {
-        //   Fimber.i("money = $money");
-        //   // String tempFee = await encryptedSharedPreferences.getString('fee');
-        //   Fimber.i(tempFee);
-        //   // double lastFee = double.parse(await encryptedSharedPreferences.getString('fee'));
-        //   Fimber.i("lastFee = $lastFee");
-        //   fee += lastFee;
-        //   encryptedSharedPreferences.remove('fee');
-        //   encryptedSharedPreferences.setString('fee', fee.toString());
-        //   Fimber.i("setFee = $fee");
-        // }
-      });
-
-
-      await Future.delayed(const Duration(seconds: 600));
+      timeCount+=1;
+      if(timeCount==580){
+        apiHandler.routineCheck();
+        catchMoney().then((value) async {
+          if(value <0){
+            _stopWmProcess();
+            return;
+          }
+          fee += (value - money) / 10;
+          final tempFee = await selfEncryptedSharedPreference.getFee();
+          Fimber.i("Fee = $fee");
+          if(tempFee != null){
+            double lastFee = double.parse(tempFee);
+            Fimber.i("lastFee = $lastFee");
+            fee += lastFee;
+          }
+          selfEncryptedSharedPreference.setFee(fee);
+          Fimber.i("setFee = $fee");
+          fee = 0;
+          money = value;
+          timeCount=0;
+        });
+      }
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 
@@ -626,8 +638,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       }
       Counter counter = Counter();
       if (counter.count >= 7200) {
-        _stopWmProcess();
-        break;
+        selfEncryptedSharedPreference.getFee().then((value) async {
+          if(value!=null){
+            final feeInt = int.parse(value);
+            if(feeInt>=1000){
+              _stopWmProcess();
+              await apiHandler.debtApi(feeInt);
+              selfEncryptedSharedPreference.setFee(0.0);
+              return;
+            }else if(feeInt<=0){
+              counter.resetTimer();
+              selfEncryptedSharedPreference.setFee(0.0);
+            }
+            else{
+              counter.resetTimer();
+            }
+          }
+          });
       }
 
       if (isShowProgress) {

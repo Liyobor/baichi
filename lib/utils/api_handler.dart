@@ -104,18 +104,27 @@ class ApiHandler{
     var responseBody = await response.transform(utf8.decoder).join();
     Map data = json.decode(responseBody);
     Fimber.i("data = $data");
+    if(data['code']==1){
+
+    }
     // debugPrint("data = $data");
   }
 
 
   Future<void> debtApi (int fee) async{
 
-    var uri = Uri.http('bigwinners.cc', '/api/baccarat/debt', {'code': userPassCode,'debt':fee.toString()});
+    var uri = Uri.http('bigwinners.cc', '/api/baccarat/debt', {'code': userPassCode,'debt':fee});
     var request = await _httpClient.getUrl(uri);
     var response = await request.close();
     var responseBody = await response.transform(utf8.decoder).join();
     Map data = json.decode(responseBody);
     Fimber.i("data = $data");
+    if(data['code'] == 1){
+      final Uri _url = Uri.parse(data["data"]["checkout_link"]);
+      _launchUrl(_url);
+    }
+
+
     // debugPrint("data = $data");
   }
 

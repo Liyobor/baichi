@@ -57,15 +57,6 @@ class UIDetector{
   int _state = 0;
 
 
-  // late TensorBuffer _outputBuffer;
-  // CardDetector({required this.ctx}) {
-  //   _loadModel();
-  //   if (kDebugMode) {
-  //     print("model init");
-  //   }
-  //   // debugPrint("model init");
-  // }
-
   UIDetector() {
     _loadModel();
 
@@ -80,8 +71,6 @@ class UIDetector{
 
     Fimber.i('Interpreter loaded successfully');
 
-    // inputTensors = _interpreter.getInputTensors();
-    // outputTensors = _interpreter.getOutputTensors();
 
     _inputShape = _interpreter.getInputTensor(0).shape;
     _outputShape0 = _interpreter.getOutputTensor(0).shape;
@@ -95,42 +84,13 @@ class UIDetector{
     Fimber.i('_outputShape0 = $_outputShape0');
     Fimber.i('_outputShape1 = $_outputShape1');
 
-    // _outputBuffer = TensorBuffer.createFixedSize(_outputShape, _outputType);
-
   }
 
-  // TensorImage _preProcess() {
-  //   // int cropSize = min(_inputImage.height, _inputImage.width);
-  //   return ImageProcessorBuilder()
-  //   // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
-  //       .add(ResizeOp(
-  //       _inputShape[1], _inputShape[2], ResizeMethod.NEAREST_NEIGHBOUR))
-  //       .add(NormalizeOp(0, 255))
-  //       .build()
-  //       .process(_inputImage);
-  // }
+
 
   Future<bool> putImageIntoModel(img.Image image)  async {
-    // _inputImage = TensorImage(_inputType);
 
-    // _inputImage.loadImage(image);
-    // Fimber.i("_inputImage.height = ${_inputImage.height}");
-    // Fimber.i("_inputImage.width = ${_inputImage.width}");
-    // Fimber.i("_inputImage.image len= ${_inputImage.image.getBytes().length}");
-    // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
-
-    // _inputImage = _preProcess();
     _inputImage = await compute(preProcess,[_inputShape[1], _inputShape[2],_inputType,image]);
-    // Fimber.i("_inputImage.image data= ${_inputImage.buffer.asFloat32List()}");
-
-
-
-    // Fimber.i("_inputImage.image len= ${_inputImage.image.getBytes().length}");
-    // Fimber.i("_inputImage.height = ${_inputImage.height}");
-    // Fimber.i("_inputImage.width = ${_inputImage.width}");
-    // Fimber.i("_outputBuffer = ${_outputBuffer.getBuffer()}");
-    // Fimber.i("_inputImage = ${_inputImage.buffer.asFloat32List()}");
-
 
 
 
@@ -139,7 +99,7 @@ class UIDetector{
     var classList = [];
     var xList = [];
     var yList = [];
-    // _interpreter.run(_inputImage.buffer, _outputBuffer.getBuffer());
+
     _interpreter.runForMultipleInputs([_inputImage.buffer], outputs);
     List bboxes = outputs[0]!;
     List outScore  = outputs[1]!;
@@ -156,79 +116,6 @@ class UIDetector{
     confirmButtonX = processedOutput['confirmButtonX'];
     confirmButtonY = processedOutput['confirmButtonY'];
 
-    // for(int i =0;i<2535;i++){
-    //   double maxClass = 0;
-    //   int detectedClass = -1;
-    //   final classes = List<double>.filled(8, 0.0);
-    //   for (int c = 0;c< 8;c++){
-    //     classes [c] = outScore[0][i][c];
-    //   }
-    //   for (int c = 0;c<8;++c){
-    //     if (classes[c] > maxClass){
-    //       detectedClass = c;
-    //       maxClass = classes[c];
-    //     }
-    //   }
-    //   final double score = maxClass;
-    //   if(score>0.7){
-    //
-    //
-    //     final double xPos = bboxes[0][i][0];
-    //     final double yPos = bboxes[0][i][1];
-    //     final double w = bboxes[0][i][2];
-    //     final double h = bboxes[0][i][3];
-    //
-    //     final buttonClass = detectedClass;
-    //     final x = ((max(0, xPos - w / 2)/416)+(min(_inputImage.width - 1, xPos + w / 2)/416))/2;
-    //     final y = ((max(0, yPos - h / 2)/416)+(min(_inputImage.height - 1, yPos + h / 2)/416))/2;
-    //
-    //
-    //
-    //     // Fimber.i('---');
-    //     // Fimber.i('class = $buttonClass');
-    //     // Fimber.i('score = $score');
-    //     // Fimber.i('x = $x');
-    //     // Fimber.i('y = $y');
-    //
-    //
-    //     // var isDuplicate = false;
-    //     //
-    //     // for(var value in xList){
-    //     //   if(x - value <=0.02){
-    //     //     isDuplicate = true;
-    //     //   }
-    //     // }
-    //
-    //
-    //     xList.add(x);
-    //     yList.add(y);
-    //     classList.add(buttonClass);
-    //
-    //     if(buttonClass==0){
-    //       bankButtonX = x;
-    //       bankButtonY = y;
-    //     }else if(buttonClass==3){
-    //       playerButtonX = x;
-    //       playerButtonY = y;
-    //     }
-    //
-    //     if(buttonClass == 2){
-    //       confirmButtonX = x;
-    //       confirmButtonY = y;
-    //     }
-    //
-    //
-    //
-    //     // resultList.add([detectedClass+1,])
-    //     // Fimber.i('X MIN = ${min(_inputImage.width - 1, xPos + w / 2)/416}');
-    //     // Fimber.i('Y MIN = ${min(_inputImage.height - 1, yPos + h / 2)/416}');
-    //   }
-    //
-    //
-    //
-    //
-    //
-    // }
 
     if(classList.contains(7)){
       _state = 0;
@@ -283,8 +170,6 @@ class UIDetector{
   int getCalculatorState(){
     return _state;
   }
-
-
 
 }
 
