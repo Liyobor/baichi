@@ -30,7 +30,7 @@ TensorImage preProcess(List param) {
 }
 
 
-double? getMoneyInIsolate(String html) {
+double? wmGetMoneyInIsolate(String html) {
   try{
     int index = html.indexOf("userBalance");
     String clip = html.substring(index);
@@ -45,6 +45,8 @@ double? getMoneyInIsolate(String html) {
   }
 
 }
+
+
 
 
 Map<String,dynamic> uiOutputProcess(List input){
@@ -79,7 +81,7 @@ Map<String,dynamic> uiOutputProcess(List input){
       }
     }
     final double score = maxClass;
-    if(score>0.7){
+    if(score>0.9){
 
 
       final double xPos = bboxes[0][i][0];

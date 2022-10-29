@@ -19,12 +19,12 @@ class UIDetector{
   // late TfLiteType _outputType;
   late TensorImage _inputImage;
 
-  double playerButtonX = -1.0;
-  double playerButtonY = -1.0;
-  double bankButtonX = -1.0;
-  double bankButtonY = -1.0;
-  double confirmButtonX = -1.0;
-  double confirmButtonY = -1.0;
+  double playerButtonX = 0.23;
+  double playerButtonY = 0.56;
+  double bankButtonX = 0.78;
+  double bankButtonY = 0.56;
+  double confirmButtonX = 0.65;
+  double confirmButtonY = 0.75;
 
 
   List output0 = List<double>.filled(2535*4, 0.0);
@@ -33,6 +33,7 @@ class UIDetector{
   String resultStr = "";
   String? winSide;
 
+  String errorStr = "";
 
 
   List label = [
@@ -109,12 +110,25 @@ class UIDetector{
     classList = processedOutput['classList'];
     xList = processedOutput['xList'];
     yList = processedOutput['yList'];
-    bankButtonX = processedOutput['bankButtonX'];
-    bankButtonY = processedOutput['bankButtonY'];
-    playerButtonX = processedOutput['playerButtonX'];
-    playerButtonY = processedOutput['playerButtonY'];
-    confirmButtonX = processedOutput['confirmButtonX'];
-    confirmButtonY = processedOutput['confirmButtonY'];
+
+    // bankButtonX = processedOutput['bankButtonX'];
+    // Fimber.i('bankButtonX = $bankButtonX');
+    // bankButtonY = processedOutput['bankButtonY'];
+    // Fimber.i('bankButtonY = $bankButtonY');
+    // playerButtonX = processedOutput['playerButtonX'];
+    // Fimber.i('playerButtonX = $playerButtonX');
+    // playerButtonY = processedOutput['playerButtonY'];
+    // Fimber.i('playerButtonY = $playerButtonY');
+    // confirmButtonX = processedOutput['confirmButtonX'];
+    // Fimber.i('confirmButtonX = $confirmButtonX');
+    // confirmButtonY = processedOutput['confirmButtonY'];
+    // Fimber.i('confirmButtonY = $confirmButtonY');
+
+
+
+
+
+
 
 
     if(classList.contains(7)){
@@ -154,7 +168,22 @@ class UIDetector{
       for(int i = 0;i<classList.length;i++){
         resultStr += "${label[classList[i]]} x:${xList[i].toString().substring(0,4)} y:${yList[i].toString().substring(0,4)}\n";
         // Fimber.i('${classList.length}');
-        // Fimber.i(resultStr);
+
+        // if(classList[i] == 3 && xList[i].toString().substring(0,4)!="0.20" &&yList[i].toString().substring(0,4)!="0.55"){
+        //   Fimber.i("button error");
+        //   resultStr = "button error";
+        //   errorStr+=",bank";
+        // }
+        // if(classList[i] == 0 && xList[i].toString().substring(0,4)!="0.79" &&yList[i].toString().substring(0,4)!="0.55"){
+        //   Fimber.i("button error");
+        //   resultStr = "button error";
+        //   errorStr+=",player";
+        // }
+        // if(classList[i] == 2 && xList[i].toString().substring(0,4)!="0.65" &&yList[i].toString().substring(0,4)!="0.75"){
+        //   Fimber.i("button error");
+        //   resultStr = "button error";
+        //   errorStr+=",confirm";
+        // }
       }
 
 

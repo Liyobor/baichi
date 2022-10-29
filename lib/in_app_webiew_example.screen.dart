@@ -3,7 +3,6 @@ import 'dart:collection';
 // import 'dart:convert';
 import 'dart:io';
 
-// import 'dart:typed_data';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,14 +16,11 @@ import 'package:untitled/utils/isolate_function.dart';
 import 'package:untitled/utils/self_encrypted_shared_preferences.dart';
 import 'package:untitled/utils/snackbar_controller.dart';
 import 'package:untitled/detector/ui_detector.dart';
-// import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:untitled/detector/card_detector.dart';
 import 'package:image/image.dart' as image;
 import 'package:provider/provider.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
 var _snackBarPresenting = false;
 
@@ -71,16 +67,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
   final TextEditingController _textFieldController = TextEditingController();
 
-
   ScreenshotConfiguration config = ScreenshotConfiguration();
   late SnackBarController snackBarController;
-  SelfEncryptedSharedPreference selfEncryptedSharedPreference = SelfEncryptedSharedPreference();
+  SelfEncryptedSharedPreference selfEncryptedSharedPreference =
+      SelfEncryptedSharedPreference();
 
   bool isUIDetectorRunning = false;
   bool isShowProgress = true;
   bool cardDetectLock = false;
   String? html;
-
 
   double money = -1;
   double fee = 0;
@@ -110,8 +105,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
         onCreateContextMenu: (hitTestResult) async {
           Fimber.i("onCreateContextMenu");
-          Fimber.i("${hitTestResult.extra}");
-          Fimber.i("${await webViewController?.getSelectedText()}");
+          // Fimber.i("${hitTestResult.extra}");
+          // Fimber.i("${await webViewController?.getSelectedText()}");
         },
         onHideContextMenu: () {
           Fimber.i("onHideContextMenu");
@@ -170,8 +165,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 return true;
               }
               _snackBarPresenting = true;
-              var snackBar = const SnackBar(
-                  content: Text('再次點擊back關閉app，若想在背景運行應用程式，請點擊home鍵'));
+              var snackBar = const SnackBar(content: Text('再次點擊back關閉app'));
               ScaffoldMessenger.of(context)
                   .showSnackBar(snackBar)
                   .closed
@@ -206,11 +200,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       initialOptions: options,
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
-                        // Fimber.i("onLoadResource");
+                        Fimber.i("onLoadResource");
                         // Fimber.i("resource.url = ${resource.url}");
-                        if(resource.url.toString().contains("iframe_101")){
-
-                          catchMoney().then((value) {
+                        if (resource.url.toString().contains("iframe_101")) {
+                          wmCatchMoney().then((value) {
                             money = value.toDouble();
                             Fimber.i("value = $value");
                             Fimber.i('set money');
@@ -218,28 +211,28 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           });
                         }
                       },
-                      onPageCommitVisible: (controller, url){
-                        // Fimber.i("onPageCommitVisible");
+                      onPageCommitVisible: (controller, url) {
+                        Fimber.i("onPageCommitVisible");
                       },
-                      onWindowFocus:(controller){
-                        // Fimber.i("onWindowFocus");
+                      onWindowFocus: (controller) {
+                        Fimber.i("onWindowFocus");
                       },
-                      onWindowBlur: (controller){
-                        // Fimber.i("onWindowBlur");
+                      onWindowBlur: (controller) {
+                        Fimber.i("onWindowBlur");
                       },
                       onWebViewCreated: (controller) {
                         webViewController = controller;
                         counter.initCount();
                       },
                       onLoadStart: (controller, url) {
-                        // Fimber.i('onLoadStart');
+                        Fimber.i('onLoadStart');
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
                         });
                       },
                       onAjaxProgress: (controller, ajaxRequest) async {
-                        // Fimber.i('onAjaxProgress');
+                        Fimber.i('onAjaxProgress');
                         // Fimber.i('${ajaxRequest.status}');
                         return AjaxRequestAction.PROCEED;
                       },
@@ -275,12 +268,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       },
 
                       onLoadStop: (controller, url) async {
-
-
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
                         });
+                        
+                        
                       },
                       onLoadError: (controller, url, code, message) {
                         pullToRefreshController.endRefreshing();
@@ -329,8 +322,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       },
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
-                        // Fimber.i('onConsoleMessage');
-                        // Fimber.i("$consoleMessage");
+                        Fimber.i('onConsoleMessage');
+                        Fimber.i("$consoleMessage");
                       },
                       onCreateWindow: (controller, createWindowRequest) async {
                         Fimber.i("onCreateWindow");
@@ -376,43 +369,58 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     TextButton(
                                         onPressed: () async {
                                           if (counter.count >= paidTime) {
-
-                                            catchMoney().then((value) async {
-                                              if(value <0){
-                                                final tempFee = await selfEncryptedSharedPreference.getFee();
-                                                if(tempFee != null){
-                                                  double lastFee = double.parse(tempFee);
-                                                  Fimber.i("lastFee = $lastFee");
+                                            wmCatchMoney().then((value) async {
+                                              if (value < 0) {
+                                                final tempFee =
+                                                    await selfEncryptedSharedPreference
+                                                        .getFee();
+                                                if (tempFee != null) {
+                                                  double lastFee =
+                                                      double.parse(tempFee);
+                                                  Fimber.i(
+                                                      "lastFee = $lastFee");
                                                   fee += lastFee;
                                                 }
                                               } else {
                                                 fee += (value - money) / 10;
-                                                final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                final tempFee =
+                                                    await selfEncryptedSharedPreference
+                                                        .getFee();
                                                 Fimber.i("Fee = $fee");
-                                                if(tempFee != null){
-                                                  double lastFee = double.parse(tempFee);
-                                                  Fimber.i("lastFee = $lastFee");
+                                                if (tempFee != null) {
+                                                  double lastFee =
+                                                      double.parse(tempFee);
+                                                  Fimber.i(
+                                                      "lastFee = $lastFee");
                                                   fee += lastFee;
                                                 }
                                               }
 
-
-
-
-                                              if(fee>=1000){
+                                              Fimber.i("after calc fee =$fee");
+                                              if (fee >= 1000) {
                                                 _stopWmProcess();
-                                                await apiHandler.debtApi(fee.toInt());
-                                                selfEncryptedSharedPreference.setFee(0.0);
-                                              }else if (fee<=0){
+                                                await apiHandler.debtApi(fee.toInt()).then((value){
+                                                  if(value){
+                                                    selfEncryptedSharedPreference
+                                                        .setFee(0.0);
+                                                  }
+                                                });
+
+                                              } else if (fee <= 0) {
                                                 counter.resetTimer();
-                                                selfEncryptedSharedPreference.setFee(0.0);
-                                                selfEncryptedSharedPreference.saveRemainTime();
-                                              }else{
+                                                selfEncryptedSharedPreference
+                                                    .setFee(0.0);
+                                                selfEncryptedSharedPreference
+                                                    .saveRemainTime();
+                                              } else {
                                                 counter.resetTimer();
-                                                selfEncryptedSharedPreference.setFee(fee);
+                                                selfEncryptedSharedPreference
+                                                    .setFee(fee);
                                                 Fimber.i("setFee = $fee");
-                                                selfEncryptedSharedPreference.saveRemainTime();
+                                                selfEncryptedSharedPreference
+                                                    .saveRemainTime();
                                               }
+
                                               fee = 0;
                                               money = value;
                                             });
@@ -446,7 +454,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                               if (apiHandler.code == 1) {
                                                 Fimber.i(
                                                     "code = ${apiHandler.code}");
-                                                wmProcess();
+                                                apiHandler
+                                                    .checkServeState()
+                                                    .then((value) {
+                                                  if (value == "clear") {
+                                                    wmProcess();
+                                                  } else {
+                                                    Fimber.i(
+                                                        'checkServeState 0 returnMsg show');
+                                                    _showReturnMessageDialog(
+                                                        apiHandler.returnMsg);
+                                                  }
+                                                });
                                               } else {
                                                 Fimber.i(
                                                     "code = ${apiHandler.code}");
@@ -457,11 +476,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                   if (value == "clear") {
                                                     wmProcess();
                                                   } else {
-                                                    snackBarController
-                                                        .showRecognizeResult(
-                                                            apiHandler
-                                                                .returnMsg,
-                                                            3000);
+                                                    Fimber.i(
+                                                        'checkServeState 1 returnMsg show');
+                                                    _showReturnMessageDialog(
+                                                        apiHandler.returnMsg);
                                                   }
                                                 });
                                               }
@@ -481,26 +499,70 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                 ),
                               ),
                             ),
-                            ElevatedButton(
-                              child: const Icon(Icons.refresh),
-                              onPressed: () async {
-
-                                // webViewController?.reload();
-                              },
+                            // ElevatedButton(
+                            //   child: const Icon(Icons.refresh),
+                            //   onPressed: () async {
+                            //     _showReturnMessageDialog(apiHandler.returnMsg);
+                            //   },
+                            // ),
+                            SizedBox(
+                              height: 35,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(3),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                            color: Colors.blue),
+                                      ),
+                                    ),
+                                    TextButton(
+                                        onPressed: () async {
+                                          launchUrlString(
+                                              'https://line.me/ti/p/@516wvzjp');
+                                        },
+                                        child: const Text(
+                                          "聯繫客服",
+                                          style: TextStyle(color: Colors.white),
+                                        ))
+                                  ],
+                                ),
+                              ),
                             ),
-                            ElevatedButton(
-                              child: const Icon(Icons.not_started),
-                              onPressed: () async {
-                                apiHandler.routineCheck();
-                              },
-                            ),
+                            //dg test
+                            // SizedBox(
+                            //   height: 35,
+                            //   child: ClipRRect(
+                            //     borderRadius: BorderRadius.circular(3),
+                            //     child: Stack(
+                            //       children: [
+                            //         Positioned.fill(
+                            //           child: Container(
+                            //             decoration: const BoxDecoration(
+                            //                 color: Colors.blue),
+                            //           ),
+                            //         ),
+                            //         TextButton(
+                            //             onPressed: () async {
+                            //               dgCatchMoney();
+                            //             },
+                            //             child: const Text(
+                            //               "test",
+                            //               style: TextStyle(color: Colors.white),
+                            //             )
+                            //         )
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
                     ),
                     IgnorePointer(
                       child: Align(
-                        alignment: Alignment.topRight,
+                        alignment: Alignment.bottomCenter,
                         child:
                             // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
                             Text('使用時間剩餘:${(7200 - counter.count)}秒',
@@ -541,19 +603,26 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     }
   }
 
-  void calculateFee() {}
+  // Future<double> dgCatchMoney() async {
+  //   // webViewController?.getTRexRunnerHtml().then((value) => debugPrint("getTRexRunnerHtml = $value"));
+  //   // webViewController?.getTRexRunnerCss().then((value) => debugPrint("getTRexRunnerCss = $value"));
+  //   // webViewController?.getMetaTags().then((value) => debugPrint("getMetaTags = $value"));
+  //   // webViewController?.getSelectedText().then((value) => debugPrint("getSelectedText = $value"));
+  //   webViewController?.evaluateJavascript(source: 'getGameVersion()').then((value) => debugPrint("getGameVersion = $value"));
+  //
+  //   return -1;
+  // }
 
-  Future<double> catchMoney() async {
+  Future<double> wmCatchMoney() async {
     if (html == null) {
-
       String? html = await webViewController?.getHtml();
-      if(html!=null){
-        final double? dollar = await compute(getMoneyInIsolate, html);
-        if(dollar!=null){
+      if (html != null) {
+        final double? dollar = await compute(wmGetMoneyInIsolate, html);
+        if (dollar != null) {
           snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
           html = null;
           return dollar;
-        }else{
+        } else {
           snackBarController.showRecognizeResult("讀取不到金額", 1500);
           html = null;
           return -1;
@@ -563,21 +632,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     return -1;
   }
 
-  Future<void> startRoutineCheck() async {
-    var timeCount = 579;
+  Future<void> wmStartRoutineCheck() async {
+    var timeCount = 449;
     while (isUIDetectorRunning) {
-      timeCount+=1;
-      if(timeCount==580){
+      timeCount += 1;
+      if (timeCount == 450) {
         apiHandler.routineCheck();
-        catchMoney().then((value) async {
-          if(value <0){
+        wmCatchMoney().then((value) async {
+          if (value < 0) {
             _stopWmProcess();
             return;
           }
+          Fimber.i("money = $money");
+          Fimber.i("value = $value");
           fee += (value - money) / 10;
           final tempFee = await selfEncryptedSharedPreference.getFee();
           Fimber.i("Fee = $fee");
-          if(tempFee != null){
+          if (tempFee != null) {
             double lastFee = double.parse(tempFee);
             Fimber.i("lastFee = $lastFee");
             fee += lastFee;
@@ -586,21 +657,26 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           Fimber.i("setFee = $fee");
           fee = 0;
           money = value;
-          timeCount=0;
+          timeCount = 0;
         });
       }
       await Future.delayed(const Duration(seconds: 1));
     }
   }
 
-  void _stopWmProcess(){
+  void _stopWmProcess() {
     apiHandler.isCalculatorRunning = 0;
-    apiHandler.routineCheck();
+    apiHandler.routineCheck().then((value) {
+      if (value == 0) {
+        Fimber.i('routineCheck 2 returnMsg show');
+        _showReturnMessageDialog(apiHandler.returnMsg);
+      }
+      apiHandler.returnMsg = "出錯了! 請聯繫客服";
+    });
     setState(() {
       isUIDetectorRunning = false;
     });
-    snackBarController.showRecognizeResult(
-        "停止辨識", 2000);
+    snackBarController.showRecognizeResult("停止辨識", 2000);
     stopTimer();
     dataHandler.reset();
   }
@@ -608,7 +684,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   void wmProcess() async {
     isShowProgress = true;
     cardDetectLock = false;
-    isUIDetectorRunning = !isUIDetectorRunning;
+    setState(() {
+      isUIDetectorRunning = !isUIDetectorRunning;
+    });
     if (!isUIDetectorRunning) {
       apiHandler.isCalculatorRunning = 0;
       apiHandler.routineCheck();
@@ -617,44 +695,35 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       dataHandler.reset();
     } else {
       apiHandler.isCalculatorRunning = 1;
-      startRoutineCheck();
+      wmStartRoutineCheck();
       startTimer();
       // apiHandler.routineCheck();
     }
     while (isUIDetectorRunning) {
       if (apiHandler.code != 1) {
         _stopWmProcess();
-        // apiHandler.isCalculatorRunning = 0;
-        // apiHandler.routineCheck();
-        // setState(() {
-        //   isUIDetectorRunning = false;
-        // });
-        //
-        // snackBarController.showRecognizeResult(
-        //     "response_code !=1\n停止辨識ui", 2000);
-        // stopTimer();
-        // dataHandler.reset();
         break;
       }
       Counter counter = Counter();
       if (counter.count >= 7200) {
         selfEncryptedSharedPreference.getFee().then((value) async {
-          if(value!=null){
+          if (value != null) {
             final feeInt = int.parse(value);
-            if(feeInt>=1000){
+            if (feeInt >= 1000) {
               _stopWmProcess();
-              await apiHandler.debtApi(feeInt);
-              selfEncryptedSharedPreference.setFee(0.0);
+              bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
+              if(ifDebtApiSuccess){
+                selfEncryptedSharedPreference.setFee(0.0);
+              }
               return;
-            }else if(feeInt<=0){
+            } else if (feeInt <= 0) {
               counter.resetTimer();
               selfEncryptedSharedPreference.setFee(0.0);
-            }
-            else{
+            } else {
               counter.resetTimer();
             }
           }
-          });
+        });
       }
 
       if (isShowProgress) {
@@ -683,6 +752,20 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           if (imageData != null) {
             bool isLaunchCardDetector =
                 await uiDetector.putImageIntoModel(imageData);
+            // if (uiDetector.resultStr == "didn't find button") {
+            //   ImageGallerySaver.saveImage(data, quality: 100);
+            // } else if (uiDetector.resultStr == "button error") {
+            //   // Fimber.i("resultStr = ${uiDetector.resultStr}");
+            //   // debugPrint(uiDetector.resultStr);
+            //   int time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+            //   String fileNameTime = time.toString();
+            //   ImageGallerySaver.saveImage(data,
+            //       quality: 100, name: uiDetector.errorStr + ",$fileNameTime}");
+            //   uiDetector.errorStr = "";
+            // } else {
+            //   Fimber.i("resultStr = ${uiDetector.resultStr}");
+            // }
+
 
             dataHandler.playerButtonX =
                 MediaQuery.of(context).size.width * uiDetector.playerButtonX;
@@ -698,6 +781,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 MediaQuery.of(context).size.width * uiDetector.confirmButtonX;
             dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
                 (dataHandler.webViewHeight * (1 - uiDetector.confirmButtonY));
+
+
+
             int state = uiDetector.getCalculatorState();
 
             dataHandler.refreshState(state);
@@ -722,16 +808,47 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               List value = await cardDetector.putImageIntoModel(imageData);
               String cardResult = cardDetector.resultStr;
               dataHandler.insertCard(value);
+              if (cardResult == "didn't find card") {
+                ImageGallerySaver.saveImage(data, quality: 100);
+              }
               snackBarController.showRecognizeResult(cardResult, 2000);
               cardDetectLock = true;
 
-              await ImageGallerySaver.saveImage(data, quality: 100);
+              // await ImageGallerySaver.saveImage(data, quality: 100);
             }
           }
         }
       }
       await Future.delayed(const Duration(milliseconds: 3500));
     }
+  }
+
+  Future<void> _showReturnMessageDialog(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          content: SingleChildScrollView(
+            child: TextButton(
+              onPressed: () {
+                launchUrlString('https://line.me/ti/p/@516wvzjp');
+              },
+              child: const Text('點我加入官方line好友'),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('確定'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
@@ -766,8 +883,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                     Navigator.pop(context);
                     apiHandler.checkServeState().then((value) {
                       if (apiHandler.code == 0) {
-                        snackBarController.showRecognizeResult(
-                            apiHandler.returnMsg, 3000);
+                        Fimber.i('checkServeState 3 returnMsg show');
+                        _showReturnMessageDialog(apiHandler.returnMsg);
                       }
 
                       if (value == "clear") {
