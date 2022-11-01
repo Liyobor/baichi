@@ -77,10 +77,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   bool cardDetectLock = false;
   String? html;
 
-  double money = -1;
+  double wmMoney = -1;
+  double allbetMoney = -1;
   double fee = 0;
 
-  int paidTime = 5;
+  String? casino;
+
+  int paidTime = 6000;
 
   @override
   void initState() {
@@ -200,14 +203,25 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       initialOptions: options,
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
-                        Fimber.i("onLoadResource");
-                        // Fimber.i("resource.url = ${resource.url}");
+                        // Fimber.i("onLoadResource");
+                        // Fimber.i("resource = ${resource.url}");
+
                         if (resource.url.toString().contains("iframe_101")) {
                           wmCatchMoney().then((value) {
-                            money = value.toDouble();
+                            wmMoney = value.toDouble();
                             Fimber.i("value = $value");
-                            Fimber.i('set money');
-                            Fimber.i('money = $money');
+                            Fimber.i('set wmMoney');
+                            Fimber.i('wmMoney = $wmMoney');
+                          });
+                        }
+
+                        if(resource.url.toString().contains("www.ab.games:8888/undefined")){
+                          Fimber.i("resource.url = ${resource.url}");
+                          allbetCatchMoney().then((value) {
+                            allbetMoney = value.toDouble();
+                            Fimber.i("value = $value");
+                            Fimber.i('set allbetMoney');
+                            Fimber.i('allbetMoney = $allbetMoney');
                           });
                         }
                       },
@@ -232,7 +246,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         });
                       },
                       onAjaxProgress: (controller, ajaxRequest) async {
-                        Fimber.i('onAjaxProgress');
+                        // Fimber.i('onAjaxProgress');
                         // Fimber.i('${ajaxRequest.status}');
                         return AjaxRequestAction.PROCEED;
                       },
@@ -293,10 +307,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         // Fimber.i("onTitleChanged");
                         Fimber.i("title = $title");
 
-                        // if(title=="WM"){
-                        //   await controller.
-                        //
-                        // }
+
+                        if(title=="WM" || title == "ALLBET"){
+                          casino = title;
+                        }else{
+                          casino = null;
+                        }
 
                         if (isUIDetectorRunning) {
                           apiHandler.isCalculatorRunning = 0;
@@ -334,7 +350,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         ? LinearProgressIndicator(value: progress)
                         : Container(),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.83,
+                      height: MediaQuery.of(context).size.height * 0.8,
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: ButtonBar(
@@ -346,6 +362,24 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                 webViewController?.goBack();
                               },
                             ),
+                            ElevatedButton(
+                              child: const Icon(Icons.refresh),
+                              onPressed: () async {
+                                webViewController?.reload();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.86,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ButtonBar(
+                          alignment: MainAxisAlignment.center,
+                          children: <Widget>[
                             SizedBox(
                               height: 35,
                               child: ClipRRect(
@@ -369,61 +403,80 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     TextButton(
                                         onPressed: () async {
                                           if (counter.count >= paidTime) {
-                                            wmCatchMoney().then((value) async {
-                                              if (value < 0) {
-                                                final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
-                                                if (tempFee != null) {
-                                                  double lastFee =
-                                                      double.parse(tempFee);
-                                                  Fimber.i(
-                                                      "lastFee = $lastFee");
-                                                  fee += lastFee;
-                                                }
-                                              } else {
-                                                fee += (value - money) / 10;
-                                                final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
-                                                Fimber.i("Fee = $fee");
-                                                if (tempFee != null) {
-                                                  double lastFee =
-                                                      double.parse(tempFee);
-                                                  Fimber.i(
-                                                      "lastFee = $lastFee");
-                                                  fee += lastFee;
-                                                }
-                                              }
 
-                                              Fimber.i("after calc fee =$fee");
-                                              if (fee >= 1000) {
-                                                _stopWmProcess();
-                                                await apiHandler.debtApi(fee.toInt()).then((value){
-                                                  if(value){
+                                            switch(casino){
+                                              case "WM":{
+                                                wmCatchMoney().then((value) async {
+                                                  if (value < 0) {
+                                                    final tempFee =
+                                                    await selfEncryptedSharedPreference
+                                                        .getFee();
+                                                    if (tempFee != null) {
+                                                      double lastFee =
+                                                      double.parse(tempFee);
+                                                      Fimber.i(
+                                                          "lastFee = $lastFee");
+                                                      fee += lastFee;
+                                                    }
+                                                  } else {
+                                                    fee += (value - wmMoney) / 10;
+                                                    final tempFee =
+                                                    await selfEncryptedSharedPreference
+                                                        .getFee();
+                                                    Fimber.i("Fee = $fee");
+                                                    if (tempFee != null) {
+                                                      double lastFee =
+                                                      double.parse(tempFee);
+                                                      Fimber.i(
+                                                          "lastFee = $lastFee");
+                                                      fee += lastFee;
+                                                    }
+                                                  }
+
+                                                  Fimber.i("after calc fee =$fee");
+                                                  if (fee >= 1000) {
+                                                    _stopWmProcess();
+                                                    await apiHandler.debtApi(fee.toInt()).then((value){
+                                                      if(value){
+                                                        selfEncryptedSharedPreference
+                                                            .setFee(0.0);
+                                                      }
+                                                    });
+
+                                                  } else if (fee <= 0) {
+                                                    counter.resetTimer();
                                                     selfEncryptedSharedPreference
                                                         .setFee(0.0);
+                                                    selfEncryptedSharedPreference
+                                                        .saveRemainTime();
+                                                  } else {
+                                                    counter.resetTimer();
+                                                    selfEncryptedSharedPreference
+                                                        .setFee(fee);
+                                                    Fimber.i("setFee = $fee");
+                                                    selfEncryptedSharedPreference
+                                                        .saveRemainTime();
                                                   }
+
+                                                  fee = 0;
+                                                  wmMoney = value;
                                                 });
-
-                                              } else if (fee <= 0) {
-                                                counter.resetTimer();
-                                                selfEncryptedSharedPreference
-                                                    .setFee(0.0);
-                                                selfEncryptedSharedPreference
-                                                    .saveRemainTime();
-                                              } else {
-                                                counter.resetTimer();
-                                                selfEncryptedSharedPreference
-                                                    .setFee(fee);
-                                                Fimber.i("setFee = $fee");
-                                                selfEncryptedSharedPreference
-                                                    .saveRemainTime();
                                               }
+                                              break;
 
-                                              fee = 0;
-                                              money = value;
-                                            });
+                                              case "ALLBET":{
+                                                Fimber.i('allbet process');
+                                              }
+                                              break;
+
+                                              default:{
+                                                snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                Fimber.i('casino = null');
+                                              }
+                                              break;
+                                            }
+
+
                                           }
                                         },
                                         child: const Text(
@@ -454,18 +507,42 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                               if (apiHandler.code == 1) {
                                                 Fimber.i(
                                                     "code = ${apiHandler.code}");
-                                                apiHandler
-                                                    .checkServeState()
-                                                    .then((value) {
-                                                  if (value == "clear") {
-                                                    wmProcess();
-                                                  } else {
-                                                    Fimber.i(
-                                                        'checkServeState 0 returnMsg show');
-                                                    _showReturnMessageDialog(
-                                                        apiHandler.returnMsg);
-                                                  }
-                                                });
+                                                if(casino!=null){
+                                                  apiHandler
+                                                      .checkServeState()
+                                                      .then((value) {
+                                                    if (value == "clear") {
+
+                                                      switch(casino){
+                                                        case "WM":{
+                                                          wmProcess();
+                                                        }
+                                                        break;
+
+                                                        case "ALLBET":{
+                                                          Fimber.i('allbet process');
+                                                        }
+                                                        break;
+
+                                                        default:{
+                                                          snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                          Fimber.i('casino = null');
+                                                        }
+                                                        break;
+                                                      }
+
+                                                    } else {
+                                                      Fimber.i(
+                                                          'checkServeState 0 returnMsg show');
+                                                      _showReturnMessageDialog(
+                                                          apiHandler.returnMsg);
+                                                    }
+                                                  });
+                                                }else{
+                                                  snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                  Fimber.i('casino = null');
+                                                }
+
                                               } else {
                                                 Fimber.i(
                                                     "code = ${apiHandler.code}");
@@ -474,7 +551,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                     .then((value) {
                                                   Fimber.i("value = $value");
                                                   if (value == "clear") {
-                                                    wmProcess();
+                                                    switch(casino){
+                                                      case "WM":{
+                                                        wmProcess();
+                                                      }
+                                                      break;
+
+                                                      case "ALLBET":{
+                                                        Fimber.i('allbet process');
+                                                      }
+                                                      break;
+
+                                                      default:{
+                                                        snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                        Fimber.i('casino = null');
+                                                      }
+                                                      break;
+                                                    }
                                                   } else {
                                                     Fimber.i(
                                                         'checkServeState 1 returnMsg show');
@@ -490,11 +583,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                         },
                                         child: (isUIDetectorRunning)
                                             ? const Text("停止辨識",
-                                                style: TextStyle(
-                                                    color: Colors.white))
+                                            style: TextStyle(
+                                                color: Colors.white))
                                             : const Text("開始辨識",
-                                                style: TextStyle(
-                                                    color: Colors.white)))
+                                            style: TextStyle(
+                                                color: Colors.white)))
                                   ],
                                 ),
                               ),
@@ -530,7 +623,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                 ),
                               ),
                             ),
-                            //dg test
+                            //test
                             // SizedBox(
                             //   height: 35,
                             //   child: ClipRRect(
@@ -545,7 +638,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             //         ),
                             //         TextButton(
                             //             onPressed: () async {
-                            //               dgCatchMoney();
+                            //               // webViewController?.getMetaTags().then((value) => Fimber.i("getMetaTags = $value"));
+                            //               // webViewController?.getTRexRunnerHtml().then((value) => Fimber.i("getTRexRunnerHtml = $value"));
+                            //               // webViewController?.getTRexRunnerCss().then((value) => Fimber.i("getTRexRunnerCss = $value"));
+                            //               // webViewController?.getHtml().then((value) => Fimber.i("gethtml = $value"));
+                            //               allbetCatchMoney();
                             //             },
                             //             child: const Text(
                             //               "test",
@@ -560,6 +657,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         ),
                       ),
                     ),
+
                     IgnorePointer(
                       child: Align(
                         alignment: Alignment.bottomCenter,
@@ -603,15 +701,28 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     }
   }
 
-  // Future<double> dgCatchMoney() async {
-  //   // webViewController?.getTRexRunnerHtml().then((value) => debugPrint("getTRexRunnerHtml = $value"));
-  //   // webViewController?.getTRexRunnerCss().then((value) => debugPrint("getTRexRunnerCss = $value"));
-  //   // webViewController?.getMetaTags().then((value) => debugPrint("getMetaTags = $value"));
-  //   // webViewController?.getSelectedText().then((value) => debugPrint("getSelectedText = $value"));
-  //   webViewController?.evaluateJavascript(source: 'getGameVersion()').then((value) => debugPrint("getGameVersion = $value"));
-  //
-  //   return -1;
-  // }
+  Future<double> allbetCatchMoney() async {
+    if (html == null) {
+      String? html = await webViewController?.getHtml();
+      if (html != null) {
+        // Fimber.i("html = $html");
+        // Fimber.i("str len = ${html.length}");
+
+        final double? dollar = await compute(allbetGetMoneyInIsolate, html);
+        Fimber.i("dollar = $dollar");
+        if (dollar != null) {
+          snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+          html = null;
+          return dollar;
+        } else {
+          snackBarController.showRecognizeResult("讀取不到金額", 1500);
+          html = null;
+          return -1;
+        }
+      }
+    }
+    return -1;
+  }
 
   Future<double> wmCatchMoney() async {
     if (html == null) {
@@ -643,9 +754,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             _stopWmProcess();
             return;
           }
-          Fimber.i("money = $money");
+          Fimber.i("wmMoney = $wmMoney");
           Fimber.i("value = $value");
-          fee += (value - money) / 10;
+          fee += (value - wmMoney) / 10;
           final tempFee = await selfEncryptedSharedPreference.getFee();
           Fimber.i("Fee = $fee");
           if (tempFee != null) {
@@ -656,7 +767,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           selfEncryptedSharedPreference.setFee(fee);
           Fimber.i("setFee = $fee");
           fee = 0;
-          money = value;
+          wmMoney = value;
           timeCount = 0;
         });
       }
@@ -888,7 +999,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       }
 
                       if (value == "clear") {
-                        wmProcess();
+                        switch(casino){
+                          case "WM":{
+                            wmProcess();
+                          }
+                          break;
+
+                          case "ALLBET":{
+                            Fimber.i('allbet process');
+                          }
+                          break;
+
+                          default:{
+                            snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                            Fimber.i('casino = null');
+                          }
+                          break;
+                        }
                       }
                     });
                   });

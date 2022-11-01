@@ -53,7 +53,7 @@ Future main() async {
       await serviceWorkerController
           .setServiceWorkerClient(AndroidServiceWorkerClient(
         shouldInterceptRequest: (request) async {
-          debugPrint("$request");
+          // debugPrint("$request");
           return null;
         },
       ));

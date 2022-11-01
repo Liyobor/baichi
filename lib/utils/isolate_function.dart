@@ -4,6 +4,7 @@
 import 'dart:math';
 
 import 'package:fimber/fimber.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as image;
 import 'dart:typed_data';
 
@@ -41,6 +42,37 @@ double? wmGetMoneyInIsolate(String html) {
     return dollar;
   }catch(e){
     Fimber.i("error :$e");
+    return null;
+  }
+
+}
+
+
+double? allbetGetMoneyInIsolate(String html) {
+
+  try{
+
+    int index = html.indexOf("username");
+
+
+    String clip = html.substring(index);
+
+    for(int i = 0;i<3;i++ ){
+      clip = clip.substring(4);
+      clip = clip.substring(clip.indexOf('span'));
+    }
+
+    clip = clip.substring(0,clip.indexOf('</span'));
+
+    clip = clip.substring(clip.indexOf('>')+1);
+
+    clip = clip.replaceAll(",","");
+    double dollar = double.parse(clip);
+    return dollar;
+  }catch(e){
+    if (kDebugMode) {
+      print("error :$e");
+    }
     return null;
   }
 
