@@ -15,12 +15,17 @@ import 'package:untitled/data_handler.dart';
 import 'package:untitled/utils/isolate_function.dart';
 import 'package:untitled/utils/self_encrypted_shared_preferences.dart';
 import 'package:untitled/utils/snackbar_controller.dart';
-import 'package:untitled/detector/ui_detector.dart';
+
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:untitled/detector/card_detector.dart';
+
 import 'package:image/image.dart' as image;
 import 'package:provider/provider.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+
+import 'allbet_detector/card_detector.dart';
+import 'allbet_detector/ui_detector.dart';
+import 'wm_detector/card_detector.dart';
+import 'wm_detector/ui_detector.dart';
 
 var _snackBarPresenting = false;
 
@@ -60,8 +65,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   String url = "";
   double progress = 0;
   final urlController = TextEditingController();
-  CardDetector cardDetector = CardDetector();
-  UIDetector uiDetector = UIDetector();
+  WmCardDetector wmCardDetector = WmCardDetector();
+  WmUIDetector wmUiDetector = WmUIDetector();
+
+  AllbetCardDetector allbetCardDetector = AllbetCardDetector();
+  AllbetUIDetector allbetUiDetector = AllbetUIDetector();
+
   DataHandler dataHandler = DataHandler();
   ApiHandler apiHandler = ApiHandler();
 
@@ -465,7 +474,61 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                               break;
 
                                               case "ALLBET":{
-                                                Fimber.i('allbet process');
+                                                allbetCatchMoney().then((value) async {
+                                                  if (value < 0) {
+                                                    final tempFee =
+                                                    await selfEncryptedSharedPreference
+                                                        .getFee();
+                                                    if (tempFee != null) {
+                                                      double lastFee =
+                                                      double.parse(tempFee);
+                                                      Fimber.i(
+                                                          "lastFee = $lastFee");
+                                                      fee += lastFee;
+                                                    }
+                                                  } else {
+                                                    fee += (value - allbetMoney) / 10;
+                                                    final tempFee =
+                                                    await selfEncryptedSharedPreference
+                                                        .getFee();
+                                                    Fimber.i("Fee = $fee");
+                                                    if (tempFee != null) {
+                                                      double lastFee =
+                                                      double.parse(tempFee);
+                                                      Fimber.i(
+                                                          "lastFee = $lastFee");
+                                                      fee += lastFee;
+                                                    }
+                                                  }
+
+                                                  Fimber.i("after calc fee =$fee");
+                                                  if (fee >= 1000) {
+                                                    _stopAllbetProcess();
+                                                    await apiHandler.debtApi(fee.toInt()).then((value){
+                                                      if(value){
+                                                        selfEncryptedSharedPreference
+                                                            .setFee(0.0);
+                                                      }
+                                                    });
+
+                                                  } else if (fee <= 0) {
+                                                    counter.resetTimer();
+                                                    selfEncryptedSharedPreference
+                                                        .setFee(0.0);
+                                                    selfEncryptedSharedPreference
+                                                        .saveRemainTime();
+                                                  } else {
+                                                    counter.resetTimer();
+                                                    selfEncryptedSharedPreference
+                                                        .setFee(fee);
+                                                    Fimber.i("setFee = $fee");
+                                                    selfEncryptedSharedPreference
+                                                        .saveRemainTime();
+                                                  }
+
+                                                  fee = 0;
+                                                  allbetMoney = value;
+                                                });
                                               }
                                               break;
 
@@ -520,6 +583,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                         break;
 
                                                         case "ALLBET":{
+                                                          allbetProcess();
                                                           Fimber.i('allbet process');
                                                         }
                                                         break;
@@ -638,11 +702,47 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             //         ),
                             //         TextButton(
                             //             onPressed: () async {
-                            //               // webViewController?.getMetaTags().then((value) => Fimber.i("getMetaTags = $value"));
-                            //               // webViewController?.getTRexRunnerHtml().then((value) => Fimber.i("getTRexRunnerHtml = $value"));
-                            //               // webViewController?.getTRexRunnerCss().then((value) => Fimber.i("getTRexRunnerCss = $value"));
-                            //               // webViewController?.getHtml().then((value) => Fimber.i("gethtml = $value"));
-                            //               allbetCatchMoney();
+                            //
+                            //
+                            //               Uint8List? data = await webViewController?.takeScreenshot(
+                            //                   screenshotConfiguration: config);
+                            //
+                            //               if(data!=null){
+                            //                 image.Image? imageData = await compute(decodeImage, data);
+                            //                 if(imageData!=null) {
+                            //                 //
+                            //                 //   bool isLaunchCardDetector =
+                            //                 //   await allbetUiDetector.putImageIntoModel(imageData);
+                            //                 //   int state = allbetUiDetector.getCalculatorState();
+                            //                 //
+                            //                 //   dataHandler.refreshState(state);
+                            //                 //   Fimber.i("resultStr = ${allbetUiDetector.resultStr}");
+                            //                 //   if (state == 1 && cardDetectLock) {
+                            //                 //     cardDetectLock = false;
+                            //                 //   }
+                            //                 //
+                            //                 //
+                            //                 //   if (isLaunchCardDetector && !cardDetectLock) {
+                            //                 //     if (allbetUiDetector.winSide == "bank") {
+                            //                 //       snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+                            //                 //     }
+                            //                 //     if (allbetUiDetector.winSide == "player") {
+                            //                 //       snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+                            //                 //     }
+                            //                 //     if (allbetUiDetector.winSide == "draw") {
+                            //                 //       snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+                            //                 //     }
+                            //                 //   }
+                            //                 //
+                            //                   allbetCardDetector.putImageIntoModel(imageData);
+                            //                   String cardResult = allbetCardDetector.resultStr;
+                            //                   snackBarController.showRecognizeResult(cardResult, 2000);
+                            //                   cardDetectLock = true;
+                            //                 //
+                            //                 }
+                            //               }
+                            //
+                            //
                             //             },
                             //             child: const Text(
                             //               "test",
@@ -862,7 +962,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
           if (imageData != null) {
             bool isLaunchCardDetector =
-                await uiDetector.putImageIntoModel(imageData);
+                await wmUiDetector.putImageIntoModel(imageData);
             // if (uiDetector.resultStr == "didn't find button") {
             //   ImageGallerySaver.saveImage(data, quality: 100);
             // } else if (uiDetector.resultStr == "button error") {
@@ -879,23 +979,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
 
             dataHandler.playerButtonX =
-                MediaQuery.of(context).size.width * uiDetector.playerButtonX;
+                MediaQuery.of(context).size.width * wmUiDetector.playerButtonX;
             dataHandler.playerButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - uiDetector.playerButtonY));
+                (dataHandler.webViewHeight * (1 - wmUiDetector.playerButtonY));
 
             dataHandler.bankButtonX =
-                MediaQuery.of(context).size.width * uiDetector.bankButtonX;
+                MediaQuery.of(context).size.width * wmUiDetector.bankButtonX;
             dataHandler.bankButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - uiDetector.bankButtonY));
+                (dataHandler.webViewHeight * (1 - wmUiDetector.bankButtonY));
 
             dataHandler.confirmButtonX =
-                MediaQuery.of(context).size.width * uiDetector.confirmButtonX;
+                MediaQuery.of(context).size.width * wmUiDetector.confirmButtonX;
             dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - uiDetector.confirmButtonY));
+                (dataHandler.webViewHeight * (1 - wmUiDetector.confirmButtonY));
 
 
 
-            int state = uiDetector.getCalculatorState();
+            int state = wmUiDetector.getCalculatorState();
 
             dataHandler.refreshState(state);
             if (state == 1 && cardDetectLock) {
@@ -903,23 +1003,216 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             }
 
             if (isLaunchCardDetector && !cardDetectLock) {
-              if (uiDetector.winSide == "bank") {
+              if (wmUiDetector.winSide == "bank") {
                 snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
               }
-              if (uiDetector.winSide == "player") {
+              if (wmUiDetector.winSide == "player") {
                 snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
               }
-              if (uiDetector.winSide == "draw") {
+              if (wmUiDetector.winSide == "draw") {
                 snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
               }
 
-              dataHandler.checkWinOrLose(uiDetector.winSide);
-              uiDetector.winSide = null;
+              dataHandler.checkWinOrLose(wmUiDetector.winSide);
+              wmUiDetector.winSide = null;
 
-              List value = await cardDetector.putImageIntoModel(imageData);
-              String cardResult = cardDetector.resultStr;
+              List value = await wmCardDetector.putImageIntoModel(imageData);
+              String cardResult = wmCardDetector.resultStr;
               dataHandler.insertCard(value);
               if (cardResult == "didn't find card") {
+                ImageGallerySaver.saveImage(data, quality: 100);
+              }
+              snackBarController.showRecognizeResult(cardResult, 2000);
+              cardDetectLock = true;
+
+              // await ImageGallerySaver.saveImage(data, quality: 100);
+            }
+          }
+        }
+      }
+      await Future.delayed(const Duration(milliseconds: 3500));
+    }
+  }
+
+
+  Future<void> allbetStartRoutineCheck() async {
+    var timeCount = 449;
+    while (isUIDetectorRunning) {
+      timeCount += 1;
+      if (timeCount == 450) {
+        apiHandler.routineCheck();
+        allbetCatchMoney().then((value) async {
+          if (value < 0) {
+            _stopAllbetProcess();
+            return;
+          }
+          Fimber.i("allbetMoney = $allbetMoney");
+          Fimber.i("value = $value");
+          fee += (value - allbetMoney) / 10;
+          final tempFee = await selfEncryptedSharedPreference.getFee();
+          Fimber.i("Fee = $fee");
+          if (tempFee != null) {
+            double lastFee = double.parse(tempFee);
+            Fimber.i("lastFee = $lastFee");
+            fee += lastFee;
+          }
+          selfEncryptedSharedPreference.setFee(fee);
+          Fimber.i("setFee = $fee");
+          fee = 0;
+          allbetMoney = value;
+          timeCount = 0;
+        });
+      }
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
+
+
+  void _stopAllbetProcess() {
+    apiHandler.isCalculatorRunning = 0;
+    apiHandler.routineCheck().then((value) {
+      if (value == 0) {
+        Fimber.i('routineCheck 2 returnMsg show');
+        _showReturnMessageDialog(apiHandler.returnMsg);
+      }
+      apiHandler.returnMsg = "出錯了! 請聯繫客服";
+    });
+    setState(() {
+      isUIDetectorRunning = false;
+    });
+    snackBarController.showRecognizeResult("停止辨識", 2000);
+    stopTimer();
+    dataHandler.reset();
+  }
+
+  void allbetProcess() async {
+    isShowProgress = true;
+    cardDetectLock = false;
+    setState(() {
+      isUIDetectorRunning = !isUIDetectorRunning;
+    });
+    if (!isUIDetectorRunning) {
+      apiHandler.isCalculatorRunning = 0;
+      apiHandler.routineCheck();
+      snackBarController.showRecognizeResult("停止辨識ui", 2000);
+      stopTimer();
+      dataHandler.reset();
+    } else {
+      apiHandler.isCalculatorRunning = 1;
+      allbetStartRoutineCheck();
+      startTimer();
+      // apiHandler.routineCheck();
+    }
+    while (isUIDetectorRunning) {
+      if (apiHandler.code != 1) {
+        _stopAllbetProcess();
+        break;
+      }
+      Counter counter = Counter();
+      if (counter.count >= 7200) {
+        selfEncryptedSharedPreference.getFee().then((value) async {
+          if (value != null) {
+            final feeInt = int.parse(value);
+            if (feeInt >= 1000) {
+              _stopAllbetProcess();
+              bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
+              if(ifDebtApiSuccess){
+                selfEncryptedSharedPreference.setFee(0.0);
+              }
+              return;
+            } else if (feeInt <= 0) {
+              counter.resetTimer();
+              selfEncryptedSharedPreference.setFee(0.0);
+            } else {
+              counter.resetTimer();
+            }
+          }
+        });
+      }
+
+      if (isShowProgress) {
+        snackBarController.showRecognizeResult("開始辨識ui!", 2000);
+      }
+      isShowProgress = false;
+
+      if (!dataHandler.isBetting) {
+        config.quality = 50;
+
+        Fimber.i("take screen shot");
+
+        Uint8List? data = await webViewController?.takeScreenshot(
+            screenshotConfiguration: config);
+
+        Fimber.i("screen shot finished");
+        await webViewController?.getContentHeight().then((value) => {
+          dataHandler.mobileWidth = MediaQuery.of(context).size.width,
+          dataHandler.mobileHeight = MediaQuery.of(context).size.height,
+          dataHandler.webViewHeight = value!.toDouble(),
+        });
+
+        if (data != null) {
+          image.Image? imageData = await compute(decodeImage, data);
+
+          if (imageData != null) {
+            bool isLaunchCardDetector =
+            await allbetUiDetector.putImageIntoModel(imageData);
+            // if (uiDetector.resultStr == "didn't find button") {
+            //   ImageGallerySaver.saveImage(data, quality: 100);
+            // } else if (uiDetector.resultStr == "button error") {
+            //   // Fimber.i("resultStr = ${uiDetector.resultStr}");
+            //   // debugPrint(uiDetector.resultStr);
+            //   int time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+            //   String fileNameTime = time.toString();
+            //   ImageGallerySaver.saveImage(data,
+            //       quality: 100, name: uiDetector.errorStr + ",$fileNameTime}");
+            //   uiDetector.errorStr = "";
+            // } else {
+            //   Fimber.i("resultStr = ${uiDetector.resultStr}");
+            // }
+
+
+            dataHandler.playerButtonX =
+                MediaQuery.of(context).size.width * allbetUiDetector.playerButtonX;
+            dataHandler.playerButtonY = MediaQuery.of(context).size.height -
+                (dataHandler.webViewHeight * (1 - allbetUiDetector.playerButtonY));
+
+            dataHandler.bankButtonX =
+                MediaQuery.of(context).size.width * allbetUiDetector.bankButtonX;
+            dataHandler.bankButtonY = MediaQuery.of(context).size.height -
+                (dataHandler.webViewHeight * (1 - allbetUiDetector.bankButtonY));
+
+            dataHandler.confirmButtonX =
+                MediaQuery.of(context).size.width * allbetUiDetector.confirmButtonX;
+            dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
+                (dataHandler.webViewHeight * (1 - allbetUiDetector.confirmButtonY));
+
+
+
+            int state = allbetUiDetector.getCalculatorState();
+
+            dataHandler.refreshState(state);
+            if (state == 1 && cardDetectLock) {
+              cardDetectLock = false;
+            }
+
+            if (isLaunchCardDetector && !cardDetectLock) {
+              if (allbetUiDetector.winSide == "bank") {
+                snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+              }
+              if (allbetUiDetector.winSide == "player") {
+                snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+              }
+              if (allbetUiDetector.winSide == "draw") {
+                snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+              }
+
+              dataHandler.checkWinOrLose(allbetUiDetector.winSide);
+              allbetUiDetector.winSide = null;
+
+              List value = await allbetCardDetector.putImageIntoModel(imageData);
+              String cardResult = allbetCardDetector.resultStr;
+              dataHandler.insertCard(value);
+              if (cardResult == "card error") {
                 ImageGallerySaver.saveImage(data, quality: 100);
               }
               snackBarController.showRecognizeResult(cardResult, 2000);
@@ -1006,7 +1299,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           break;
 
                           case "ALLBET":{
-                            Fimber.i('allbet process');
+                            allbetProcess();
                           }
                           break;
 

@@ -112,7 +112,9 @@ class DataHandler{
         Fimber.i("_point = 0");
         betSide = null;
       }
-      await bettingConfirm();
+      if(betSide!=null){
+        await bettingConfirm();
+      }
 
       // betTimes = 31;
       isBetting = false;
@@ -161,6 +163,8 @@ class DataHandler{
 
   Future<void> bettingConfirm() async {
     Fimber.i("bettingConfirm");
+
+    await Future.delayed(const Duration(milliseconds: 300));
 
     Fimber.i("confirmButton pos :$confirmButtonX,$confirmButtonY");
     taper.handlePointerEvent(PointerDownEvent(

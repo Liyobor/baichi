@@ -163,7 +163,8 @@ Map<String,dynamic> uiOutputProcess(List input){
   return map;
 }
 
-List<List> cardOutputProcess(List input){
+
+List<List> allbetCardOutputProcess(List input){
 
   List bboxes = input[0];
   List outScore  = input[1];
@@ -183,6 +184,74 @@ List<List> cardOutputProcess(List input){
       }
     }
     final double score = maxClass;
+
+
+    if(score>0.7){
+
+
+      final double xPos = bboxes[0][i][0];
+      final double yPos = bboxes[0][i][1];
+      final double w = bboxes[0][i][2];
+      final double h = bboxes[0][i][3];
+
+      final cardClass = detectedClass;
+      final x = max(0, xPos - w / 2)/416;
+      final y = max(0, yPos - h / 2)/416;
+
+
+
+      // Fimber.i('---');
+      // Fimber.i('class = $cardClass');
+      // Fimber.i('score = $score');
+      // Fimber.i('x = $x');
+      // Fimber.i('y = $y');
+
+
+      var isDuplicate = false;
+      if(y>0.69 && y<0.74){
+
+
+        for(var value in xList){
+          if(x - value <=0.02){
+            isDuplicate = true;
+          }
+        }
+
+        if(!isDuplicate) {
+          xList.add(x);
+          classList.add(cardClass);
+        }
+      }
+      // resultList.add([detectedClass+1,])
+      // Fimber.i('${min(_inputImage.width - 1, xPos + w / 2)/416}');
+      // Fimber.i('${min(_inputImage.height - 1, yPos + h / 2)/416}');
+    }
+  }
+  return [xList,classList];
+}
+
+List<List> wmCardOutputProcess(List input){
+
+  List bboxes = input[0];
+  List outScore  = input[1];
+  List xList = [];
+  List classList = [];
+  for(int i =0;i<2535;i++){
+    double maxClass = 0;
+    int detectedClass = -1;
+    final classes = List<double>.filled(10, 0.0);
+    for (int c = 0;c< 10;c++){
+      classes [c] = outScore[0][i][c];
+    }
+    for (int c = 0;c<10;++c){
+      if (classes[c] > maxClass){
+        detectedClass = c;
+        maxClass = classes[c];
+      }
+    }
+    final double score = maxClass;
+
+
     if(score>0.7){
 
 
