@@ -1,3 +1,3 @@
 # untitled
 
-A Flutter project with AI stuff.
+A Flutter project with poker cards recognition.
