@@ -36,17 +36,20 @@ Future main() async {
   Fimber.plantTree(DebugTree());
   await _checkPermissions();
 
-  await  InAppWebViewController.setWebContentsDebuggingEnabled(true);
-  var swAvailable = await WebViewFeature.isFeatureSupported(
-      WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-  var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
-      WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
-  if(swAvailable && swInterceptAvailable) {
-    ServiceWorkerController serviceWorkerController = ServiceWorkerController.instance();
-    await serviceWorkerController.setServiceWorkerClient(ServiceWorkerClient(shouldInterceptRequest: (request) async{
-      return null;
+  if(Platform.isAndroid) {
+    await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+    var swAvailable = await WebViewFeature.isFeatureSupported(
+        WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
+        WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+    if (swAvailable && swInterceptAvailable) {
+      ServiceWorkerController serviceWorkerController =
+          ServiceWorkerController.instance();
+      await serviceWorkerController.setServiceWorkerClient(
+          ServiceWorkerClient(shouldInterceptRequest: (request) async {
+        return null;
+      }));
     }
-    ));
   }
 
   // if (Platform.isAndroid) {

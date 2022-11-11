@@ -1,5 +1,6 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class DataHandler{
 
@@ -65,7 +66,7 @@ class DataHandler{
     return false;
   }
 
-  bool refreshState(int state){
+  bool refreshState(int state,InAppWebViewController webViewController,String casino){
     if(_state == state){
       return false;
     }
@@ -77,7 +78,7 @@ class DataHandler{
 
 
 
-      _bet();
+      _bet(webViewController,casino);
     }else if(_state==0){
 
       Fimber.i("stop betting!");
@@ -85,7 +86,7 @@ class DataHandler{
     return true;
   }
 
-  Future<void> _bet() async {
+  Future<void> _bet(InAppWebViewController webViewController,String casino) async {
     Fimber.i("bet");
     if(bankButtonY < 0 || bankButtonX<0 ||playerButtonY<0 || playerButtonX<0 || confirmButtonX<0 || confirmButtonY<0 || webViewHeight<0 || mobileHeight<0 || mobileWidth<0){
       Fimber.i("Button pos error!");
@@ -101,19 +102,22 @@ class DataHandler{
       if(_point>0){
         Fimber.i('betBank');
         for (int i = 0; i < betTimes; i++){
-          await betBank();
+          clickBankJS(webViewController, casino);
+          // await betBank();
         }
       }else if(_point<0){
         Fimber.i('betPlayer');
         for (int i = 0; i < betTimes; i++) {
-          await betPlayer();
+          clickPlayerJS(webViewController, casino);
+          // await betPlayer();
         }
       }else{
         Fimber.i("_point = 0");
         betSide = null;
       }
       if(betSide!=null){
-        await bettingConfirm();
+        clickConfirmJS(webViewController, casino);
+        // await bettingConfirm();
       }
 
       // betTimes = 31;
@@ -131,8 +135,68 @@ class DataHandler{
     _state = -1;
   }
 
+  void clickTest(InAppWebViewController webViewController){
+    webViewController.evaluateJavascript(source: 'document.getElementsByClassName("btn login-btn")[0].click()');
+  }
+
+  void clickBankJS(InAppWebViewController webViewController,String casino) {
+    switch(casino){
+      case "WM":{
+        webViewController.evaluateJavascript(source: "document.getElementById('playbetboxBanker').click()");
+      }
+      break;
+
+      case "ALLBET":{
+
+      }
+      break;
+
+      default:{}
+      break;
+    }
+
+
+
+  }
+
+  Future<void> clickPlayerJS(InAppWebViewController webViewController,String casino) async {
+
+    switch(casino){
+      case "WM":{
+        webViewController.evaluateJavascript(source: "document.getElementById('playbetboxPlayer').click()");
+      }
+      break;
+
+      case "ALLBET":{
+
+      }
+      break;
+
+      default:{}
+      break;
+    }
+
+  }
+  Future<void> clickConfirmJS(InAppWebViewController webViewController,String casino) async {
+    switch(casino){
+      case "WM":{
+        webViewController.evaluateJavascript(source: "document.getElementById('bet_btn').click()");
+      }
+      break;
+
+      case "ALLBET":{
+
+      }
+      break;
+
+      default:{}
+      break;
+    }
+  }
+
   Future<void> betBank() async {
     Fimber.i("betBank");
+
     Fimber.i("bankButton pos :$bankButtonX,$bankButtonY");
     await Future.delayed(const Duration(milliseconds: 50));
     taper.handlePointerEvent(PointerDownEvent(

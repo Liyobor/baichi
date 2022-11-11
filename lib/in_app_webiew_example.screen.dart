@@ -708,71 +708,32 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                               ),
                             ),
                             //test
-                            // SizedBox(
-                            //   height: 35,
-                            //   child: ClipRRect(
-                            //     borderRadius: BorderRadius.circular(3),
-                            //     child: Stack(
-                            //       children: [
-                            //         Positioned.fill(
-                            //           child: Container(
-                            //             decoration: const BoxDecoration(
-                            //                 color: Colors.blue),
-                            //           ),
-                            //         ),
-                            //         TextButton(
-                            //             onPressed: () async {
-                            //
-                            //
-                            //               Uint8List? data = await webViewController?.takeScreenshot(
-                            //                   screenshotConfiguration: config);
-                            //
-                            //               if(data!=null){
-                            //                 image.Image? imageData = await compute(decodeImage, data);
-                            //                 if(imageData!=null) {
-                            //                 //
-                            //                 //   bool isLaunchCardDetector =
-                            //                 //   await allbetUiDetector.putImageIntoModel(imageData);
-                            //                 //   int state = allbetUiDetector.getCalculatorState();
-                            //                 //
-                            //                 //   dataHandler.refreshState(state);
-                            //                 //   Fimber.i("resultStr = ${allbetUiDetector.resultStr}");
-                            //                 //   if (state == 1 && cardDetectLock) {
-                            //                 //     cardDetectLock = false;
-                            //                 //   }
-                            //                 //
-                            //                 //
-                            //                 //   if (isLaunchCardDetector && !cardDetectLock) {
-                            //                 //     if (allbetUiDetector.winSide == "bank") {
-                            //                 //       snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
-                            //                 //     }
-                            //                 //     if (allbetUiDetector.winSide == "player") {
-                            //                 //       snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
-                            //                 //     }
-                            //                 //     if (allbetUiDetector.winSide == "draw") {
-                            //                 //       snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
-                            //                 //     }
-                            //                 //   }
-                            //                 //
-                            //                   allbetCardDetector.putImageIntoModel(imageData);
-                            //                   String cardResult = allbetCardDetector.resultStr;
-                            //                   snackBarController.showRecognizeResult(cardResult, 2000);
-                            //                   cardDetectLock = true;
-                            //                 //
-                            //                 }
-                            //               }
-                            //
-                            //
-                            //             },
-                            //             child: const Text(
-                            //               "test",
-                            //               style: TextStyle(color: Colors.white),
-                            //             )
-                            //         )
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
+                            SizedBox(
+                              height: 35,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(3),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                            color: Colors.blue),
+                                      ),
+                                    ),
+                                    TextButton(
+                                        onPressed: () async {
+                                          dataHandler.clickTest(webViewController!);
+
+                                        },
+                                        child: const Text(
+                                          "test",
+                                          style: TextStyle(color: Colors.white),
+                                        )
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1019,7 +980,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
             int state = wmUiDetector.getCalculatorState();
 
-            dataHandler.refreshState(state);
+            dataHandler.refreshState(state,webViewController!,casino!);
             if (state == 1 && cardDetectLock) {
               cardDetectLock = false;
             }
@@ -1214,7 +1175,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
             int state = allbetUiDetector.getCalculatorState();
 
-            dataHandler.refreshState(state);
+            dataHandler.refreshState(state,webViewController!,casino!);
             if (state == 1 && cardDetectLock) {
               cardDetectLock = false;
             }
@@ -1316,6 +1277,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       }
 
                       if (value == "clear") {
+
                         switch(casino){
                           case "WM":{
                             wmProcess();
