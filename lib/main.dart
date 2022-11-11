@@ -6,8 +6,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/in_app_webiew_example.screen.dart';
-import 'package:untitled/utils/api_handler.dart';
-import 'package:workmanager/workmanager.dart';
 import 'utils/counter.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -38,27 +36,40 @@ Future main() async {
   Fimber.plantTree(DebugTree());
   await _checkPermissions();
 
-  if (Platform.isAndroid) {
-    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-
-    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
-        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
-        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
-
-    if (swAvailable && swInterceptAvailable) {
-      AndroidServiceWorkerController serviceWorkerController =
-      AndroidServiceWorkerController.instance();
-
-      await serviceWorkerController
-          .setServiceWorkerClient(AndroidServiceWorkerClient(
-        shouldInterceptRequest: (request) async {
-          // debugPrint("$request");
-          return null;
-        },
-      ));
+  await  InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  var swAvailable = await WebViewFeature.isFeatureSupported(
+      WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+  var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
+      WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+  if(swAvailable && swInterceptAvailable) {
+    ServiceWorkerController serviceWorkerController = ServiceWorkerController.instance();
+    await serviceWorkerController.setServiceWorkerClient(ServiceWorkerClient(shouldInterceptRequest: (request) async{
+      return null;
     }
+    ));
   }
+
+  // if (Platform.isAndroid) {
+  //   // await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  //
+  //   // var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+  //   //     AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+  //   // var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+  //   //     AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+  //
+  //   if (swAvailable && swInterceptAvailable) {
+  //     // AndroidServiceWorkerController serviceWorkerController =
+  //     // AndroidServiceWorkerController.instance();
+  //
+  //     await serviceWorkerController
+  //         .setServiceWorkerClient(AndroidServiceWorkerClient(
+  //       shouldInterceptRequest: (request) async {
+  //         // debugPrint("$request");
+  //         return null;
+  //       },
+  //     ));
+  //   }
+  // }
 
   //
   // Workmanager().initialize(
@@ -89,10 +100,10 @@ Drawer myDrawer({required BuildContext context}) {
       padding: EdgeInsets.zero,
       children: <Widget>[
         const DrawerHeader(
-          child: Text('flutter_inappbrowser example'),
           decoration: BoxDecoration(
             color: Colors.blue,
           ),
+          child: Text('flutter_inappbrowser example'),
         ),
         ListTile(
           title: const Text('InAppBrowser'),

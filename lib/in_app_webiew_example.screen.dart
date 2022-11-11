@@ -33,7 +33,7 @@ class InAppWebViewExampleScreen extends StatefulWidget {
   const InAppWebViewExampleScreen({Key? key}) : super(key: key);
 
   @override
-  _InAppWebViewExampleScreenState createState() =>
+  State<InAppWebViewExampleScreen> createState() =>
       _InAppWebViewExampleScreenState();
 }
 
@@ -45,19 +45,29 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   String? valueText;
 
   InAppWebViewController? webViewController;
-  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(
-          useOnLoadResource: true,
-          javaScriptEnabled: true,
-          useShouldInterceptAjaxRequest: true,
-          useShouldOverrideUrlLoading: true,
-          mediaPlaybackRequiresUserGesture: false),
-      android: AndroidInAppWebViewOptions(
-        useHybridComposition: true,
-      ),
-      ios: IOSInAppWebViewOptions(
-        allowsInlineMediaPlayback: true,
-      ));
+  InAppWebViewSettings settings = InAppWebViewSettings(
+    useOnLoadResource: true,
+    javaScriptEnabled: true,
+    useShouldInterceptAjaxRequest: true,
+    useShouldOverrideUrlLoading: true,
+    mediaPlaybackRequiresUserGesture: false,
+    useHybridComposition: true,
+    allowsInlineMediaPlayback: true,
+  );
+  // InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+  //     crossPlatform: InAppWebViewOptions(
+  //         useOnLoadResource: true,
+  //         javaScriptEnabled: true,
+  //         useShouldInterceptAjaxRequest: true,
+  //         useShouldOverrideUrlLoading: true,
+  //         mediaPlaybackRequiresUserGesture: false),
+  //     android: AndroidInAppWebViewOptions(
+  //       useHybridComposition: true,
+  //     ),
+  //     ios: IOSInAppWebViewOptions(
+  //       allowsInlineMediaPlayback: true,
+  //       useOnNavigationResponse: true
+  //     ));
 
   late PullToRefreshController pullToRefreshController;
   late ContextMenu contextMenu;
@@ -105,8 +115,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     contextMenu = ContextMenu(
         menuItems: [
           ContextMenuItem(
-              androidId: 1,
-              iosId: "1",
+              id: 1,
+              // androidId: 1,
+              // iosId: "1",
               title: "Special",
               action: () async {
                 Fimber.i("Menu item Special clicked!");
@@ -114,7 +125,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 await webViewController?.clearFocus();
               })
         ],
-        options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
+        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
+        // options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
         onCreateContextMenu: (hitTestResult) async {
           Fimber.i("onCreateContextMenu");
           // Fimber.i("${hitTestResult.extra}");
@@ -125,18 +137,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         },
         onContextMenuActionItemClicked: (contextMenuItemClicked) async {
           var id = (Platform.isAndroid)
-              ? contextMenuItemClicked.androidId
-              : contextMenuItemClicked.iosId;
-          Fimber.i("onContextMenuActionItemClicked: " +
-              id.toString() +
-              " " +
-              contextMenuItemClicked.title);
+              ? contextMenuItemClicked.id
+              : contextMenuItemClicked.id.toString();
+          Fimber.i("onContextMenuActionItemClicked: $id ${contextMenuItemClicked.title}");
         });
 
     pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
-        color: Colors.blue,
+      settings: PullToRefreshSettings(
+        color: Colors.blue
       ),
+      // options: PullToRefreshOptions(
+      //   color: Colors.blue,
+      // ),
       onRefresh: () async {
         if (Platform.isAndroid) {
           webViewController?.reload();
@@ -191,9 +203,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 controller: urlController,
                 keyboardType: TextInputType.url,
                 onSubmitted: (value) {
-                  var url = Uri.parse(value);
+                  var url = WebUri(value);
                   if (url.scheme.isEmpty) {
-                    url = Uri.parse("https://www.google.com/search?q=" + value);
+                    url = WebUri("https://www.google.com/search?q=$value");
                   }
                   webViewController?.loadUrl(urlRequest: URLRequest(url: url));
                 },
@@ -206,10 +218,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       // contextMenu: contextMenu,
                       initialUrlRequest: URLRequest(
                           url:
-                              Uri.parse("https://www.bl868.net/new_home2.php")),
+                          WebUri("https://www.bl868.net/new_home2.php")),
                       // initialFile: "assets/index.html",
                       initialUserScripts: UnmodifiableListView<UserScript>([]),
-                      initialOptions: options,
+                      initialSettings: settings,
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
                         // Fimber.i("onLoadResource");
@@ -259,12 +271,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         // Fimber.i('${ajaxRequest.status}');
                         return AjaxRequestAction.PROCEED;
                       },
-                      androidOnPermissionRequest:
-                          (controller, origin, resources) async {
-                        return PermissionRequestResponse(
-                            resources: resources,
-                            action: PermissionRequestResponseAction.GRANT);
-                      },
+                      onPermissionRequest: (controller,request) async {
+                        return PermissionResponse(resources: request.resources,action: PermissionResponseAction.GRANT);
+                        }
+                        ,
+
+                      // androidOnPermissionRequest:
+                      //     (controller, origin, resources) async {
+                      //   return PermissionRequestResponse(
+                      //       resources: resources,
+                      //       action: PermissionRequestResponseAction.GRANT);
+                      // },
                       shouldOverrideUrlLoading:
                           (controller, navigationAction) async {
                         var uri = navigationAction.request.url!;
@@ -298,9 +315,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         
                         
                       },
-                      onLoadError: (controller, url, code, message) {
+                      onReceivedError: (controller,request,error){
                         pullToRefreshController.endRefreshing();
                       },
+                      // onLoadError: (controller, url, code, message) {
+                      //   pullToRefreshController.endRefreshing();
+                      // },
                       onProgressChanged: (controller, progress) {
                         // Fimber.i("onProgressChanged");
                         if (progress == 100) {
@@ -977,21 +997,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             //   Fimber.i("resultStr = ${uiDetector.resultStr}");
             // }
 
+            if(mounted){
+              dataHandler.playerButtonX =
+                  MediaQuery.of(context).size.width * wmUiDetector.playerButtonX;
+              dataHandler.playerButtonY = MediaQuery.of(context).size.height -
+                  (dataHandler.webViewHeight * (1 - wmUiDetector.playerButtonY));
 
-            dataHandler.playerButtonX =
-                MediaQuery.of(context).size.width * wmUiDetector.playerButtonX;
-            dataHandler.playerButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - wmUiDetector.playerButtonY));
+              dataHandler.bankButtonX =
+                  MediaQuery.of(context).size.width * wmUiDetector.bankButtonX;
+              dataHandler.bankButtonY = MediaQuery.of(context).size.height -
+                  (dataHandler.webViewHeight * (1 - wmUiDetector.bankButtonY));
 
-            dataHandler.bankButtonX =
-                MediaQuery.of(context).size.width * wmUiDetector.bankButtonX;
-            dataHandler.bankButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - wmUiDetector.bankButtonY));
+              dataHandler.confirmButtonX =
+                  MediaQuery.of(context).size.width * wmUiDetector.confirmButtonX;
+              dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
+                  (dataHandler.webViewHeight * (1 - wmUiDetector.confirmButtonY));
+            }
 
-            dataHandler.confirmButtonX =
-                MediaQuery.of(context).size.width * wmUiDetector.confirmButtonX;
-            dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - wmUiDetector.confirmButtonY));
 
 
 
@@ -1170,21 +1192,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             //   Fimber.i("resultStr = ${uiDetector.resultStr}");
             // }
 
+            if(mounted){
+              dataHandler.playerButtonX =
+                  MediaQuery.of(context).size.width * allbetUiDetector.playerButtonX;
+              dataHandler.playerButtonY = MediaQuery.of(context).size.height -
+                  (dataHandler.webViewHeight * (1 - allbetUiDetector.playerButtonY));
 
-            dataHandler.playerButtonX =
-                MediaQuery.of(context).size.width * allbetUiDetector.playerButtonX;
-            dataHandler.playerButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - allbetUiDetector.playerButtonY));
+              dataHandler.bankButtonX =
+                  MediaQuery.of(context).size.width * allbetUiDetector.bankButtonX;
+              dataHandler.bankButtonY = MediaQuery.of(context).size.height -
+                  (dataHandler.webViewHeight * (1 - allbetUiDetector.bankButtonY));
 
-            dataHandler.bankButtonX =
-                MediaQuery.of(context).size.width * allbetUiDetector.bankButtonX;
-            dataHandler.bankButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - allbetUiDetector.bankButtonY));
+              dataHandler.confirmButtonX =
+                  MediaQuery.of(context).size.width * allbetUiDetector.confirmButtonX;
+              dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
+                  (dataHandler.webViewHeight * (1 - allbetUiDetector.confirmButtonY));
+            }
 
-            dataHandler.confirmButtonX =
-                MediaQuery.of(context).size.width * allbetUiDetector.confirmButtonX;
-            dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
-                (dataHandler.webViewHeight * (1 - allbetUiDetector.confirmButtonY));
 
 
 

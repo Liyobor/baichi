@@ -80,7 +80,7 @@ class WmCardDetector{
 
     List result = [];
 
-    Fimber.i('count = ${xList.size}');
+    Fimber.i('count = ${xList.length}');
 
     if(xList.isEmpty){
       Fimber.i("didn't find card");
