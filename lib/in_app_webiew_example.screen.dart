@@ -227,7 +227,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
                         // Fimber.i("onLoadResource");
-                        Fimber.i("resource = ${resource.url}");
+                        // Fimber.i("resource = ${resource.url}");
 
                         if (resource.url.toString().contains("iframe_101")) {
                           wmCatchMoney().then((value) {
@@ -385,10 +385,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       },
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
-                        Fimber.i('onConsoleMessage');
-                        Fimber.i(consoleMessage.message);
+                        // Fimber.i('onConsoleMessage');
+                        // Fimber.i(consoleMessage.message);
                         if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
-                          Fimber.i('setup event');
+                          // Fimber.i('setup event');
                           String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e});";
                           String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e});";
                           webViewController?.evaluateJavascript(source: 'var tapdown;');

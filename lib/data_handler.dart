@@ -70,12 +70,12 @@ class DataHandler{
     if(_state == state){
       return false;
     }
-    Fimber.i("state change!");
+
     _state =state;
+    Fimber.i("state change to $_state");
     if(_state==2){
       _reset();
     }else if(_state ==1){
-
       _bet(webViewController,casino);
     }else if(_state==0){
 
@@ -101,14 +101,18 @@ class DataHandler{
         Fimber.i('betBank');
         for (int i = 0; i < betTimes; i++){
           clickBank(webViewController, casino);
+
           // await betBank();
         }
+        betSide="bank";
       }else if(_point<0){
         Fimber.i('betPlayer');
         for (int i = 0; i < betTimes; i++) {
           clickPlayer(webViewController, casino);
+
           // await betPlayer();
         }
+        betSide = "player";
       }else{
         Fimber.i("_point = 0");
         betSide = null;

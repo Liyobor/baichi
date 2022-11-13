@@ -125,10 +125,11 @@ Map<String,dynamic> uiOutputProcess(List input){
       final x = ((max(0, xPos - w / 2)/416)+(min(width - 1, xPos + w / 2)/416))/2;
       final y = ((max(0, yPos - h / 2)/416)+(min(height - 1, yPos + h / 2)/416))/2;
 
-
+      if(y<0.8){
       xList.add(x);
       yList.add(y);
       classList.add(buttonClass);
+      }
 
       if(buttonClass==0){
         bankButtonX = x;
@@ -208,7 +209,7 @@ List<List> allbetCardOutputProcess(List input){
 
 
       var isDuplicate = false;
-      if(y>0.69 && y<0.74){
+      if(y>0.5 && y<0.75){
 
 
         for(var value in xList){
@@ -274,7 +275,7 @@ List<List> wmCardOutputProcess(List input){
 
 
       var isDuplicate = false;
-      if(y>0.63 && y<0.65){
+      if(y>0.5 && y<0.75){
 
 
         for(var value in xList){

@@ -112,17 +112,17 @@ class AllbetUIDetector{
     yList = processedOutput['yList'];
 
     bankButtonX = processedOutput['bankButtonX'];
-    Fimber.i('bankButtonX = $bankButtonX');
+    // Fimber.i('bankButtonX = $bankButtonX');
     bankButtonY = processedOutput['bankButtonY'];
-    Fimber.i('bankButtonY = $bankButtonY');
+    // Fimber.i('bankButtonY = $bankButtonY');
     playerButtonX = processedOutput['playerButtonX'];
-    Fimber.i('playerButtonX = $playerButtonX');
+    // Fimber.i('playerButtonX = $playerButtonX');
     playerButtonY = processedOutput['playerButtonY'];
-    Fimber.i('playerButtonY = $playerButtonY');
+    // Fimber.i('playerButtonY = $playerButtonY');
     confirmButtonX = processedOutput['confirmButtonX'];
-    Fimber.i('confirmButtonX = $confirmButtonX');
+    // Fimber.i('confirmButtonX = $confirmButtonX');
     confirmButtonY = processedOutput['confirmButtonY'];
-    Fimber.i('confirmButtonY = $confirmButtonY');
+    // Fimber.i('confirmButtonY = $confirmButtonY');
 
 
 
@@ -140,20 +140,23 @@ class AllbetUIDetector{
     }
 
 
+    // Fimber.i("classList = $classList");
+    // Fimber.i("xList = $xList");
+    // Fimber.i("yList = $yList");
 
     if(classList.contains(1)){
-      Fimber.i("xList = $xList");
+      // Fimber.i("xList = $xList");
       winSide = "bank";
       return true;
     }
     if(classList.contains(4)){
-      Fimber.i("xList = $xList");
+      // Fimber.i("xList = $xList");
       winSide = "player";
       return true;
     }
 
     if(classList.contains(5)){
-      Fimber.i("xList = $xList");
+      // Fimber.i("xList = $xList");
       winSide = "draw";
       return true;
     }
