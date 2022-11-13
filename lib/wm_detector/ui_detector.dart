@@ -19,12 +19,12 @@ class WmUIDetector{
   // late TfLiteType _outputType;
   late TensorImage _inputImage;
 
-  double playerButtonX = 0.23;
-  double playerButtonY = 0.56;
-  double bankButtonX = 0.78;
-  double bankButtonY = 0.56;
-  double confirmButtonX = 0.65;
-  double confirmButtonY = 0.75;
+  // double playerButtonX = 0.23;
+  // double playerButtonY = 0.56;
+  // double bankButtonX = 0.78;
+  // double bankButtonY = 0.56;
+  // double confirmButtonX = 0.65;
+  // double confirmButtonY = 0.75;
 
 
   List output0 = List<double>.filled(2535*4, 0.0);

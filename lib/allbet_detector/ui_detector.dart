@@ -19,12 +19,12 @@ class AllbetUIDetector{
   // late TfLiteType _outputType;
   late TensorImage _inputImage;
 
-  double playerButtonX = 0.18;
-  double playerButtonY = 0.60;
-  double bankButtonX = 0.82;
-  double bankButtonY = 0.560;
-  double confirmButtonX = 0.50;
-  double confirmButtonY = 0.65;
+  // double playerButtonX = 0.18;
+  // double playerButtonY = 0.60;
+  // double bankButtonX = 0.82;
+  // double bankButtonY = 0.560;
+  // double confirmButtonX = 0.50;
+  // double confirmButtonY = 0.65;
 
 
   List output0 = List<double>.filled(2535*4, 0.0);
@@ -111,17 +111,17 @@ class AllbetUIDetector{
     xList = processedOutput['xList'];
     yList = processedOutput['yList'];
 
-    bankButtonX = processedOutput['bankButtonX'];
+    // bankButtonX = processedOutput['bankButtonX'];
     // Fimber.i('bankButtonX = $bankButtonX');
-    bankButtonY = processedOutput['bankButtonY'];
+    // bankButtonY = processedOutput['bankButtonY'];
     // Fimber.i('bankButtonY = $bankButtonY');
-    playerButtonX = processedOutput['playerButtonX'];
+    // playerButtonX = processedOutput['playerButtonX'];
     // Fimber.i('playerButtonX = $playerButtonX');
-    playerButtonY = processedOutput['playerButtonY'];
+    // playerButtonY = processedOutput['playerButtonY'];
     // Fimber.i('playerButtonY = $playerButtonY');
-    confirmButtonX = processedOutput['confirmButtonX'];
+    // confirmButtonX = processedOutput['confirmButtonX'];
     // Fimber.i('confirmButtonX = $confirmButtonX');
-    confirmButtonY = processedOutput['confirmButtonY'];
+    // confirmButtonY = processedOutput['confirmButtonY'];
     // Fimber.i('confirmButtonY = $confirmButtonY');
 
 

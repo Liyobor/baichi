@@ -201,14 +201,16 @@ List<List> allbetCardOutputProcess(List input){
 
 
 
-      // Fimber.i('---');
-      // Fimber.i('class = $cardClass');
-      // Fimber.i('score = $score');
-      // Fimber.i('x = $x');
-      // Fimber.i('y = $y');
+      Fimber.i('---');
+      Fimber.i('class = $cardClass');
+      Fimber.i('score = $score');
+      Fimber.i('x = $x');
+      Fimber.i('y = $y');
 
 
       var isDuplicate = false;
+      // Fimber.i('x = $x');
+      // Fimber.i('y = $y');
       if(y>0.5 && y<0.75){
 
 

@@ -5,12 +5,12 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 class DataHandler{
 
 
-  double playerButtonX = -1.0;
-  double playerButtonY = -1.0;
-  double bankButtonX = -1.0;
-  double bankButtonY = -1.0;
-  double confirmButtonX = -1.0;
-  double confirmButtonY = -1.0;
+  // double playerButtonX = -1.0;
+  // double playerButtonY = -1.0;
+  // double bankButtonX = -1.0;
+  // double bankButtonY = -1.0;
+  // double confirmButtonX = -1.0;
+  // double confirmButtonY = -1.0;
   GestureBinding taper = GestureBinding.instance;
 
   double mobileHeight = -1.0;
@@ -54,7 +54,7 @@ class DataHandler{
 
   void insertCard(List cardList){
     for(var card in cardList){
-      Fimber.i("card = $card");
+      // Fimber.i("card = $card");
       _point += pointMap[card]!;
     }
   }
@@ -146,8 +146,8 @@ class DataHandler{
     // webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapup);');
 
 
-    webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
-    webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup);');
+    // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
+    // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup);');
   }
 
   void clickBank(InAppWebViewController webViewController,String casino) async {

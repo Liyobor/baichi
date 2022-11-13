@@ -80,7 +80,8 @@ class AllbetCardDetector{
 
     List result = [];
 
-    Fimber.i("xList = $xList}");
+    // Fimber.i("xList = $xList}");
+
 
     if(xList.length<4 || xList.length>6){
       Fimber.i("card error");

@@ -736,38 +736,38 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                               ),
                             ),
                             //test
-                            SizedBox(
-                              height: 35,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: Stack(
-                                  children: [
-                                    Positioned.fill(
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            color: Colors.blue),
-                                      ),
-                                    ),
-                                    TextButton(
-                                        onPressed: () async {
-
-                                          // config.compressFormat = CompressFormat.JPEG;
-                                          // Uint8List? data = await webViewController?.takeScreenshot(
-                                          //     screenshotConfiguration: config);
-                                          // if(data!=null){
-                                          //   await ImageGallerySaver.saveImage(data, quality: 100);
-                                          // }
-                                          dataHandler.clickTest(webViewController!);
-                                        },
-                                        child: const Text(
-                                          "test",
-                                          style: TextStyle(color: Colors.white),
-                                        )
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // SizedBox(
+                            //   height: 35,
+                            //   child: ClipRRect(
+                            //     borderRadius: BorderRadius.circular(3),
+                            //     child: Stack(
+                            //       children: [
+                            //         Positioned.fill(
+                            //           child: Container(
+                            //             decoration: const BoxDecoration(
+                            //                 color: Colors.blue),
+                            //           ),
+                            //         ),
+                            //         TextButton(
+                            //             onPressed: () async {
+                            //
+                            //               // config.compressFormat = CompressFormat.JPEG;
+                            //               // Uint8List? data = await webViewController?.takeScreenshot(
+                            //               //     screenshotConfiguration: config);
+                            //               // if(data!=null){
+                            //               //   await ImageGallerySaver.saveImage(data, quality: 100);
+                            //               // }
+                            //               dataHandler.clickTest(webViewController!);
+                            //             },
+                            //             child: const Text(
+                            //               "test",
+                            //               style: TextStyle(color: Colors.white),
+                            //             )
+                            //         )
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -992,22 +992,22 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             //   Fimber.i("resultStr = ${uiDetector.resultStr}");
             // }
 
-            if(mounted){
-              dataHandler.playerButtonX =
-                  MediaQuery.of(context).size.width * wmUiDetector.playerButtonX;
-              dataHandler.playerButtonY = MediaQuery.of(context).size.height -
-                  (dataHandler.webViewHeight * (1 - wmUiDetector.playerButtonY));
-
-              dataHandler.bankButtonX =
-                  MediaQuery.of(context).size.width * wmUiDetector.bankButtonX;
-              dataHandler.bankButtonY = MediaQuery.of(context).size.height -
-                  (dataHandler.webViewHeight * (1 - wmUiDetector.bankButtonY));
-
-              dataHandler.confirmButtonX =
-                  MediaQuery.of(context).size.width * wmUiDetector.confirmButtonX;
-              dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
-                  (dataHandler.webViewHeight * (1 - wmUiDetector.confirmButtonY));
-            }
+            // if(mounted){
+            //   dataHandler.playerButtonX =
+            //       MediaQuery.of(context).size.width * wmUiDetector.playerButtonX;
+            //   dataHandler.playerButtonY = MediaQuery.of(context).size.height -
+            //       (dataHandler.webViewHeight * (1 - wmUiDetector.playerButtonY));
+            //
+            //   dataHandler.bankButtonX =
+            //       MediaQuery.of(context).size.width * wmUiDetector.bankButtonX;
+            //   dataHandler.bankButtonY = MediaQuery.of(context).size.height -
+            //       (dataHandler.webViewHeight * (1 - wmUiDetector.bankButtonY));
+            //
+            //   dataHandler.confirmButtonX =
+            //       MediaQuery.of(context).size.width * wmUiDetector.confirmButtonX;
+            //   dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
+            //       (dataHandler.webViewHeight * (1 - wmUiDetector.confirmButtonY));
+            // }
 
 
 
@@ -1188,22 +1188,22 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             //   Fimber.i("resultStr = ${uiDetector.resultStr}");
             // }
 
-            if(mounted){
-              dataHandler.playerButtonX =
-                  MediaQuery.of(context).size.width * allbetUiDetector.playerButtonX;
-              dataHandler.playerButtonY = MediaQuery.of(context).size.height -
-                  (dataHandler.webViewHeight * (1 - allbetUiDetector.playerButtonY));
-
-              dataHandler.bankButtonX =
-                  MediaQuery.of(context).size.width * allbetUiDetector.bankButtonX;
-              dataHandler.bankButtonY = MediaQuery.of(context).size.height -
-                  (dataHandler.webViewHeight * (1 - allbetUiDetector.bankButtonY));
-
-              dataHandler.confirmButtonX =
-                  MediaQuery.of(context).size.width * allbetUiDetector.confirmButtonX;
-              dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
-                  (dataHandler.webViewHeight * (1 - allbetUiDetector.confirmButtonY));
-            }
+            // if(mounted){
+            //   dataHandler.playerButtonX =
+            //       MediaQuery.of(context).size.width * allbetUiDetector.playerButtonX;
+            //   dataHandler.playerButtonY = MediaQuery.of(context).size.height -
+            //       (dataHandler.webViewHeight * (1 - allbetUiDetector.playerButtonY));
+            //
+            //   dataHandler.bankButtonX =
+            //       MediaQuery.of(context).size.width * allbetUiDetector.bankButtonX;
+            //   dataHandler.bankButtonY = MediaQuery.of(context).size.height -
+            //       (dataHandler.webViewHeight * (1 - allbetUiDetector.bankButtonY));
+            //
+            //   dataHandler.confirmButtonX =
+            //       MediaQuery.of(context).size.width * allbetUiDetector.confirmButtonX;
+            //   dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
+            //       (dataHandler.webViewHeight * (1 - allbetUiDetector.confirmButtonY));
+            // }
 
 
 
