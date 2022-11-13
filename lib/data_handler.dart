@@ -155,16 +155,16 @@ class DataHandler{
       case "WM":{
         // ContentWorld.world(name: webViewController.getIFrameId());
 
-        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
-        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
-        webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxBanker').click();");
+        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101')");
+        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document");
+        webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxBanker').click()");
         // document.getElementById('playbetboxBanker').click()
       }
       break;
 
       case "ALLBET":{
-        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
-        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup);');
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown)');
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup)');
         // await betBank();
       }
       break;
@@ -182,15 +182,15 @@ class DataHandler{
     switch(casino){
       case "WM":{
         // webViewController.evaluateJavascript(source: "document.getElementById('playbetboxPlayer').click()");
-        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
-        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
-        webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxPlayer').click();");
+        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101')");
+        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document");
+        webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxPlayer').click()");
       }
       break;
 
       case "ALLBET":{
-        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapdown);');
-        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapup);');
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapdown)');
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapup)');
         // await betPlayer();
       }
       break;
@@ -207,15 +207,15 @@ class DataHandler{
     switch(casino){
       case "WM":{
         // webViewController.evaluateJavascript(source: "document.getElementById('bet_btn').click()");
-        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
-        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
-        webViewController.evaluateJavascript(source: "var form = doc.getElementById('bet_btn').click();");
+        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101')");
+        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document");
+        webViewController.evaluateJavascript(source: "var form = doc.getElementById('bet_btn').click()");
       }
       break;
 
       case "ALLBET":{
-        webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapdown);');
-        webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapup);');
+        webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapdown)');
+        webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapup)');
         // bettingConfirm();
       }
       break;

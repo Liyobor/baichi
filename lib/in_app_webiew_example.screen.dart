@@ -389,8 +389,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         // Fimber.i(consoleMessage.message);
                         if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
                           // Fimber.i('setup event');
-                          String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e});";
-                          String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e});";
+                          String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
+                          String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
                           webViewController?.evaluateJavascript(source: 'var tapdown;');
                           webViewController?.evaluateJavascript(source: 'var tapup;');
                           webViewController?.evaluateJavascript(source: catchDown);

@@ -201,11 +201,11 @@ List<List> allbetCardOutputProcess(List input){
 
 
 
-      Fimber.i('---');
-      Fimber.i('class = $cardClass');
-      Fimber.i('score = $score');
-      Fimber.i('x = $x');
-      Fimber.i('y = $y');
+      // Fimber.i('---');
+      // Fimber.i('class = $cardClass');
+      // Fimber.i('score = $score');
+      // Fimber.i('x = $x');
+      // Fimber.i('y = $y');
 
 
       var isDuplicate = false;
@@ -215,7 +215,7 @@ List<List> allbetCardOutputProcess(List input){
 
 
         for(var value in xList){
-          if(x - value <=0.02){
+          if((x - value).abs() <=0.02){
             isDuplicate = true;
           }
         }
@@ -281,7 +281,7 @@ List<List> wmCardOutputProcess(List input){
 
 
         for(var value in xList){
-          if(x - value <=0.02){
+          if((x - value).abs() <=0.02){
             isDuplicate = true;
           }
         }
