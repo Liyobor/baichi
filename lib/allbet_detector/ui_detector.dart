@@ -127,11 +127,16 @@ class AllbetUIDetector{
 
 
 
+    // if (kDebugMode) {
+    //   print("class list = $classList");
+    //   print("xList = $xList");
+    //   print("yList = $yList");
+    // }
 
 
 
 
-    if(classList.contains(7)){
+    if(classList.contains(7)||classList.contains(1)||classList.contains(4)||classList.contains(5)){
       _state = 0;
     }else if(classList.contains(6)){
       _state = 2;

@@ -75,7 +75,7 @@ class DataHandler{
     Fimber.i("state change to $_state");
     if(_state==2){
       _reset();
-    }else if(_state ==1){
+    }else if(_state == 1){
       _bet(webViewController,casino);
     }else if(_state==0){
 
@@ -118,6 +118,7 @@ class DataHandler{
         betSide = null;
       }
       if(betSide!=null){
+        await Future.delayed(const Duration(milliseconds: 100));
         clickConfirm(webViewController, casino);
         // await bettingConfirm();
       }
@@ -142,8 +143,8 @@ class DataHandler{
     // webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
     // webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxPlayer').click();");
     // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("btn login-btn")[0].click()',contentWorld: );
-    // webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapdown);');
-    // webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapup);');
+    webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapdown);');
+    webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapup);');
 
 
     // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
