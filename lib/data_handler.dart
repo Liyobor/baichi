@@ -76,8 +76,6 @@ class DataHandler{
       _reset();
     }else if(_state ==1){
 
-
-
       _bet(webViewController,casino);
     }else if(_state==0){
 
@@ -88,10 +86,10 @@ class DataHandler{
 
   Future<void> _bet(InAppWebViewController webViewController,String casino) async {
     Fimber.i("bet");
-    if(bankButtonY < 0 || bankButtonX<0 ||playerButtonY<0 || playerButtonX<0 || confirmButtonX<0 || confirmButtonY<0 || webViewHeight<0 || mobileHeight<0 || mobileWidth<0){
-      Fimber.i("Button pos error!");
-      return;
-    }
+    // if(bankButtonY < 0 || bankButtonX<0 ||playerButtonY<0 || playerButtonX<0 || confirmButtonX<0 || confirmButtonY<0 || webViewHeight<0 || mobileHeight<0 || mobileWidth<0){
+    //   Fimber.i("Button pos error!");
+    //   return;
+    // }
     if(_state == 1){
     //  do bet operation
 
@@ -102,13 +100,13 @@ class DataHandler{
       if(_point>0){
         Fimber.i('betBank');
         for (int i = 0; i < betTimes; i++){
-          clickBankJS(webViewController, casino);
+          clickBank(webViewController, casino);
           // await betBank();
         }
       }else if(_point<0){
         Fimber.i('betPlayer');
         for (int i = 0; i < betTimes; i++) {
-          clickPlayerJS(webViewController, casino);
+          clickPlayer(webViewController, casino);
           // await betPlayer();
         }
       }else{
@@ -116,7 +114,7 @@ class DataHandler{
         betSide = null;
       }
       if(betSide!=null){
-        clickConfirmJS(webViewController, casino);
+        clickConfirm(webViewController, casino);
         // await bettingConfirm();
       }
 
@@ -136,18 +134,34 @@ class DataHandler{
   }
 
   void clickTest(InAppWebViewController webViewController){
-    webViewController.evaluateJavascript(source: 'document.getElementsByClassName("btn login-btn")[0].click()');
+    // webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
+    // webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
+    // webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxPlayer').click();");
+    // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("btn login-btn")[0].click()',contentWorld: );
+    // webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapdown);');
+    // webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapup);');
+
+
+    webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
+    webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup);');
   }
 
-  void clickBankJS(InAppWebViewController webViewController,String casino) {
+  void clickBank(InAppWebViewController webViewController,String casino) async {
     switch(casino){
       case "WM":{
-        webViewController.evaluateJavascript(source: "document.getElementById('playbetboxBanker').click()");
+        // ContentWorld.world(name: webViewController.getIFrameId());
+
+        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
+        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
+        webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxBanker').click();");
+        // document.getElementById('playbetboxBanker').click()
       }
       break;
 
       case "ALLBET":{
-
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup);');
+        // await betBank();
       }
       break;
 
@@ -159,16 +173,21 @@ class DataHandler{
 
   }
 
-  Future<void> clickPlayerJS(InAppWebViewController webViewController,String casino) async {
+  Future<void> clickPlayer(InAppWebViewController webViewController,String casino) async {
 
     switch(casino){
       case "WM":{
-        webViewController.evaluateJavascript(source: "document.getElementById('playbetboxPlayer').click()");
+        // webViewController.evaluateJavascript(source: "document.getElementById('playbetboxPlayer').click()");
+        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
+        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
+        webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxPlayer').click();");
       }
       break;
 
       case "ALLBET":{
-
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapdown);');
+        webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapup);');
+        // await betPlayer();
       }
       break;
 
@@ -177,15 +196,23 @@ class DataHandler{
     }
 
   }
-  Future<void> clickConfirmJS(InAppWebViewController webViewController,String casino) async {
+
+
+
+  Future<void> clickConfirm(InAppWebViewController webViewController,String casino) async {
     switch(casino){
       case "WM":{
-        webViewController.evaluateJavascript(source: "document.getElementById('bet_btn').click()");
+        // webViewController.evaluateJavascript(source: "document.getElementById('bet_btn').click()");
+        webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
+        webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
+        webViewController.evaluateJavascript(source: "var form = doc.getElementById('bet_btn').click();");
       }
       break;
 
       case "ALLBET":{
-
+        webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapdown);');
+        webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapup);');
+        // bettingConfirm();
       }
       break;
 
@@ -194,52 +221,52 @@ class DataHandler{
     }
   }
 
-  Future<void> betBank() async {
-    Fimber.i("betBank");
+  // Future<void> betBank() async {
+  //   Fimber.i("betBank");
+  //
+  //   Fimber.i("bankButton pos :$bankButtonX,$bankButtonY");
+  //   await Future.delayed(const Duration(milliseconds: 50));
+  //   taper.handlePointerEvent(PointerDownEvent(
+  //     position: Offset(bankButtonX, bankButtonY),
+  //   ));
+  //   await Future.delayed(const Duration(milliseconds: 50));
+  //   taper.handlePointerEvent(PointerUpEvent(
+  //     position: Offset(bankButtonX, bankButtonY),
+  //   ));
+  //   betSide = "bank";
+  //
+  // }
 
-    Fimber.i("bankButton pos :$bankButtonX,$bankButtonY");
-    await Future.delayed(const Duration(milliseconds: 50));
-    taper.handlePointerEvent(PointerDownEvent(
-      position: Offset(bankButtonX, bankButtonY),
-    ));
-    await Future.delayed(const Duration(milliseconds: 50));
-    taper.handlePointerEvent(PointerUpEvent(
-      position: Offset(bankButtonX, bankButtonY),
-    ));
-    betSide = "bank";
+  // Future<void> betPlayer() async {
+  //   Fimber.i("betPlayer");
+  //
+  //   Fimber.i("playerButton pos :$playerButtonX,$playerButtonY");
+  //   await Future.delayed(const Duration(milliseconds: 50));
+  //   taper.handlePointerEvent(PointerDownEvent(
+  //     position: Offset(playerButtonX, playerButtonY),
+  //   ));
+  //   await Future.delayed(const Duration(milliseconds: 50));
+  //   taper.handlePointerEvent( PointerUpEvent(
+  //     position: Offset(playerButtonX, playerButtonY),
+  //   ));
+  //   betSide = "player";
+  // }
 
-  }
-
-  Future<void> betPlayer() async {
-    Fimber.i("betPlayer");
-
-    Fimber.i("playerButton pos :$playerButtonX,$playerButtonY");
-    await Future.delayed(const Duration(milliseconds: 50));
-    taper.handlePointerEvent(PointerDownEvent(
-      position: Offset(playerButtonX, playerButtonY),
-    ));
-    await Future.delayed(const Duration(milliseconds: 50));
-    taper.handlePointerEvent( PointerUpEvent(
-      position: Offset(playerButtonX, playerButtonY),
-    ));
-    betSide = "player";
-  }
-
-  Future<void> bettingConfirm() async {
-    Fimber.i("bettingConfirm");
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    Fimber.i("confirmButton pos :$confirmButtonX,$confirmButtonY");
-    taper.handlePointerEvent(PointerDownEvent(
-      position: Offset(confirmButtonX, confirmButtonY),
-    ));
-    await Future.delayed(const Duration(milliseconds: 200));
-    taper.handlePointerEvent(PointerUpEvent(
-      position: Offset(confirmButtonX, confirmButtonY),
-    ));
-
-  }
+  // Future<void> bettingConfirm() async {
+  //   Fimber.i("bettingConfirm");
+  //
+  //   await Future.delayed(const Duration(milliseconds: 300));
+  //
+  //   Fimber.i("confirmButton pos :$confirmButtonX,$confirmButtonY");
+  //   taper.handlePointerEvent(PointerDownEvent(
+  //     position: Offset(confirmButtonX, confirmButtonY),
+  //   ));
+  //   await Future.delayed(const Duration(milliseconds: 50));
+  //   taper.handlePointerEvent(PointerUpEvent(
+  //     position: Offset(confirmButtonX, confirmButtonY),
+  //   ));
+  //
+  // }
 
   void checkWinOrLose(String? winSide){
     if(winSide==null || betSide==null){

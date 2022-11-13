@@ -46,9 +46,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
+
     useOnLoadResource: true,
     javaScriptEnabled: true,
-    useShouldInterceptAjaxRequest: true,
+    // useShouldInterceptAjaxRequest: true,
     useShouldOverrideUrlLoading: true,
     mediaPlaybackRequiresUserGesture: false,
     useHybridComposition: true,
@@ -214,6 +215,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 child: Stack(
                   children: [
                     InAppWebView(
+
                       key: webViewKey,
                       // contextMenu: contextMenu,
                       initialUrlRequest: URLRequest(
@@ -225,7 +227,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
                         // Fimber.i("onLoadResource");
-                        // Fimber.i("resource = ${resource.url}");
+                        Fimber.i("resource = ${resource.url}");
 
                         if (resource.url.toString().contains("iframe_101")) {
                           wmCatchMoney().then((value) {
@@ -246,15 +248,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           });
                         }
                       },
-                      onPageCommitVisible: (controller, url) {
-                        Fimber.i("onPageCommitVisible");
-                      },
-                      onWindowFocus: (controller) {
-                        Fimber.i("onWindowFocus");
-                      },
-                      onWindowBlur: (controller) {
-                        Fimber.i("onWindowBlur");
-                      },
+                      // onPageCommitVisible: (controller, url) {
+                      //   Fimber.i("onPageCommitVisible");
+                      // },
+                      // onWindowFocus: (controller) {
+                      //   Fimber.i("onWindowFocus");
+                      // },
+                      // onWindowBlur: (controller) {
+                      //   Fimber.i("onWindowBlur");
+                      // },
                       onWebViewCreated: (controller) {
                         webViewController = controller;
                         counter.initCount();
@@ -266,11 +268,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           urlController.text = this.url;
                         });
                       },
-                      onAjaxProgress: (controller, ajaxRequest) async {
-                        // Fimber.i('onAjaxProgress');
-                        // Fimber.i('${ajaxRequest.status}');
-                        return AjaxRequestAction.PROCEED;
-                      },
+                      // onAjaxProgress: (controller, ajaxRequest) async {
+                      //   // Fimber.i('onAjaxProgress');
+                      //   // Fimber.i('${ajaxRequest.status}');
+                      //   return AjaxRequestAction.PROCEED;
+                      // },
                       onPermissionRequest: (controller,request) async {
                         return PermissionResponse(resources: request.resources,action: PermissionResponseAction.GRANT);
                         }
@@ -336,12 +338,28 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         // Fimber.i("onTitleChanged");
                         Fimber.i("title = $title");
 
+                        switch(title){
+                          case "WM":{
+                            casino = title;
+                          }
+                          break;
 
-                        if(title=="WM" || title == "ALLBET"){
-                          casino = title;
-                        }else{
-                          casino = null;
+                          case "ALLBET":{
+                            casino = title;
+                          }
+                          break;
+
+                          default:{
+                            casino = null;
+                          }
+                          break;
                         }
+
+                        // if(title=="WM" || title == "ALLBET"){
+                        //   casino = title;
+                        // }else{
+                        //   casino = null;
+                        // }
 
                         if (isUIDetectorRunning) {
                           apiHandler.isCalculatorRunning = 0;
@@ -368,7 +386,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
                         Fimber.i('onConsoleMessage');
-                        Fimber.i("$consoleMessage");
+                        Fimber.i(consoleMessage.message);
+                        if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
+                          Fimber.i('setup event');
+                          String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e});";
+                          String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e});";
+                          webViewController?.evaluateJavascript(source: 'var tapdown;');
+                          webViewController?.evaluateJavascript(source: 'var tapup;');
+                          webViewController?.evaluateJavascript(source: catchDown);
+                          webViewController?.evaluateJavascript(source: catchUp);
+                        }
+                        
                       },
                       onCreateWindow: (controller, createWindowRequest) async {
                         Fimber.i("onCreateWindow");
@@ -722,8 +750,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     ),
                                     TextButton(
                                         onPressed: () async {
-                                          dataHandler.clickTest(webViewController!);
 
+                                          // config.compressFormat = CompressFormat.JPEG;
+                                          // Uint8List? data = await webViewController?.takeScreenshot(
+                                          //     screenshotConfiguration: config);
+                                          // if(data!=null){
+                                          //   await ImageGallerySaver.saveImage(data, quality: 100);
+                                          // }
+                                          dataHandler.clickTest(webViewController!);
                                         },
                                         child: const Text(
                                           "test",
@@ -1127,6 +1161,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             screenshotConfiguration: config);
 
         Fimber.i("screen shot finished");
+        // Fimber.i("state = ${allbetUiDetector.getCalculatorState()}");
         await webViewController?.getContentHeight().then((value) => {
           dataHandler.mobileWidth = MediaQuery.of(context).size.width,
           dataHandler.mobileHeight = MediaQuery.of(context).size.height,
@@ -1138,7 +1173,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
           if (imageData != null) {
             bool isLaunchCardDetector =
-            await allbetUiDetector.putImageIntoModel(imageData);
+              await allbetUiDetector.putImageIntoModel(imageData);
             // if (uiDetector.resultStr == "didn't find button") {
             //   ImageGallerySaver.saveImage(data, quality: 100);
             // } else if (uiDetector.resultStr == "button error") {
@@ -1179,7 +1214,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             if (state == 1 && cardDetectLock) {
               cardDetectLock = false;
             }
-
             if (isLaunchCardDetector && !cardDetectLock) {
               if (allbetUiDetector.winSide == "bank") {
                 snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);

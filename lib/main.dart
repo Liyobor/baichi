@@ -35,9 +35,12 @@ Future main() async {
   Fimber.clearAll();
   Fimber.plantTree(DebugTree());
   await _checkPermissions();
+  WebView.debugLoggingSettings.enabled = false;
 
   if(Platform.isAndroid) {
+
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+
     var swAvailable = await WebViewFeature.isFeatureSupported(
         WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
     var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
