@@ -386,9 +386,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
                         // Fimber.i('onConsoleMessage');
-                        // Fimber.i(consoleMessage.message);
+                        Fimber.i(consoleMessage.message);
                         if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
                           // Fimber.i('setup event');
+                          allbetCatchMoneyJS().then((value){
+                          allbetMoney = value;
+                          Fimber.i("value = $value");
+                          Fimber.i('set allbetMoney');
+                          Fimber.i('allbetMoney = $allbetMoney');
+                          });
                           String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
                           String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
                           webViewController?.evaluateJavascript(source: 'var tapdown;');
@@ -757,7 +763,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             //               // if(data!=null){
                             //               //   await ImageGallerySaver.saveImage(data, quality: 100);
                             //               // }
-                            //               dataHandler.clickTest(webViewController!);
+                            //               // dataHandler.clickTest(webViewController!);
+                            //               await allbetCatchMoneyJS();
                             //             },
                             //             child: const Text(
                             //               "test",
@@ -814,6 +821,36 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       timer?.cancel();
       timer = null;
     }
+  }
+
+  Future<double> allbetCatchMoneyJS() async {
+
+    String temp = await webViewController?.evaluateJavascript(source: 'document.getElementById("amount").textContent');
+    temp = temp.replaceAll(",", "");
+    double moneyTemp = double.parse(temp);
+    Fimber.i("moneyTemp = $moneyTemp");
+    return moneyTemp;
+
+    // if (html == null) {
+    //   String? html = await webViewController?.getHtml();
+    //   if (html != null) {
+    //     // Fimber.i("html = $html");
+    //     // Fimber.i("str len = ${html.length}");
+    //
+    //     final double? dollar = await compute(allbetGetMoneyInIsolate, html);
+    //     Fimber.i("dollar = $dollar");
+    //     if (dollar != null) {
+    //       snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+    //       html = null;
+    //       return dollar;
+    //     } else {
+    //       snackBarController.showRecognizeResult("讀取不到金額", 1500);
+    //       html = null;
+    //       return -1;
+    //     }
+    //   }
+    // }
+    // return -1;
   }
 
   Future<double> allbetCatchMoney() async {
