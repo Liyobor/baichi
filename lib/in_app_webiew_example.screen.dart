@@ -20,14 +20,13 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:image/image.dart' as image;
 import 'package:provider/provider.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'allbet_detector/card_detector.dart';
 import 'allbet_detector/ui_detector.dart';
 import 'wm_detector/card_detector.dart';
 import 'wm_detector/ui_detector.dart';
 
-var _snackBarPresenting = false;
+// var _snackBarPresenting = false;
 
 class InAppWebViewExampleScreen extends StatefulWidget {
   const InAppWebViewExampleScreen({Key? key}) : super(key: key);
@@ -112,6 +111,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
     config.compressFormat = CompressFormat.JPEG;
     snackBarController = SnackBarController(context: context);
+    Fimber.i("apiHandler.defaultUrl = ${apiHandler.defaultUrl}");
 
     contextMenu = ContextMenu(
         menuItems: [
@@ -180,23 +180,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           onTapDown: (details) {
             Fimber.i("${details.globalPosition}");
           },
-          child: WillPopScope(
-            onWillPop: () async {
-              if (_snackBarPresenting) {
-                EasyLoading.show(status: '與伺服器同步狀態中...');
-                await apiHandler.check2WhenCloseApp();
-                // await apiHandler.debtApiWhenCloseApp();
-                // EasyLoading.dismiss();
-                return true;
-              }
-              _snackBarPresenting = true;
-              var snackBar = const SnackBar(content: Text('再次點擊back關閉app'));
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(snackBar)
-                  .closed
-                  .then((_) => _snackBarPresenting = false);
-              return false;
-            },
+          // child: WillPopScope(
+          //   onWillPop: () async {
+          //     if (_snackBarPresenting) {
+          //       EasyLoading.show(status: '與伺服器同步狀態中...');
+          //       await apiHandler.check2WhenCloseApp();
+          //       // await apiHandler.debtApiWhenCloseApp();
+          //       // EasyLoading.dismiss();
+          //       return true;
+          //     }
+          //     _snackBarPresenting = true;
+          //     var snackBar = const SnackBar(content: Text('再次點擊back關閉app'));
+          //     ScaffoldMessenger.of(context)
+          //         .showSnackBar(snackBar)
+          //         .closed
+          //         .then((_) => _snackBarPresenting = false);
+          //     return false;
+          //   },
             child: Column(children: <Widget>[
               TextField(
                 decoration:
@@ -220,7 +220,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       // contextMenu: contextMenu,
                       initialUrlRequest: URLRequest(
                           url:
-                          WebUri("https://www.bl868.net/new_home2.php")),
+                          WebUri(apiHandler.defaultUrl)),
                       // initialFile: "assets/index.html",
                       initialUserScripts: UnmodifiableListView<UserScript>([]),
                       initialSettings: settings,
@@ -789,7 +789,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                 ),
               ),
             ]),
-          ),
+          // ),
         )));
   }
 

@@ -6,7 +6,6 @@ import 'dart:math';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as image;
-import 'dart:typed_data';
 
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
@@ -15,8 +14,8 @@ image.Image? decodeImage(Uint8List data){
 }
 
 TensorImage preProcess(List param) {
-  final _inputShape1 = param[0];
-  final _inputShape2 = param[1];
+  final inputShape1 = param[0];
+  final inputShape2 = param[1];
   final inputImage = TensorImage(param[2]);
   inputImage.loadImage(param[3]);
 
@@ -24,7 +23,7 @@ TensorImage preProcess(List param) {
   return ImageProcessorBuilder()
   // .add(ResizeWithCropOrPadOp(cropSize, cropSize))
       .add(ResizeOp(
-      _inputShape1, _inputShape2, ResizeMethod.BILINEAR))
+      inputShape1, inputShape2, ResizeMethod.BILINEAR))
       .add(NormalizeOp(0, 255))
       .build()
       .process(inputImage);

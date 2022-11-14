@@ -2,15 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:fimber/fimber.dart';
-import 'package:untitled/utils/isolate_function.dart';
 import 'package:untitled/utils/self_encrypted_shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 import 'package:untitled/utils/counter.dart';
 // import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
 
 class ApiHandler{
+  static final ApiHandler _singleton = ApiHandler._internal();
+  factory ApiHandler() {
+    return _singleton;
+  }
+
+  ApiHandler._internal();
+
 
   final _httpClient = HttpClient();
 
@@ -19,6 +24,7 @@ class ApiHandler{
   int code = 0;
   String? uuid;
   String returnMsg = "出錯了! 請聯繫客服" ;
+  String defaultUrl = "https://www.bl868.net/new_home2.php";
 
 
 
@@ -36,6 +42,14 @@ class ApiHandler{
 
 
 
+  Future<String> getDefaultUrl()async{
+    var uri = Uri.http('bigwinners.cc', '/api/baccarat/get_default_url');
+    var request = await _httpClient.getUrl(uri);
+    var response = await request.close();
+    var responseBody = await response.transform(utf8.decoder).join();
+    defaultUrl = responseBody;
+    return(responseBody);
+  }
 
   Future<String?> checkServeState() async {
 
@@ -53,8 +67,8 @@ class ApiHandler{
     }
 
     if(data["code"]==0){
-      final Uri _url = Uri.parse(data["data"]["checkout_link"]);
-      _launchUrlUtil(_url);
+      final Uri url = Uri.parse(data["data"]["checkout_link"]);
+      _launchUrlUtil(url);
       return null;
       // Fimber.i("link = ${data["data"]["checkout_link"]}");
     }
@@ -90,8 +104,8 @@ class ApiHandler{
     Map data = json.decode(responseBody);
     Fimber.i("data = $data");
     if(data['code'] == 1){
-      final Uri _url = Uri.parse(data["data"]["checkout_link"]);
-      _launchUrlUtil(_url);
+      final Uri url = Uri.parse(data["data"]["checkout_link"]);
+      _launchUrlUtil(url);
 
     }
     if(data['code'] == 0){
@@ -132,10 +146,10 @@ class ApiHandler{
   }
 
 
-  Future<void> _launchUrlUtil(Uri _url) async {
-    if (!await launchUrl(_url,
+  Future<void> _launchUrlUtil(Uri url) async {
+    if (!await launchUrl(url,
         mode: LaunchMode.externalApplication,webViewConfiguration: const WebViewConfiguration(enableJavaScript: true,enableDomStorage: true))) {
-      throw 'Could not launch $_url';
+      throw 'Could not launch $url';
     }
   }
 
