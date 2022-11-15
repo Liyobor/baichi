@@ -17,7 +17,7 @@ class InitPage extends StatefulWidget {
 class _InitPageState extends State<InitPage> {
 
 
-  final TextEditingController _passCodeFieldController = TextEditingController();
+  // final TextEditingController _passCodeFieldController = TextEditingController();
   late TextEditingController _urlTextController;
 
 
@@ -45,17 +45,17 @@ class _InitPageState extends State<InitPage> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-              child: TextFormField(
-                controller: _passCodeFieldController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.abc_outlined),
-                  labelText: "代碼",
-                  hintText: "輸入提示(可改)",
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            //   child: TextFormField(
+            //     controller: _passCodeFieldController,
+            //     decoration: const InputDecoration(
+            //       prefixIcon: Icon(Icons.abc_outlined),
+            //       labelText: "代碼",
+            //       hintText: "輸入提示(可改)",
+            //     ),
+            //   ),
+            // ),
 
             Padding(
               padding: const EdgeInsets.only(top: 24),
@@ -70,20 +70,21 @@ class _InitPageState extends State<InitPage> {
                         String urlStr = "https://www.bl868.net/new_home2.php";
 
                         // bool urlCheck = Uri.tryParse(_urlTextController.text)?.hasAbsolutePath ?? false;
-                        if(_passCodeFieldController.text == ""){
-                          _showDialog("代碼不可為空!");
-                        }else{
-                          apiHandler.userPassCode = _passCodeFieldController.text;
+                        // if(_passCodeFieldController.text == ""){
+                        //   _showDialog("代碼不可為空!");
+                        // }else{
+                        //   apiHandler.userPassCode = _passCodeFieldController.text;
                           apiHandler.defaultUrl = urlStr;
-                          EasyLoading.show(status: '檢查代碼...');
-                          String? result = await apiHandler.checkServeState();
-                          EasyLoading.dismiss();
-                          if(result=="clear" && mounted){
+                          // EasyLoading.show(status: '檢查代碼...');
+                          // String? result = await apiHandler.checkServeState();
+                          // EasyLoading.dismiss();
+                          // if(mounted){
                             Navigator.push(context, MaterialPageRoute(builder: (context)=> const InAppWebViewExampleScreen()));
-                          }else{
-                            _showDialog("代碼出錯!");
-                          }
-                        }
+                          // }
+                          // else{
+                          //   _showDialog("代碼出錯!");
+                          // }
+                        // }
                         // Fimber.i(_textFieldController.text);
                       },
                     ),
@@ -101,23 +102,25 @@ class _InitPageState extends State<InitPage> {
                         }
                         bool validURL = Uri.parse(urlStr).isAbsolute;
                         // bool urlCheck = Uri.tryParse(_urlTextController.text)?.hasAbsolutePath ?? false;
-                        if(_passCodeFieldController.text == ""){
-                          _showDialog("代碼不可為空!");
-                        }else if(!validURL){
+                        // if(_passCodeFieldController.text == ""){
+                        //   _showDialog("代碼不可為空!");
+                        // }
+                        if(!validURL){
                           _showDialog("網址格式錯誤!");
                         } else{
-                          apiHandler.userPassCode = _passCodeFieldController.text;
+                          // apiHandler.userPassCode = _passCodeFieldController.text;
                           apiHandler.defaultUrl = urlStr;
-                          EasyLoading.show(status: '檢查代碼...');
-                          String? result = await apiHandler.checkServeState();
-                          EasyLoading.dismiss();
-                          if(result=="clear" && mounted){
+                          // EasyLoading.show(status: '檢查代碼...');
+                          // String? result = await apiHandler.checkServeState();
+                          // EasyLoading.dismiss();
+                          // if(mounted){
                             // apiHandler.getDefaultUrl().then((value) => _showDialog(value));
 
                             Navigator.push(context, MaterialPageRoute(builder: (context)=> const InAppWebViewExampleScreen()));
-                          }else{
-                            _showDialog("代碼出錯!");
-                          }
+                          // }
+                          // else{
+                          //   _showDialog("代碼出錯!");
+                          // }
                         }
                         // Fimber.i(_textFieldController.text);
                       },

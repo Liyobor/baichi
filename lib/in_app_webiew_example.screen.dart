@@ -84,7 +84,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   DataHandler dataHandler = DataHandler();
   ApiHandler apiHandler = ApiHandler();
 
-  final TextEditingController _textFieldController = TextEditingController();
+  // final TextEditingController _textFieldController = TextEditingController();
 
   ScreenshotConfiguration config = ScreenshotConfiguration();
   late SnackBarController snackBarController;
@@ -111,7 +111,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
     config.compressFormat = CompressFormat.JPEG;
     snackBarController = SnackBarController(context: context);
-    Fimber.i("apiHandler.defaultUrl = ${apiHandler.defaultUrl}");
+    // Fimber.i("apiHandler.defaultUrl = ${apiHandler.defaultUrl}");
 
     contextMenu = ContextMenu(
         menuItems: [
@@ -229,24 +229,24 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         // Fimber.i("onLoadResource");
                         // Fimber.i("resource = ${resource.url}");
 
-                        if (resource.url.toString().contains("iframe_101")) {
-                          wmCatchMoney().then((value) {
-                            wmMoney = value.toDouble();
-                            Fimber.i("value = $value");
-                            Fimber.i('set wmMoney');
-                            Fimber.i('wmMoney = $wmMoney');
-                          });
-                        }
-
-                        if(resource.url.toString().contains("www.ab.games:8888/undefined")){
-                          Fimber.i("resource.url = ${resource.url}");
-                          allbetCatchMoney().then((value) {
-                            allbetMoney = value.toDouble();
-                            Fimber.i("value = $value");
-                            Fimber.i('set allbetMoney');
-                            Fimber.i('allbetMoney = $allbetMoney');
-                          });
-                        }
+                        // if (resource.url.toString().contains("iframe_101")) {
+                        //   wmCatchMoney().then((value) {
+                        //     wmMoney = value.toDouble();
+                        //     Fimber.i("value = $value");
+                        //     Fimber.i('set wmMoney');
+                        //     Fimber.i('wmMoney = $wmMoney');
+                        //   });
+                        // }
+                        //
+                        // if(resource.url.toString().contains("www.ab.games:8888/undefined")){
+                        //   Fimber.i("resource.url = ${resource.url}");
+                        //   allbetCatchMoney().then((value) {
+                        //     allbetMoney = value.toDouble();
+                        //     Fimber.i("value = $value");
+                        //     Fimber.i('set allbetMoney');
+                        //     Fimber.i('allbetMoney = $allbetMoney');
+                        //   });
+                        // }
                       },
                       // onPageCommitVisible: (controller, url) {
                       //   Fimber.i("onPageCommitVisible");
@@ -362,11 +362,25 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         // }
 
                         if (isUIDetectorRunning) {
-                          apiHandler.isCalculatorRunning = 0;
-                          apiHandler.routineCheck();
+                          // apiHandler.isCalculatorRunning = 0;
+                          // apiHandler.routineCheck();
                           setState(() {
                             isUIDetectorRunning = false;
                           });
+
+                          switch(title){
+                            case "WM":{
+                              _stopWmProcess();
+                            }
+                            break;
+
+                            case "ALLBET":{
+                              _stopAllbetProcess();
+                            }
+                            break;
+
+                          }
+
                           snackBarController.showRecognizeResult(
                               "偵測到網頁跳轉，停止辨識", 2000);
                           stopTimer();
@@ -443,167 +457,167 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         child: ButtonBar(
                           alignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            SizedBox(
-                              height: 35,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: Stack(
-                                  children: [
-                                    if (counter.count >= paidTime)
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              color: Colors.blue),
-                                        ),
-                                      )
-                                    else
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              color: Colors.grey),
-                                        ),
-                                      ),
-                                    TextButton(
-                                        onPressed: () async {
-                                          if (counter.count >= paidTime) {
-
-                                            switch(casino){
-                                              case "WM":{
-                                                wmCatchMoney().then((value) async {
-                                                  if (value < 0) {
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
-                                                    if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
-                                                      fee += lastFee;
-                                                    }
-                                                  } else {
-                                                    fee += (value - wmMoney) / 10;
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
-                                                    Fimber.i("Fee = $fee");
-                                                    if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
-                                                      fee += lastFee;
-                                                    }
-                                                  }
-
-                                                  Fimber.i("after calc fee =$fee");
-                                                  if (fee >= 1000) {
-                                                    _stopWmProcess();
-                                                    await apiHandler.debtApi(fee.toInt()).then((value){
-                                                      if(value){
-                                                        selfEncryptedSharedPreference
-                                                            .setFee(0.0);
-                                                      }
-                                                    });
-
-                                                  } else if (fee <= 0) {
-                                                    counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(0.0);
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
-                                                  } else {
-                                                    counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(fee);
-                                                    Fimber.i("setFee = $fee");
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
-                                                  }
-
-                                                  fee = 0;
-                                                  wmMoney = value;
-                                                });
-                                              }
-                                              break;
-
-                                              case "ALLBET":{
-                                                allbetCatchMoney().then((value) async {
-                                                  if (value < 0) {
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
-                                                    if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
-                                                      fee += lastFee;
-                                                    }
-                                                  } else {
-                                                    fee += (value - allbetMoney) / 10;
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
-                                                    Fimber.i("Fee = $fee");
-                                                    if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
-                                                      fee += lastFee;
-                                                    }
-                                                  }
-
-                                                  Fimber.i("after calc fee =$fee");
-                                                  if (fee >= 1000) {
-                                                    _stopAllbetProcess();
-                                                    await apiHandler.debtApi(fee.toInt()).then((value){
-                                                      if(value){
-                                                        selfEncryptedSharedPreference
-                                                            .setFee(0.0);
-                                                      }
-                                                    });
-
-                                                  } else if (fee <= 0) {
-                                                    counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(0.0);
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
-                                                  } else {
-                                                    counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(fee);
-                                                    Fimber.i("setFee = $fee");
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
-                                                  }
-
-                                                  fee = 0;
-                                                  allbetMoney = value;
-                                                });
-                                              }
-                                              break;
-
-                                              default:{
-                                                snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                                                Fimber.i('casino = null');
-                                              }
-                                              break;
-                                            }
-
-
-                                          }
-                                        },
-                                        child: const Text(
-                                          "繳費",
-                                          style: TextStyle(color: Colors.white),
-                                        ))
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // SizedBox(
+                            //   height: 35,
+                            //   child: ClipRRect(
+                            //     borderRadius: BorderRadius.circular(3),
+                            //     child: Stack(
+                            //       children: [
+                            //         if (counter.count >= paidTime)
+                            //           Positioned.fill(
+                            //             child: Container(
+                            //               decoration: const BoxDecoration(
+                            //                   color: Colors.blue),
+                            //             ),
+                            //           )
+                            //         else
+                            //           Positioned.fill(
+                            //             child: Container(
+                            //               decoration: const BoxDecoration(
+                            //                   color: Colors.grey),
+                            //             ),
+                            //           ),
+                            //         TextButton(
+                            //             onPressed: () async {
+                            //               if (counter.count >= paidTime) {
+                            //
+                            //                 switch(casino){
+                            //                   case "WM":{
+                            //                     wmCatchMoney().then((value) async {
+                            //                       if (value < 0) {
+                            //                         final tempFee =
+                            //                         await selfEncryptedSharedPreference
+                            //                             .getFee();
+                            //                         if (tempFee != null) {
+                            //                           double lastFee =
+                            //                           double.parse(tempFee);
+                            //                           Fimber.i(
+                            //                               "lastFee = $lastFee");
+                            //                           fee += lastFee;
+                            //                         }
+                            //                       } else {
+                            //                         fee += (value - wmMoney) / 10;
+                            //                         final tempFee =
+                            //                         await selfEncryptedSharedPreference
+                            //                             .getFee();
+                            //                         Fimber.i("Fee = $fee");
+                            //                         if (tempFee != null) {
+                            //                           double lastFee =
+                            //                           double.parse(tempFee);
+                            //                           Fimber.i(
+                            //                               "lastFee = $lastFee");
+                            //                           fee += lastFee;
+                            //                         }
+                            //                       }
+                            //
+                            //                       Fimber.i("after calc fee =$fee");
+                            //                       if (fee >= 1000) {
+                            //                         _stopWmProcess();
+                            //                         await apiHandler.debtApi(fee.toInt()).then((value){
+                            //                           if(value){
+                            //                             selfEncryptedSharedPreference
+                            //                                 .setFee(0.0);
+                            //                           }
+                            //                         });
+                            //
+                            //                       } else if (fee <= 0) {
+                            //                         counter.resetTimer();
+                            //                         selfEncryptedSharedPreference
+                            //                             .setFee(0.0);
+                            //                         selfEncryptedSharedPreference
+                            //                             .saveRemainTime();
+                            //                       } else {
+                            //                         counter.resetTimer();
+                            //                         selfEncryptedSharedPreference
+                            //                             .setFee(fee);
+                            //                         Fimber.i("setFee = $fee");
+                            //                         selfEncryptedSharedPreference
+                            //                             .saveRemainTime();
+                            //                       }
+                            //
+                            //                       fee = 0;
+                            //                       wmMoney = value;
+                            //                     });
+                            //                   }
+                            //                   break;
+                            //
+                            //                   case "ALLBET":{
+                            //                     allbetCatchMoney().then((value) async {
+                            //                       if (value < 0) {
+                            //                         final tempFee =
+                            //                         await selfEncryptedSharedPreference
+                            //                             .getFee();
+                            //                         if (tempFee != null) {
+                            //                           double lastFee =
+                            //                           double.parse(tempFee);
+                            //                           Fimber.i(
+                            //                               "lastFee = $lastFee");
+                            //                           fee += lastFee;
+                            //                         }
+                            //                       } else {
+                            //                         fee += (value - allbetMoney) / 10;
+                            //                         final tempFee =
+                            //                         await selfEncryptedSharedPreference
+                            //                             .getFee();
+                            //                         Fimber.i("Fee = $fee");
+                            //                         if (tempFee != null) {
+                            //                           double lastFee =
+                            //                           double.parse(tempFee);
+                            //                           Fimber.i(
+                            //                               "lastFee = $lastFee");
+                            //                           fee += lastFee;
+                            //                         }
+                            //                       }
+                            //
+                            //                       Fimber.i("after calc fee =$fee");
+                            //                       if (fee >= 1000) {
+                            //                         _stopAllbetProcess();
+                            //                         await apiHandler.debtApi(fee.toInt()).then((value){
+                            //                           if(value){
+                            //                             selfEncryptedSharedPreference
+                            //                                 .setFee(0.0);
+                            //                           }
+                            //                         });
+                            //
+                            //                       } else if (fee <= 0) {
+                            //                         counter.resetTimer();
+                            //                         selfEncryptedSharedPreference
+                            //                             .setFee(0.0);
+                            //                         selfEncryptedSharedPreference
+                            //                             .saveRemainTime();
+                            //                       } else {
+                            //                         counter.resetTimer();
+                            //                         selfEncryptedSharedPreference
+                            //                             .setFee(fee);
+                            //                         Fimber.i("setFee = $fee");
+                            //                         selfEncryptedSharedPreference
+                            //                             .saveRemainTime();
+                            //                       }
+                            //
+                            //                       fee = 0;
+                            //                       allbetMoney = value;
+                            //                     });
+                            //                   }
+                            //                   break;
+                            //
+                            //                   default:{
+                            //                     snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                            //                     Fimber.i('casino = null');
+                            //                   }
+                            //                   break;
+                            //                 }
+                            //
+                            //
+                            //               }
+                            //             },
+                            //             child: const Text(
+                            //               "繳費",
+                            //               style: TextStyle(color: Colors.white),
+                            //             ))
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                             SizedBox(
                               height: 35,
                               child: ClipRRect(
@@ -619,16 +633,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     TextButton(
                                         onPressed: () {
                                           setState(() {
-                                            if (apiHandler.userPassCode !=
-                                                null) {
-                                              if (apiHandler.code == 1) {
-                                                Fimber.i(
-                                                    "code = ${apiHandler.code}");
+                                            // if (apiHandler.userPassCode !=
+                                            //     null) {
+                                            //   if (apiHandler.code == 1) {
+                                            //     Fimber.i(
+                                            //         "code = ${apiHandler.code}");
                                                 if(casino!=null){
-                                                  apiHandler
-                                                      .checkServeState()
-                                                      .then((value) {
-                                                    if (value == "clear") {
+                                                  // apiHandler.checkServeState().then((value) {
+                                                  //   if (value == "clear") {
 
                                                       switch(casino){
                                                         case "WM":{
@@ -649,54 +661,55 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                         break;
                                                       }
 
-                                                    } else {
-                                                      Fimber.i(
-                                                          'checkServeState 0 returnMsg show');
-                                                      _showReturnMessageDialog(
-                                                          apiHandler.returnMsg);
-                                                    }
-                                                  });
+                                                  //   } else {
+                                                  //     Fimber.i(
+                                                  //         'checkServeState 0 returnMsg show');
+                                                  //     _showReturnMessageDialog(
+                                                  //         apiHandler.returnMsg);
+                                                  //   }
+                                                  // });
                                                 }else{
                                                   snackBarController.showRecognizeResult("讀取不到場地", 1500);
                                                   Fimber.i('casino = null');
                                                 }
 
-                                              } else {
-                                                Fimber.i(
-                                                    "code = ${apiHandler.code}");
-                                                apiHandler
-                                                    .checkServeState()
-                                                    .then((value) {
-                                                  Fimber.i("value = $value");
-                                                  if (value == "clear") {
-                                                    switch(casino){
-                                                      case "WM":{
-                                                        wmProcess();
-                                                      }
-                                                      break;
-
-                                                      case "ALLBET":{
-                                                        Fimber.i('allbet process');
-                                                      }
-                                                      break;
-
-                                                      default:{
-                                                        snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                                                        Fimber.i('casino = null');
-                                                      }
-                                                      break;
-                                                    }
-                                                  } else {
-                                                    Fimber.i(
-                                                        'checkServeState 1 returnMsg show');
-                                                    _showReturnMessageDialog(
-                                                        apiHandler.returnMsg);
-                                                  }
-                                                });
-                                              }
-                                            } else {
-                                              _displayTextInputDialog(context);
-                                            }
+                                              // } else {
+                                              //   Fimber.i(
+                                              //       "code = ${apiHandler.code}");
+                                              //   apiHandler
+                                              //       .checkServeState()
+                                              //       .then((value) {
+                                              //     Fimber.i("value = $value");
+                                              //     if (value == "clear") {
+                                              //       switch(casino){
+                                              //         case "WM":{
+                                              //           wmProcess();
+                                              //         }
+                                              //         break;
+                                              //
+                                              //         case "ALLBET":{
+                                              //           Fimber.i('allbet process');
+                                              //         }
+                                              //         break;
+                                              //
+                                              //         default:{
+                                              //           snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                              //           Fimber.i('casino = null');
+                                              //         }
+                                              //         break;
+                                              //       }
+                                              //     } else {
+                                              //       Fimber.i(
+                                              //           'checkServeState 1 returnMsg show');
+                                              //       _showReturnMessageDialog(
+                                              //           apiHandler.returnMsg);
+                                              //     }
+                                              //   });
+                                              // }
+                                            // }
+                                            // else {
+                                            //   _displayTextInputDialog(context);
+                                            // }
                                           });
                                         },
                                         child: (isUIDetectorRunning)
@@ -780,18 +793,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       ),
                     ),
 
-                    IgnorePointer(
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child:
-                            // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
-                            Text('使用時間剩餘:${(7200 - counter.count)}秒',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                    fontSize: 20.0)),
-                      ),
-                    ),
+                    // IgnorePointer(
+                    //   child: Align(
+                    //     alignment: Alignment.bottomCenter,
+                    //     child:
+                    //         // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                    //         Text('使用時間剩餘:${(7200 - counter.count)}秒',
+                    //             style: const TextStyle(
+                    //                 fontWeight: FontWeight.bold,
+                    //                 color: Colors.red,
+                    //                 fontSize: 20.0)),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -853,89 +866,89 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     // return -1;
   }
 
-  Future<double> allbetCatchMoney() async {
-    if (html == null) {
-      String? html = await webViewController?.getHtml();
-      if (html != null) {
-        // Fimber.i("html = $html");
-        // Fimber.i("str len = ${html.length}");
+  // Future<double> allbetCatchMoney() async {
+  //   if (html == null) {
+  //     String? html = await webViewController?.getHtml();
+  //     if (html != null) {
+  //       // Fimber.i("html = $html");
+  //       // Fimber.i("str len = ${html.length}");
+  //
+  //       final double? dollar = await compute(allbetGetMoneyInIsolate, html);
+  //       Fimber.i("dollar = $dollar");
+  //       if (dollar != null) {
+  //         snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+  //         html = null;
+  //         return dollar;
+  //       } else {
+  //         snackBarController.showRecognizeResult("讀取不到金額", 1500);
+  //         html = null;
+  //         return -1;
+  //       }
+  //     }
+  //   }
+  //   return -1;
+  // }
 
-        final double? dollar = await compute(allbetGetMoneyInIsolate, html);
-        Fimber.i("dollar = $dollar");
-        if (dollar != null) {
-          snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
-          html = null;
-          return dollar;
-        } else {
-          snackBarController.showRecognizeResult("讀取不到金額", 1500);
-          html = null;
-          return -1;
-        }
-      }
-    }
-    return -1;
-  }
+  // Future<double> wmCatchMoney() async {
+  //   if (html == null) {
+  //     String? html = await webViewController?.getHtml();
+  //     if (html != null) {
+  //       final double? dollar = await compute(wmGetMoneyInIsolate, html);
+  //       if (dollar != null) {
+  //         snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+  //         html = null;
+  //         return dollar;
+  //       } else {
+  //         snackBarController.showRecognizeResult("讀取不到金額", 1500);
+  //         html = null;
+  //         return -1;
+  //       }
+  //     }
+  //   }
+  //   return -1;
+  // }
 
-  Future<double> wmCatchMoney() async {
-    if (html == null) {
-      String? html = await webViewController?.getHtml();
-      if (html != null) {
-        final double? dollar = await compute(wmGetMoneyInIsolate, html);
-        if (dollar != null) {
-          snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
-          html = null;
-          return dollar;
-        } else {
-          snackBarController.showRecognizeResult("讀取不到金額", 1500);
-          html = null;
-          return -1;
-        }
-      }
-    }
-    return -1;
-  }
-
-  Future<void> wmStartRoutineCheck() async {
-    var timeCount = 449;
-    while (isUIDetectorRunning) {
-      timeCount += 1;
-      if (timeCount == 450) {
-        apiHandler.routineCheck();
-        wmCatchMoney().then((value) async {
-          if (value < 0) {
-            _stopWmProcess();
-            return;
-          }
-          Fimber.i("wmMoney = $wmMoney");
-          Fimber.i("value = $value");
-          fee += (value - wmMoney) / 10;
-          final tempFee = await selfEncryptedSharedPreference.getFee();
-          Fimber.i("Fee = $fee");
-          if (tempFee != null) {
-            double lastFee = double.parse(tempFee);
-            Fimber.i("lastFee = $lastFee");
-            fee += lastFee;
-          }
-          selfEncryptedSharedPreference.setFee(fee);
-          Fimber.i("setFee = $fee");
-          fee = 0;
-          wmMoney = value;
-          timeCount = 0;
-        });
-      }
-      await Future.delayed(const Duration(seconds: 1));
-    }
-  }
+  // Future<void> wmStartRoutineCheck() async {
+  //   var timeCount = 449;
+  //   while (isUIDetectorRunning) {
+  //     timeCount += 1;
+  //     if (timeCount == 450) {
+  //       apiHandler.routineCheck();
+  //       wmCatchMoney().then((value) async {
+  //         if (value < 0) {
+  //           _stopWmProcess();
+  //           return;
+  //         }
+  //         Fimber.i("wmMoney = $wmMoney");
+  //         Fimber.i("value = $value");
+  //         fee += (value - wmMoney) / 10;
+  //         final tempFee = await selfEncryptedSharedPreference.getFee();
+  //         Fimber.i("Fee = $fee");
+  //         if (tempFee != null) {
+  //           double lastFee = double.parse(tempFee);
+  //           Fimber.i("lastFee = $lastFee");
+  //           fee += lastFee;
+  //         }
+  //         selfEncryptedSharedPreference.setFee(fee);
+  //         Fimber.i("setFee = $fee");
+  //         fee = 0;
+  //         wmMoney = value;
+  //         timeCount = 0;
+  //       });
+  //     }
+  //     await Future.delayed(const Duration(seconds: 1));
+  //   }
+  // }
 
   void _stopWmProcess() {
-    apiHandler.isCalculatorRunning = 0;
-    apiHandler.routineCheck().then((value) {
-      if (value == 0) {
-        Fimber.i('routineCheck 2 returnMsg show');
-        _showReturnMessageDialog(apiHandler.returnMsg);
-      }
-      apiHandler.returnMsg = "出錯了! 請聯繫客服";
-    });
+    // apiHandler.isCalculatorRunning = 0;
+    // apiHandler.routineCheck().then((value) {
+    //   if (value == 0) {
+    //     Fimber.i('routineCheck 2 returnMsg show');
+    //     _showReturnMessageDialog(apiHandler.returnMsg);
+    //   }
+    //   apiHandler.returnMsg = "出錯了! 請聯繫客服";
+    // });
     setState(() {
       isUIDetectorRunning = false;
     });
@@ -951,43 +964,43 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       isUIDetectorRunning = !isUIDetectorRunning;
     });
     if (!isUIDetectorRunning) {
-      apiHandler.isCalculatorRunning = 0;
-      apiHandler.routineCheck();
+      // apiHandler.isCalculatorRunning = 0;
+      // apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
       stopTimer();
       dataHandler.reset();
     } else {
-      apiHandler.isCalculatorRunning = 1;
-      wmStartRoutineCheck();
+      // apiHandler.isCalculatorRunning = 1;
+      // wmStartRoutineCheck();
       startTimer();
       // apiHandler.routineCheck();
     }
     while (isUIDetectorRunning) {
-      if (apiHandler.code != 1) {
-        _stopWmProcess();
-        break;
-      }
-      Counter counter = Counter();
-      if (counter.count >= 7200) {
-        selfEncryptedSharedPreference.getFee().then((value) async {
-          if (value != null) {
-            final feeInt = int.parse(value);
-            if (feeInt >= 1000) {
-              _stopWmProcess();
-              bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
-              if(ifDebtApiSuccess){
-                selfEncryptedSharedPreference.setFee(0.0);
-              }
-              return;
-            } else if (feeInt <= 0) {
-              counter.resetTimer();
-              selfEncryptedSharedPreference.setFee(0.0);
-            } else {
-              counter.resetTimer();
-            }
-          }
-        });
-      }
+      // if (apiHandler.code != 1) {
+      //   _stopWmProcess();
+      //   break;
+      // }
+      // Counter counter = Counter();
+      // if (counter.count >= 7200) {
+      //   selfEncryptedSharedPreference.getFee().then((value) async {
+      //     if (value != null) {
+      //       final feeInt = int.parse(value);
+      //       if (feeInt >= 1000) {
+      //         _stopWmProcess();
+      //         bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
+      //         if(ifDebtApiSuccess){
+      //           selfEncryptedSharedPreference.setFee(0.0);
+      //         }
+      //         return;
+      //       } else if (feeInt <= 0) {
+      //         counter.resetTimer();
+      //         selfEncryptedSharedPreference.setFee(0.0);
+      //       } else {
+      //         counter.resetTimer();
+      //       }
+      //     }
+      //   });
+      // }
 
       if (isShowProgress) {
         snackBarController.showRecognizeResult("開始辨識ui!", 2000);
@@ -1089,48 +1102,48 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   }
 
 
-  Future<void> allbetStartRoutineCheck() async {
-    var timeCount = 449;
-    while (isUIDetectorRunning) {
-      timeCount += 1;
-      if (timeCount == 450) {
-        apiHandler.routineCheck();
-        allbetCatchMoney().then((value) async {
-          if (value < 0) {
-            _stopAllbetProcess();
-            return;
-          }
-          Fimber.i("allbetMoney = $allbetMoney");
-          Fimber.i("value = $value");
-          fee += (value - allbetMoney) / 10;
-          final tempFee = await selfEncryptedSharedPreference.getFee();
-          Fimber.i("Fee = $fee");
-          if (tempFee != null) {
-            double lastFee = double.parse(tempFee);
-            Fimber.i("lastFee = $lastFee");
-            fee += lastFee;
-          }
-          selfEncryptedSharedPreference.setFee(fee);
-          Fimber.i("setFee = $fee");
-          fee = 0;
-          allbetMoney = value;
-          timeCount = 0;
-        });
-      }
-      await Future.delayed(const Duration(seconds: 1));
-    }
-  }
+  // Future<void> allbetStartRoutineCheck() async {
+  //   var timeCount = 449;
+  //   while (isUIDetectorRunning) {
+  //     timeCount += 1;
+  //     if (timeCount == 450) {
+  //       apiHandler.routineCheck();
+  //       allbetCatchMoney().then((value) async {
+  //         if (value < 0) {
+  //           _stopAllbetProcess();
+  //           return;
+  //         }
+  //         Fimber.i("allbetMoney = $allbetMoney");
+  //         Fimber.i("value = $value");
+  //         fee += (value - allbetMoney) / 10;
+  //         final tempFee = await selfEncryptedSharedPreference.getFee();
+  //         Fimber.i("Fee = $fee");
+  //         if (tempFee != null) {
+  //           double lastFee = double.parse(tempFee);
+  //           Fimber.i("lastFee = $lastFee");
+  //           fee += lastFee;
+  //         }
+  //         selfEncryptedSharedPreference.setFee(fee);
+  //         Fimber.i("setFee = $fee");
+  //         fee = 0;
+  //         allbetMoney = value;
+  //         timeCount = 0;
+  //       });
+  //     }
+  //     await Future.delayed(const Duration(seconds: 1));
+  //   }
+  // }
 
 
   void _stopAllbetProcess() {
-    apiHandler.isCalculatorRunning = 0;
-    apiHandler.routineCheck().then((value) {
-      if (value == 0) {
-        Fimber.i('routineCheck 2 returnMsg show');
-        _showReturnMessageDialog(apiHandler.returnMsg);
-      }
-      apiHandler.returnMsg = "出錯了! 請聯繫客服";
-    });
+    // apiHandler.isCalculatorRunning = 0;
+    // apiHandler.routineCheck().then((value) {
+    //   if (value == 0) {
+    //     Fimber.i('routineCheck 2 returnMsg show');
+    //     _showReturnMessageDialog(apiHandler.returnMsg);
+    //   }
+    //   apiHandler.returnMsg = "出錯了! 請聯繫客服";
+    // });
     setState(() {
       isUIDetectorRunning = false;
     });
@@ -1146,43 +1159,43 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       isUIDetectorRunning = !isUIDetectorRunning;
     });
     if (!isUIDetectorRunning) {
-      apiHandler.isCalculatorRunning = 0;
-      apiHandler.routineCheck();
+      // apiHandler.isCalculatorRunning = 0;
+      // apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
       stopTimer();
       dataHandler.reset();
     } else {
-      apiHandler.isCalculatorRunning = 1;
-      allbetStartRoutineCheck();
+      // apiHandler.isCalculatorRunning = 1;
+      // allbetStartRoutineCheck();
       startTimer();
       // apiHandler.routineCheck();
     }
     while (isUIDetectorRunning) {
-      if (apiHandler.code != 1) {
-        _stopAllbetProcess();
-        break;
-      }
-      Counter counter = Counter();
-      if (counter.count >= 7200) {
-        selfEncryptedSharedPreference.getFee().then((value) async {
-          if (value != null) {
-            final feeInt = int.parse(value);
-            if (feeInt >= 1000) {
-              _stopAllbetProcess();
-              bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
-              if(ifDebtApiSuccess){
-                selfEncryptedSharedPreference.setFee(0.0);
-              }
-              return;
-            } else if (feeInt <= 0) {
-              counter.resetTimer();
-              selfEncryptedSharedPreference.setFee(0.0);
-            } else {
-              counter.resetTimer();
-            }
-          }
-        });
-      }
+      // if (apiHandler.code != 1) {
+      //   _stopAllbetProcess();
+      //   break;
+      // }
+      // Counter counter = Counter();
+      // if (counter.count >= 7200) {
+      //   selfEncryptedSharedPreference.getFee().then((value) async {
+      //     if (value != null) {
+      //       final feeInt = int.parse(value);
+      //       if (feeInt >= 1000) {
+      //         _stopAllbetProcess();
+      //         bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
+      //         if(ifDebtApiSuccess){
+      //           selfEncryptedSharedPreference.setFee(0.0);
+      //         }
+      //         return;
+      //       } else if (feeInt <= 0) {
+      //         counter.resetTimer();
+      //         selfEncryptedSharedPreference.setFee(0.0);
+      //       } else {
+      //         counter.resetTimer();
+      //       }
+      //     }
+      //   });
+      // }
 
       if (isShowProgress) {
         snackBarController.showRecognizeResult("開始辨識ui!", 2000);
@@ -1198,7 +1211,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             screenshotConfiguration: config);
 
         Fimber.i("screen shot finished");
-        // Fimber.i("state = ${allbetUiDetector.getCalculatorState()}");
+
         await webViewController?.getContentHeight().then((value) => {
           dataHandler.mobileWidth = MediaQuery.of(context).size.width,
           dataHandler.mobileHeight = MediaQuery.of(context).size.height,
@@ -1211,36 +1224,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           if (imageData != null) {
             bool isLaunchCardDetector =
               await allbetUiDetector.putImageIntoModel(imageData);
-            // if (uiDetector.resultStr == "didn't find button") {
-            //   ImageGallerySaver.saveImage(data, quality: 100);
-            // } else if (uiDetector.resultStr == "button error") {
-            //   // Fimber.i("resultStr = ${uiDetector.resultStr}");
-            //   // debugPrint(uiDetector.resultStr);
-            //   int time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-            //   String fileNameTime = time.toString();
-            //   ImageGallerySaver.saveImage(data,
-            //       quality: 100, name: uiDetector.errorStr + ",$fileNameTime}");
-            //   uiDetector.errorStr = "";
-            // } else {
-            //   Fimber.i("resultStr = ${uiDetector.resultStr}");
-            // }
 
-            // if(mounted){
-            //   dataHandler.playerButtonX =
-            //       MediaQuery.of(context).size.width * allbetUiDetector.playerButtonX;
-            //   dataHandler.playerButtonY = MediaQuery.of(context).size.height -
-            //       (dataHandler.webViewHeight * (1 - allbetUiDetector.playerButtonY));
-            //
-            //   dataHandler.bankButtonX =
-            //       MediaQuery.of(context).size.width * allbetUiDetector.bankButtonX;
-            //   dataHandler.bankButtonY = MediaQuery.of(context).size.height -
-            //       (dataHandler.webViewHeight * (1 - allbetUiDetector.bankButtonY));
-            //
-            //   dataHandler.confirmButtonX =
-            //       MediaQuery.of(context).size.width * allbetUiDetector.confirmButtonX;
-            //   dataHandler.confirmButtonY = MediaQuery.of(context).size.height -
-            //       (dataHandler.webViewHeight * (1 - allbetUiDetector.confirmButtonY));
-            // }
 
 
 
@@ -1283,96 +1267,96 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     }
   }
 
-  Future<void> _showReturnMessageDialog(String message) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(message),
-          content: SingleChildScrollView(
-            child: TextButton(
-              onPressed: () {
-                launchUrlString('https://line.me/ti/p/@516wvzjp');
-              },
-              child: const Text('點我加入官方line好友'),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('確定'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // Future<void> _showReturnMessageDialog(String message) async {
+  //   return showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: false, // user must tap button!
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(message),
+  //         content: SingleChildScrollView(
+  //           child: TextButton(
+  //             onPressed: () {
+  //               launchUrlString('https://line.me/ti/p/@516wvzjp');
+  //             },
+  //             child: const Text('點我加入官方line好友'),
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: const Text('確定'),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  Future<void> _displayTextInputDialog(BuildContext context) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            // title: const Text('TextField in Dialog'),
-            content: TextField(
-              onChanged: (value) {
-                setState(() {
-                  valueText = value;
-                });
-              },
-              controller: _textFieldController,
-              decoration: const InputDecoration(hintText: "輸入代碼"),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('取消'),
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-              TextButton(
-                child: const Text('確認'),
-                onPressed: () {
-                  setState(() {
-                    apiHandler.userPassCode = valueText;
-                    Navigator.pop(context);
-                    apiHandler.checkServeState().then((value) {
-                      if (apiHandler.code == 0) {
-                        Fimber.i('checkServeState 3 returnMsg show');
-                        _showReturnMessageDialog(apiHandler.returnMsg);
-                      }
-
-                      if (value == "clear") {
-
-                        switch(casino){
-                          case "WM":{
-                            wmProcess();
-                          }
-                          break;
-
-                          case "ALLBET":{
-                            allbetProcess();
-                          }
-                          break;
-
-                          default:{
-                            snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                            Fimber.i('casino = null');
-                          }
-                          break;
-                        }
-                      }
-                    });
-                  });
-                },
-              ),
-            ],
-          );
-        });
-  }
+  // Future<void> _displayTextInputDialog(BuildContext context) async {
+  //   return showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           // title: const Text('TextField in Dialog'),
+  //           content: TextField(
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 valueText = value;
+  //               });
+  //             },
+  //             controller: _textFieldController,
+  //             decoration: const InputDecoration(hintText: "輸入代碼"),
+  //           ),
+  //           actions: <Widget>[
+  //             TextButton(
+  //               child: const Text('取消'),
+  //               onPressed: () {
+  //                 setState(() {
+  //                   Navigator.pop(context);
+  //                 });
+  //               },
+  //             ),
+  //             TextButton(
+  //               child: const Text('確認'),
+  //               onPressed: () {
+  //                 setState(() {
+  //                   apiHandler.userPassCode = valueText;
+  //                   Navigator.pop(context);
+  //                   apiHandler.checkServeState().then((value) {
+  //                     if (apiHandler.code == 0) {
+  //                       Fimber.i('checkServeState 3 returnMsg show');
+  //                       _showReturnMessageDialog(apiHandler.returnMsg);
+  //                     }
+  //
+  //                     if (value == "clear") {
+  //
+  //                       switch(casino){
+  //                         case "WM":{
+  //                           wmProcess();
+  //                         }
+  //                         break;
+  //
+  //                         case "ALLBET":{
+  //                           allbetProcess();
+  //                         }
+  //                         break;
+  //
+  //                         default:{
+  //                           snackBarController.showRecognizeResult("讀取不到場地", 1500);
+  //                           Fimber.i('casino = null');
+  //                         }
+  //                         break;
+  //                       }
+  //                     }
+  //                   });
+  //                 });
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       });
+  // }
 }
