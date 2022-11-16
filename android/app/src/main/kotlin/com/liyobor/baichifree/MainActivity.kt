@@ -1,4 +1,4 @@
-package com.liyobor.baichi
+package com.liyobor.baichifree
 
 import io.flutter.embedding.android.FlutterActivity
 
