@@ -978,6 +978,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       isUIDetectorRunning = !isUIDetectorRunning;
     });
     if (!isUIDetectorRunning) {
+      clickStartTimes = 0;
       apiHandler.isCalculatorRunning = 0;
       apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
@@ -1182,6 +1183,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       isUIDetectorRunning = !isUIDetectorRunning;
     });
     if (!isUIDetectorRunning) {
+      clickStartTimes = 0;
       apiHandler.isCalculatorRunning = 0;
       apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
