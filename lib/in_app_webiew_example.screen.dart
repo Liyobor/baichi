@@ -173,6 +173,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     var counter = Provider.of<Counter>(context);
     counter.count;
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         // appBar: AppBar(title: const Text("InAppWebView")),
         // drawer: myDrawer(context: context),
@@ -887,11 +888,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         final double? dollar = await compute(allbetGetMoneyInIsolate, html);
         Fimber.i("dollar = $dollar");
         if (dollar != null) {
-          snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+          Fimber.i("現在金額:$dollar");
+          // snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
           html = null;
           return dollar;
         } else {
-          snackBarController.showRecognizeResult("讀取不到金額", 1500);
+          Fimber.i("讀取不到金額");
+          // snackBarController.showRecognizeResult("讀取不到金額", 1500);
           html = null;
           return -1;
         }

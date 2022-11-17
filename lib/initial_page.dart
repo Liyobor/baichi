@@ -26,6 +26,7 @@ class _InitPageState extends State<InitPage> {
     ApiHandler apiHandler = ApiHandler();
     _urlTextController = TextEditingController(text:apiHandler.defaultUrl);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title:
         const Text("擊敗莊家1.0"),
