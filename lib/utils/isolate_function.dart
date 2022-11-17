@@ -78,9 +78,7 @@ double? allbetGetMoneyInIsolate(String html) {
 }
 
 
-
-
-Map<String,dynamic> uiOutputProcess(List input){
+Map<String,dynamic> wmUiOutputProcess(List input){
 
   List bboxes = input[0];
   List outScore  = input[1];
@@ -125,10 +123,93 @@ Map<String,dynamic> uiOutputProcess(List input){
       final y = ((max(0, yPos - h / 2)/416)+(min(height - 1, yPos + h / 2)/416))/2;
 
       // if(y<0.8){
+        xList.add(x);
+        yList.add(y);
+        classList.add(buttonClass);
+      // }
+
+      if(buttonClass==0){
+        bankButtonX = x;
+        bankButtonY = y;
+      }else if(buttonClass==3){
+        playerButtonX = x;
+        playerButtonY = y;
+      }
+
+      if(buttonClass == 2){
+        confirmButtonX = x;
+        confirmButtonY = y;
+      }
+
+    }
+
+
+  }
+  var map = {
+    'xList':xList,
+    'yList':yList,
+    'classList':classList,
+    'playerButtonX':playerButtonX,
+    'playerButtonY':playerButtonY,
+    'bankButtonX':bankButtonX,
+    'bankButtonY':bankButtonY,
+    'confirmButtonX':confirmButtonX,
+    'confirmButtonY':confirmButtonY
+  };
+
+
+  return map;
+}
+
+Map<String,dynamic> allbetUiOutputProcess(List input){
+
+  List bboxes = input[0];
+  List outScore  = input[1];
+  int width = input[2];
+  int height = input[3];
+
+  var classList = [];
+  var xList = [];
+  var yList = [];
+
+  double playerButtonX = -1.0;
+  double playerButtonY = -1.0;
+  double bankButtonX = -1.0;
+  double bankButtonY = -1.0;
+  double confirmButtonX = -1.0;
+  double confirmButtonY = -1.0;
+
+  for(int i =0;i<2535;i++){
+    double maxClass = 0;
+    int detectedClass = -1;
+    final classes = List<double>.filled(8, 0.0);
+    for (int c = 0;c< 8;c++){
+      classes [c] = outScore[0][i][c];
+    }
+    for (int c = 0;c<8;++c){
+      if (classes[c] > maxClass){
+        detectedClass = c;
+        maxClass = classes[c];
+      }
+    }
+    final double score = maxClass;
+    if(score>0.9){
+
+
+      final double xPos = bboxes[0][i][0];
+      final double yPos = bboxes[0][i][1];
+      final double w = bboxes[0][i][2];
+      final double h = bboxes[0][i][3];
+
+      final buttonClass = detectedClass;
+      final x = ((max(0, xPos - w / 2)/416)+(min(width - 1, xPos + w / 2)/416))/2;
+      final y = ((max(0, yPos - h / 2)/416)+(min(height - 1, yPos + h / 2)/416))/2;
+
+      if(y<0.8){
       xList.add(x);
       yList.add(y);
       classList.add(buttonClass);
-      // }
+      }
 
       if(buttonClass==0){
         bankButtonX = x;

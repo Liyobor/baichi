@@ -105,7 +105,7 @@ class AllbetUIDetector{
     List bboxes = outputs[0]!;
     List outScore  = outputs[1]!;
 
-    Map processedOutput = await compute(uiOutputProcess,[bboxes,outScore,_inputImage.width,_inputImage.height]);
+    Map processedOutput = await compute(allbetUiOutputProcess,[bboxes,outScore,_inputImage.width,_inputImage.height]);
 
     classList = processedOutput['classList'];
     xList = processedOutput['xList'];
