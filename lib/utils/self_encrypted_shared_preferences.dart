@@ -8,6 +8,7 @@ class SelfEncryptedSharedPreference {
   static final SelfEncryptedSharedPreference _singleton = SelfEncryptedSharedPreference._internal();
   EncryptedSharedPreferences encryptedSharedPreferences = EncryptedSharedPreferences();
   Counter counter = Counter();
+  double fee = 0;
   late SharedPreferences pref;
   factory SelfEncryptedSharedPreference() {
     return _singleton;
@@ -38,6 +39,7 @@ class SelfEncryptedSharedPreference {
 
   void setFee(double fee){
     encryptedSharedPreferences.setString('fee', fee.toInt().toString());
+    this.fee = fee;
   }
 
   void saveRemainTime(){

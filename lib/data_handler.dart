@@ -130,7 +130,7 @@ class DataHandler{
   void _reset(){
     Fimber.i("reset");
     _point = 0;
-    betTimes=1;
+    betTimes = 1 ;
   }
   void reset(){
     Fimber.i("public reset");

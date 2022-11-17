@@ -102,6 +102,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
   String? casino;
 
+  int clickStartTimes = 0;
   int paidTime = 6000;
 
   @override
@@ -239,7 +240,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         }
 
                         if(resource.url.toString().contains("www.ab.games:8888/undefined")){
-                          Fimber.i("resource.url = ${resource.url}");
+                          // Fimber.i("resource.url = ${resource.url}");
                           allbetCatchMoney().then((value) {
                             allbetMoney = value.toDouble();
                             Fimber.i("value = $value");
@@ -412,32 +413,36 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                     progress < 1.0
                         ? LinearProgressIndicator(value: progress)
                         : Container(),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.8,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            ElevatedButton(
-                              child: const Icon(Icons.arrow_back),
-                              onPressed: () {
-                                webViewController?.goBack();
-                              },
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.75,
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: ButtonBar(
+                              alignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                ElevatedButton(
+                                  child: const Icon(Icons.arrow_back),
+                                  onPressed: () {
+                                    webViewController?.goBack();
+                                  },
+                                ),
+                                ElevatedButton(
+                                  child: const Icon(Icons.refresh),
+                                  onPressed: () async {
+                                    webViewController?.reload();
+                                  },
+                                ),
+                              ],
                             ),
-                            ElevatedButton(
-                              child: const Icon(Icons.refresh),
-                              onPressed: () async {
-                                webViewController?.reload();
-                              },
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
 
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.86,
+                      height: MediaQuery.of(context).size.height * 0.8,
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: ButtonBar(
@@ -466,32 +471,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     TextButton(
                                         onPressed: () async {
                                           if (counter.count >= paidTime) {
-
                                             switch(casino){
                                               case "WM":{
                                                 wmCatchMoney().then((value) async {
                                                   if (value < 0) {
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
+                                                    final tempFee = await selfEncryptedSharedPreference.getFee();
                                                     if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
+                                                      double lastFee = double.parse(tempFee);
+                                                      Fimber.i("lastFee = $lastFee");
                                                       fee += lastFee;
                                                     }
                                                   } else {
                                                     fee += (value - wmMoney) / 10;
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
+                                                    final tempFee = await selfEncryptedSharedPreference.getFee();
                                                     Fimber.i("Fee = $fee");
                                                     if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
+                                                      double lastFee = double.parse(tempFee);
+                                                      Fimber.i("lastFee = $lastFee");
                                                       fee += lastFee;
                                                     }
                                                   }
@@ -501,24 +497,31 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                     _stopWmProcess();
                                                     await apiHandler.debtApi(fee.toInt()).then((value){
                                                       if(value){
-                                                        selfEncryptedSharedPreference
-                                                            .setFee(0.0);
+                                                        setState(() {
+                                                          selfEncryptedSharedPreference.setFee(0.0);
+                                                        });
                                                       }
                                                     });
 
                                                   } else if (fee <= 0) {
                                                     counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(0.0);
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
+                                                    setState(() {
+                                                      selfEncryptedSharedPreference.setFee(0.0);
+                                                    });
+
+
+                                                    selfEncryptedSharedPreference.saveRemainTime();
                                                   } else {
                                                     counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(fee);
+
+                                                    setState(() {
+                                                      selfEncryptedSharedPreference.setFee(fee);
+                                                    });
+
+
+
                                                     Fimber.i("setFee = $fee");
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
+                                                    selfEncryptedSharedPreference.saveRemainTime();
                                                   }
 
                                                   fee = 0;
@@ -530,27 +533,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                               case "ALLBET":{
                                                 allbetCatchMoney().then((value) async {
                                                   if (value < 0) {
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
+                                                    final tempFee = await selfEncryptedSharedPreference.getFee();
                                                     if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
+                                                      double lastFee = double.parse(tempFee);
+                                                      Fimber.i("lastFee = $lastFee");
                                                       fee += lastFee;
                                                     }
                                                   } else {
                                                     fee += (value - allbetMoney) / 10;
-                                                    final tempFee =
-                                                    await selfEncryptedSharedPreference
-                                                        .getFee();
+                                                    final tempFee = await selfEncryptedSharedPreference.getFee();
                                                     Fimber.i("Fee = $fee");
                                                     if (tempFee != null) {
-                                                      double lastFee =
-                                                      double.parse(tempFee);
-                                                      Fimber.i(
-                                                          "lastFee = $lastFee");
+                                                      double lastFee = double.parse(tempFee);
+                                                      Fimber.i("lastFee = $lastFee");
                                                       fee += lastFee;
                                                     }
                                                   }
@@ -560,26 +555,28 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                     _stopAllbetProcess();
                                                     await apiHandler.debtApi(fee.toInt()).then((value){
                                                       if(value){
-                                                        selfEncryptedSharedPreference
-                                                            .setFee(0.0);
+                                                        setState(() {
+                                                          selfEncryptedSharedPreference.setFee(0.0);
+                                                        });
+
                                                       }
                                                     });
-
                                                   } else if (fee <= 0) {
                                                     counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(0.0);
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
+                                                    setState(() {
+                                                      selfEncryptedSharedPreference.setFee(0.0);
+                                                    });
+
+                                                    selfEncryptedSharedPreference.saveRemainTime();
                                                   } else {
                                                     counter.resetTimer();
-                                                    selfEncryptedSharedPreference
-                                                        .setFee(fee);
-                                                    Fimber.i("setFee = $fee");
-                                                    selfEncryptedSharedPreference
-                                                        .saveRemainTime();
-                                                  }
+                                                    setState(() {
+                                                      selfEncryptedSharedPreference.setFee(fee);
+                                                    });
 
+                                                    Fimber.i("setFee = $fee");
+                                                    selfEncryptedSharedPreference.saveRemainTime();
+                                                  }
                                                   fee = 0;
                                                   allbetMoney = value;
                                                 });
@@ -592,7 +589,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                               }
                                               break;
                                             }
-
 
                                           }
                                         },
@@ -618,6 +614,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     ),
                                     TextButton(
                                         onPressed: () {
+                                          if(!isUIDetectorRunning){
+                                            if(clickStartTimes != 0){
+                                              Fimber.i("return");
+                                              return;
+                                            }
+                                            Fimber.i("+=1");
+                                            clickStartTimes += 1;
+                                          }
+
                                           setState(() {
                                             if (apiHandler.userPassCode !=
                                                 null) {
@@ -676,7 +681,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                       break;
 
                                                       case "ALLBET":{
-                                                        Fimber.i('allbet process');
+                                                        allbetProcess();
+                                                        // Fimber.i('allbet process');
                                                       }
                                                       break;
 
@@ -756,18 +762,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             //         ),
                             //         TextButton(
                             //             onPressed: () async {
+                            //               setState(() {
+                            //                 selfEncryptedSharedPreference.fee += 50;
+                            //               });
                             //
-                            //               // config.compressFormat = CompressFormat.JPEG;
+                            //
+                            //             // config.compressFormat = CompressFormat.JPEG;
                             //               // Uint8List? data = await webViewController?.takeScreenshot(
                             //               //     screenshotConfiguration: config);
                             //               // if(data!=null){
                             //               //   await ImageGallerySaver.saveImage(data, quality: 100);
                             //               // }
                             //               // dataHandler.clickTest(webViewController!);
-                            //               await allbetCatchMoneyJS();
+                            //               // await allbetCatchMoneyJS();
+                            //
                             //             },
                             //             child: const Text(
-                            //               "test",
+                            //               "顯示費用",
                             //               style: TextStyle(color: Colors.white),
                             //             )
                             //         )
@@ -790,6 +801,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red,
                                     fontSize: 20.0)),
+                      ),
+                    ),
+
+                    IgnorePointer(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child:
+                        // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                        Text('手續費:${selfEncryptedSharedPreference.fee}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                                fontSize: 20.0)),
                       ),
                     ),
                   ],
@@ -916,7 +940,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             Fimber.i("lastFee = $lastFee");
             fee += lastFee;
           }
-          selfEncryptedSharedPreference.setFee(fee);
+          setState(() {
+            selfEncryptedSharedPreference.setFee(fee);
+          });
           Fimber.i("setFee = $fee");
           fee = 0;
           wmMoney = value;
@@ -928,6 +954,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   }
 
   void _stopWmProcess() {
+    clickStartTimes = 0;
     apiHandler.isCalculatorRunning = 0;
     apiHandler.routineCheck().then((value) {
       if (value == 0) {
@@ -960,7 +987,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       apiHandler.isCalculatorRunning = 1;
       wmStartRoutineCheck();
       startTimer();
-      // apiHandler.routineCheck();
+
     }
     while (isUIDetectorRunning) {
       if (apiHandler.code != 1) {
@@ -976,12 +1003,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               _stopWmProcess();
               bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
               if(ifDebtApiSuccess){
-                selfEncryptedSharedPreference.setFee(0.0);
+                setState(() {
+                  selfEncryptedSharedPreference.setFee(0.0);
+                });
+
               }
               return;
             } else if (feeInt <= 0) {
               counter.resetTimer();
-              selfEncryptedSharedPreference.setFee(0.0);
+              setState(() {
+                selfEncryptedSharedPreference.setFee(0.0);
+              });
+
             } else {
               counter.resetTimer();
             }
@@ -1074,7 +1107,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               String cardResult = wmCardDetector.resultStr;
               dataHandler.insertCard(value);
               if (cardResult == "didn't find card") {
-                ImageGallerySaver.saveImage(data, quality: 100);
+                // ImageGallerySaver.saveImage(data, quality: 100);
               }
               snackBarController.showRecognizeResult(cardResult, 2000);
               cardDetectLock = true;
@@ -1110,7 +1143,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             Fimber.i("lastFee = $lastFee");
             fee += lastFee;
           }
-          selfEncryptedSharedPreference.setFee(fee);
+          setState(() {
+            selfEncryptedSharedPreference.setFee(fee);
+          });
           Fimber.i("setFee = $fee");
           fee = 0;
           allbetMoney = value;
@@ -1123,6 +1158,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
 
   void _stopAllbetProcess() {
+    clickStartTimes = 0;
     apiHandler.isCalculatorRunning = 0;
     apiHandler.routineCheck().then((value) {
       if (value == 0) {
@@ -1155,7 +1191,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       apiHandler.isCalculatorRunning = 1;
       allbetStartRoutineCheck();
       startTimer();
-      // apiHandler.routineCheck();
     }
     while (isUIDetectorRunning) {
       if (apiHandler.code != 1) {
@@ -1171,12 +1206,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               _stopAllbetProcess();
               bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
               if(ifDebtApiSuccess){
-                selfEncryptedSharedPreference.setFee(0.0);
+                setState(() {
+                  selfEncryptedSharedPreference.setFee(0.0);
+                });
+
               }
               return;
             } else if (feeInt <= 0) {
               counter.resetTimer();
-              selfEncryptedSharedPreference.setFee(0.0);
+              setState(() {
+                selfEncryptedSharedPreference.setFee(0.0);
+              });
+
             } else {
               counter.resetTimer();
             }

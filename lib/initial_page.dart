@@ -62,36 +62,36 @@ class _InitPageState extends State<InitPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // SizedBox(
+                  //   height: 48.0,
+                  //   child: TextButton(
+                  //     child: const Text("自行登入"),
+                  //     onPressed: () async {
+                  //       String urlStr = "https://www.bl868.net/new_home2.php";
+                  //
+                  //       // bool urlCheck = Uri.tryParse(_urlTextController.text)?.hasAbsolutePath ?? false;
+                  //       if(_passCodeFieldController.text == ""){
+                  //         _showDialog("代碼不可為空!");
+                  //       }else{
+                  //         apiHandler.userPassCode = _passCodeFieldController.text;
+                  //         apiHandler.defaultUrl = urlStr;
+                  //         EasyLoading.show(status: '檢查代碼...');
+                  //         String? result = await apiHandler.checkServeState();
+                  //         EasyLoading.dismiss();
+                  //         if(result=="clear" && mounted){
+                  //           Navigator.push(context, MaterialPageRoute(builder: (context)=> const InAppWebViewExampleScreen()));
+                  //         }else{
+                  //           _showDialog("代碼出錯!");
+                  //         }
+                  //       }
+                  //       // Fimber.i(_textFieldController.text);
+                  //     },
+                  //   ),
+                  // ),
                   SizedBox(
                     height: 48.0,
                     child: TextButton(
-                      child: const Text("自行登入"),
-                      onPressed: () async {
-                        String urlStr = "https://www.bl868.net/new_home2.php";
-
-                        // bool urlCheck = Uri.tryParse(_urlTextController.text)?.hasAbsolutePath ?? false;
-                        if(_passCodeFieldController.text == ""){
-                          _showDialog("代碼不可為空!");
-                        }else{
-                          apiHandler.userPassCode = _passCodeFieldController.text;
-                          apiHandler.defaultUrl = urlStr;
-                          EasyLoading.show(status: '檢查代碼...');
-                          String? result = await apiHandler.checkServeState();
-                          EasyLoading.dismiss();
-                          if(result=="clear" && mounted){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> const InAppWebViewExampleScreen()));
-                          }else{
-                            _showDialog("代碼出錯!");
-                          }
-                        }
-                        // Fimber.i(_textFieldController.text);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 48.0,
-                    child: TextButton(
-                      child: const Text("使用網址登入"),
+                      child: const Text("登入"),
                       onPressed: () async {
                         String urlStr;
                         if(_urlTextController.text.contains("https://")){
