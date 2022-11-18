@@ -465,6 +465,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                               default:{
                                                                 snackBarController.showRecognizeResult("讀取不到場地", 1500);
                                                                 Fimber.i('casino = null');
+                                                                clickStartTimes = 0;
                                                               }
                                                               break;
                                                             }
@@ -478,6 +479,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                         });
                                                       }else{
                                                         snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                        clickStartTimes = 0;
                                                         Fimber.i('casino = null');
                                                       }
 
@@ -503,6 +505,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                                                             default:{
                                                               snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                              clickStartTimes=0;
                                                               Fimber.i('casino = null');
                                                             }
                                                             break;
@@ -693,6 +696,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                                                     default:{
                                                       snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                      clickStartTimes = 0;
                                                       Fimber.i('casino = null');
                                                     }
                                                     break;
@@ -1247,6 +1251,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                           default:{
                             snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                            clickStartTimes = 0;
                             Fimber.i('casino = null');
                           }
                           break;
