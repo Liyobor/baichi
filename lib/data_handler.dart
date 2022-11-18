@@ -1,6 +1,7 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:untitled/utils/api_handler.dart';
 
 class DataHandler{
 
@@ -26,6 +27,23 @@ class DataHandler{
   int _point = 0;
 
 
+  double pointOfPlayer = -0.23508/100;
+  double pointOfBank = -0.05791/100;
+
+  var pointMap = <int,double>{
+    0:0,
+    1:0.0018/100,
+    2:0.0045/100,
+    3:0.0051/100,
+    4:0.0120/100,
+    5:-0.0084/100,
+    6:-0.0113/100,
+    7:-0.0082/100,
+    8:-0.0053/100,
+    9:-0.0025/100,
+  };
+
+
 
   /*
   state
@@ -37,25 +55,27 @@ class DataHandler{
    */
   int _state = -1;
 
-  var pointMap = <int,int>{
-    0:0,
-    1:1,
-    2:1,
-    3:2,
-    4:3,
-    5:-2,
-    6:-2,
-    7:-2,
-    8:-1,
-    9:0,
-  };
+  // var pointMap = <int,int>{
+  //   0:0,
+  //   1:1,
+  //   2:1,
+  //   3:2,
+  //   4:3,
+  //   5:-2,
+  //   6:-2,
+  //   7:-2,
+  //   8:-1,
+  //   9:0,
+  // };
 
   DataHandler();
 
   void insertCard(List cardList){
     for(var card in cardList){
       // Fimber.i("card = $card");
-      _point += pointMap[card]!;
+      pointOfBank += pointMap[card]!;
+      pointOfPlayer -= pointMap[card]!;
+      // _point += pointMap[card]!;
     }
   }
 
@@ -97,15 +117,14 @@ class DataHandler{
 
 
       await Future.delayed(const Duration(milliseconds: 100));
-      if(_point>0){
+
+      if(pointOfPlayer<pointOfBank){
         Fimber.i('betBank');
         for (int i = 0; i < betTimes; i++){
           clickBank(webViewController, casino);
-
-          // await betBank();
         }
         betSide="bank";
-      }else if(_point<0){
+      }else if(pointOfPlayer>pointOfBank){
         Fimber.i('betPlayer');
         for (int i = 0; i < betTimes; i++) {
           clickPlayer(webViewController, casino);
@@ -117,6 +136,28 @@ class DataHandler{
         Fimber.i("_point = 0");
         betSide = null;
       }
+
+      // if(_point>0){
+      //   Fimber.i('betBank');
+      //   for (int i = 0; i < betTimes; i++){
+      //     clickBank(webViewController, casino);
+      //
+      //     // await betBank();
+      //   }
+      //   betSide="bank";
+      // }else if(_point<0){
+      //   Fimber.i('betPlayer');
+      //   for (int i = 0; i < betTimes; i++) {
+      //     clickPlayer(webViewController, casino);
+      //
+      //     // await betPlayer();
+      //   }
+      //   betSide = "player";
+      // }else{
+      //   Fimber.i("_point = 0");
+      //   betSide = null;
+      // }
+
       if(betSide!=null){
         await Future.delayed(const Duration(milliseconds: 100));
         clickConfirm(webViewController, casino);
@@ -127,12 +168,26 @@ class DataHandler{
       isBetting = false;
     }
   }
+
+  void calculateBetTimes(){
+    if(pointOfBank <0 && pointOfPlayer<0){
+      betTimes = 1;
+      return;
+    }
+    if(pointOfBank>pointOfPlayer){
+      betTimes = (pointOfBank*0.76/1000).round();
+     return;
+    }
+
+  }
   void _reset(){
     Fimber.i("reset");
     _point = 0;
     betTimes=1;
     winSide = null;
     betSide = null;
+    pointOfPlayer = -0.23508/100;
+    pointOfBank = -0.05791/100;
   }
   void reset(){
     Fimber.i("public reset");
@@ -278,8 +333,8 @@ class DataHandler{
   void checkWinOrLose(String? winSide){
     if(winSide==null || betSide==null){
       Fimber.i("winSide or betSide = null");
-      Fimber.i("betTimes didn't change!");
-      Fimber.i("betTimes = $betTimes");
+      // Fimber.i("betTimes didn't change!");
+      // Fimber.i("betTimes = $betTimes");
       return;
     }
     Fimber.i("winSide = $winSide");
@@ -292,14 +347,14 @@ class DataHandler{
     }
 
 
-    if(winSide == betSide || betTimes > 32){
-      betTimes = 1;
-      Fimber.i("betTimes = 1");
-    }else{
-
-      Fimber.i("betTimes = ${betTimes * 2 + 1}");
-      betTimes = betTimes*2+1;
-    }
+    // if(winSide == betSide || betTimes > 32){
+    //   betTimes = 1;
+    //   Fimber.i("betTimes = 1");
+    // }else{
+    //
+    //   Fimber.i("betTimes = ${betTimes * 2 + 1}");
+    //   betTimes = betTimes*2+1;
+    // }
   }
 
   void noBet(){
