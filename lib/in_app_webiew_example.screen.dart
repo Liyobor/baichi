@@ -91,6 +91,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   int clickStartTimes = 0;
   int paidTime = 6000;
 
+  bool isWmInGame = false;
+
+
+  int wmEnterPageConsoleLogTimes = 0;
+
   @override
   void initState() {
     super.initState();
@@ -215,6 +220,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
 
+                        // Fimber.i("onLoadResource : ${resource.url.toString()}");
 
                         if (resource.url.toString().contains("iframe_101")) {
                           wmCatchMoney().then((value) {
@@ -233,6 +239,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             Fimber.i('set allbetMoney');
                             Fimber.i('allbetMoney = $allbetMoney');
                           });
+
+                          webViewController?.evaluateJavascript(source: 'document.getElementById("backBtn").addEventListener("touchstart",function(e){console.log("allbet_back")})');
                         }
                       },
 
@@ -308,6 +316,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         switch(title){
                           case "WM":{
                             casino = title;
+                            webViewController?.evaluateJavascript(source: "document.getElementById('golobby_btn').addEventListener('click',function(e){console.log('wm_back')})");
+
                           }
                           break;
 
@@ -325,15 +335,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
 
                         if (isUIDetectorRunning) {
-                          apiHandler.isCalculatorRunning = 0;
                           apiHandler.routineCheck();
-                          setState(() {
-                            isUIDetectorRunning = false;
-                          });
                           snackBarController.showRecognizeResult(
                               "偵測到網頁跳轉，停止辨識", 2000);
-                          stopTimer();
-                          dataHandler.reset();
+                          stop();
                         }
                       },
                       onCloseWindow: (controller) {
@@ -365,6 +370,55 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           webViewController?.evaluateJavascript(source: catchDown);
                           webViewController?.evaluateJavascript(source: catchUp);
                         }
+
+
+
+                        switch(consoleMessage.message){
+                          case "allbet_back":{
+                            if (isUIDetectorRunning) {
+                              apiHandler.routineCheck();
+                              snackBarController.showRecognizeResult(
+                                  "偵測到網頁跳轉，停止辨識", 2000);
+                              stop();
+                            }
+                          }
+                          break;
+                          case "wm_back":{
+                            if (isUIDetectorRunning) {
+                              apiHandler.routineCheck();
+                              snackBarController.showRecognizeResult(
+                                  "偵測到網頁跳轉，停止辨識", 2000);
+                              stop();
+                            }
+                            isWmInGame = false;
+                          }
+                          break;
+
+                          case "[FLVDemuxer] > Parsed onMetaData":{
+                            Fimber.i("isWmInGame = true");
+                            isWmInGame = true;
+
+                            wmCatchMoney().then((value) {
+                              wmMoney = value.toDouble();
+                              Fimber.i("value = $value");
+                              Fimber.i('set wmMoney');
+                              Fimber.i('wmMoney = $wmMoney');
+                            });
+                          }
+                          break;
+
+                          // case "WebSocket connection to 'wss://wmgs.mingruishuwen.com/15101' failed: Error during WebSocket handshake: Unexpected response code: 502":{
+                          //   // wmEnterPageConsoleLogTimes+=1;
+                          //   // if(wmEnterPageConsoleLogTimes>3){
+                          //     wmCatchMoneyJSFirstTimes();
+                          //     wmEnterPageConsoleLogTimes = 0;
+                          //   // }
+                          //
+                          // }
+                          // break;
+                        }
+
+
                         
                       },
                       onCreateWindow: (controller, createWindowRequest) async {
@@ -582,125 +636,165 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                           TextButton(
                                               onPressed: () async {
                                                 if (counter.count >= paidTime) {
-                                                  switch(casino){
-                                                    case "WM":{
-                                                      wmCatchMoney().then((value) async {
-                                                        if (value < 0) {
-                                                          final tempFee = await selfEncryptedSharedPreference.getFee();
-                                                          if (tempFee != null) {
-                                                            double lastFee = double.parse(tempFee);
-                                                            Fimber.i("lastFee = $lastFee");
-                                                            fee += lastFee;
-                                                          }
-                                                        } else {
-                                                          fee += (value - wmMoney) / 10;
-                                                          final tempFee = await selfEncryptedSharedPreference.getFee();
-                                                          Fimber.i("Fee = $fee");
-                                                          if (tempFee != null) {
-                                                            double lastFee = double.parse(tempFee);
-                                                            Fimber.i("lastFee = $lastFee");
-                                                            fee += lastFee;
-                                                          }
-                                                        }
-
-                                                        Fimber.i("after calc fee =$fee");
-                                                        if (fee >= 1000) {
+                                                  final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                  if (tempFee != null) {
+                                                    double lastFee = double.parse(tempFee);
+                                                    Fimber.i("lastFee = $lastFee");
+                                                    if (lastFee >= 1000) {
+                                                      switch(casino){
+                                                        case "WM":{
                                                           _stopWmProcess();
-                                                          await apiHandler.debtApi(fee.toInt()).then((value){
-                                                            if(value){
-                                                              setState(() {
-                                                                selfEncryptedSharedPreference.setFee(0.0);
-                                                              });
-                                                            }
-                                                          });
-
-                                                        } else if (fee <= 0) {
-                                                          counter.resetTimer();
-                                                          setState(() {
-                                                            selfEncryptedSharedPreference.setFee(0.0);
-                                                          });
-
-
-                                                          selfEncryptedSharedPreference.saveRemainTime();
-                                                        } else {
-                                                          counter.resetTimer();
-
-                                                          setState(() {
-                                                            selfEncryptedSharedPreference.setFee(fee);
-                                                          });
-
-
-
-                                                          Fimber.i("setFee = $fee");
-                                                          selfEncryptedSharedPreference.saveRemainTime();
                                                         }
-
-                                                        fee = 0;
-                                                        wmMoney = value;
-                                                      });
-                                                    }
-                                                    break;
-
-                                                    case "ALLBET":{
-                                                      allbetCatchMoney().then((value) async {
-                                                        if (value < 0) {
-                                                          final tempFee = await selfEncryptedSharedPreference.getFee();
-                                                          if (tempFee != null) {
-                                                            double lastFee = double.parse(tempFee);
-                                                            Fimber.i("lastFee = $lastFee");
-                                                            fee += lastFee;
-                                                          }
-                                                        } else {
-                                                          fee += (value - allbetMoney) / 10;
-                                                          final tempFee = await selfEncryptedSharedPreference.getFee();
-                                                          Fimber.i("Fee = $fee");
-                                                          if (tempFee != null) {
-                                                            double lastFee = double.parse(tempFee);
-                                                            Fimber.i("lastFee = $lastFee");
-                                                            fee += lastFee;
-                                                          }
-                                                        }
-
-                                                        Fimber.i("after calc fee =$fee");
-                                                        if (fee >= 1000) {
+                                                        break;
+                                                        case "ALLBET":{
                                                           _stopAllbetProcess();
-                                                          await apiHandler.debtApi(fee.toInt()).then((value){
-                                                            if(value){
-                                                              setState(() {
-                                                                selfEncryptedSharedPreference.setFee(0.0);
-                                                              });
-
-                                                            }
-                                                          });
-                                                        } else if (fee <= 0) {
-                                                          counter.resetTimer();
+                                                        }
+                                                        break;
+                                                      }
+                                                      await apiHandler.debtApi(lastFee.toInt()).then((value){
+                                                        if(value){
                                                           setState(() {
                                                             selfEncryptedSharedPreference.setFee(0.0);
                                                           });
-
-                                                          selfEncryptedSharedPreference.saveRemainTime();
-                                                        } else {
-                                                          counter.resetTimer();
-                                                          setState(() {
-                                                            selfEncryptedSharedPreference.setFee(fee);
-                                                          });
-
-                                                          Fimber.i("setFee = $fee");
-                                                          selfEncryptedSharedPreference.saveRemainTime();
                                                         }
-                                                        fee = 0;
-                                                        allbetMoney = value;
                                                       });
+                                                    } else if (lastFee <= 0) {
+                                                      counter.resetTimer();
+                                                      setState(() {
+                                                        selfEncryptedSharedPreference.setFee(0.0);
+                                                      });
+                                                      selfEncryptedSharedPreference.saveRemainTime();
+                                                    } else {
+                                                      counter.resetTimer();
+                                                      setState(() {
+                                                        selfEncryptedSharedPreference.setFee(lastFee);
+                                                      });
+                                                      Fimber.i("setFee = $lastFee");
+                                                      selfEncryptedSharedPreference.saveRemainTime();
                                                     }
-                                                    break;
-
-                                                    default:{
-                                                      snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                                                      clickStartTimes = 0;
-                                                      Fimber.i('casino = null');
-                                                    }
-                                                    break;
                                                   }
+
+
+
+                                                  // switch(casino){
+                                                  //   case "WM":{
+                                                  //     wmCatchMoney().then((value) async {
+                                                  //       if (value < 0) {
+                                                  //         final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                  //         if (tempFee != null) {
+                                                  //           double lastFee = double.parse(tempFee);
+                                                  //           Fimber.i("lastFee = $lastFee");
+                                                  //           fee += lastFee;
+                                                  //         }
+                                                  //       } else {
+                                                  //         fee += (value - wmMoney) / 10;
+                                                  //         final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                  //         Fimber.i("Fee = $fee");
+                                                  //         if (tempFee != null) {
+                                                  //           double lastFee = double.parse(tempFee);
+                                                  //           Fimber.i("lastFee = $lastFee");
+                                                  //           fee += lastFee;
+                                                  //         }
+                                                  //       }
+                                                  //
+                                                  //       Fimber.i("after calc fee =$fee");
+                                                  //       if (fee >= 1000) {
+                                                  //         _stopWmProcess();
+                                                  //         await apiHandler.debtApi(fee.toInt()).then((value){
+                                                  //           if(value){
+                                                  //             setState(() {
+                                                  //               selfEncryptedSharedPreference.setFee(0.0);
+                                                  //             });
+                                                  //           }
+                                                  //         });
+                                                  //
+                                                  //       } else if (fee <= 0) {
+                                                  //         counter.resetTimer();
+                                                  //         setState(() {
+                                                  //           selfEncryptedSharedPreference.setFee(0.0);
+                                                  //         });
+                                                  //
+                                                  //
+                                                  //         selfEncryptedSharedPreference.saveRemainTime();
+                                                  //       } else {
+                                                  //         counter.resetTimer();
+                                                  //
+                                                  //         setState(() {
+                                                  //           selfEncryptedSharedPreference.setFee(fee);
+                                                  //         });
+                                                  //
+                                                  //
+                                                  //
+                                                  //         Fimber.i("setFee = $fee");
+                                                  //         selfEncryptedSharedPreference.saveRemainTime();
+                                                  //       }
+                                                  //
+                                                  //       fee = 0;
+                                                  //       wmMoney = value;
+                                                  //     });
+                                                  //   }
+                                                  //   break;
+                                                  //
+                                                  //   case "ALLBET":{
+                                                  //     allbetCatchMoney().then((value) async {
+                                                  //       if (value < 0) {
+                                                  //         final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                  //         if (tempFee != null) {
+                                                  //           double lastFee = double.parse(tempFee);
+                                                  //           Fimber.i("lastFee = $lastFee");
+                                                  //           fee += lastFee;
+                                                  //         }
+                                                  //       } else {
+                                                  //         fee += (value - allbetMoney) / 10;
+                                                  //         final tempFee = await selfEncryptedSharedPreference.getFee();
+                                                  //         Fimber.i("Fee = $fee");
+                                                  //         if (tempFee != null) {
+                                                  //           double lastFee = double.parse(tempFee);
+                                                  //           Fimber.i("lastFee = $lastFee");
+                                                  //           fee += lastFee;
+                                                  //         }
+                                                  //       }
+                                                  //
+                                                  //       Fimber.i("after calc fee =$fee");
+                                                  //       if (fee >= 1000) {
+                                                  //         _stopAllbetProcess();
+                                                  //         await apiHandler.debtApi(fee.toInt()).then((value){
+                                                  //           if(value){
+                                                  //             setState(() {
+                                                  //               selfEncryptedSharedPreference.setFee(0.0);
+                                                  //             });
+                                                  //
+                                                  //           }
+                                                  //         });
+                                                  //       } else if (fee <= 0) {
+                                                  //         counter.resetTimer();
+                                                  //         setState(() {
+                                                  //           selfEncryptedSharedPreference.setFee(0.0);
+                                                  //         });
+                                                  //
+                                                  //         selfEncryptedSharedPreference.saveRemainTime();
+                                                  //       } else {
+                                                  //         counter.resetTimer();
+                                                  //         setState(() {
+                                                  //           selfEncryptedSharedPreference.setFee(fee);
+                                                  //         });
+                                                  //
+                                                  //         Fimber.i("setFee = $fee");
+                                                  //         selfEncryptedSharedPreference.saveRemainTime();
+                                                  //       }
+                                                  //       fee = 0;
+                                                  //       allbetMoney = value;
+                                                  //     });
+                                                  //   }
+                                                  //   break;
+                                                  //
+                                                  //   default:{
+                                                  //     snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                  //     clickStartTimes = 0;
+                                                  //     Fimber.i('casino = null');
+                                                  //   }
+                                                  //   break;
+                                                  // }
 
                                                 }
                                               },
@@ -778,6 +872,51 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     }
   }
 
+
+  void stop(){
+    setState(() {
+      isUIDetectorRunning = false;
+    });
+    stopTimer();
+    dataHandler.reset();
+    clickStartTimes = 0;
+    apiHandler.isCalculatorRunning = 0;
+    Fimber.i("casino = $casino");
+    switch(casino){
+      case "wm":{
+        wmCatchMoney().then((value) async {
+          if(wmMoney!=-1.0){
+            fee += (value - wmMoney) / 10;
+            final tempFee = await selfEncryptedSharedPreference.getFee();
+            Fimber.i("Fee = $fee");
+            if (tempFee != null) {
+              double lastFee = double.parse(tempFee);
+              Fimber.i("lastFee = $lastFee");
+              fee += lastFee;
+            }
+          }
+        });
+      }
+      break;
+      case "ALLBET":{
+        allbetCatchMoney().then((value) async {
+          if(allbetMoney!=-1.0){
+            fee += (value - allbetMoney) / 10;
+            final tempFee = await selfEncryptedSharedPreference.getFee();
+            Fimber.i("Fee = $fee");
+            if (tempFee != null) {
+              double lastFee = double.parse(tempFee);
+              Fimber.i("lastFee = $lastFee");
+              fee += lastFee;
+            }
+          }
+        });
+      }
+      break;
+
+    }
+  }
+
   Future<double> allbetCatchMoneyJS() async {
     String temp = await webViewController?.evaluateJavascript(source: 'document.getElementById("amount").textContent');
     temp = temp.replaceAll(",", "");
@@ -811,17 +950,68 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     return -1;
   }
 
+  Future<double> wmCatchMoneyJSFirstTimes() async {
+    webViewController?.evaluateJavascript(
+        source: "var iframe_109 = document.getElementById('iframe_109')");
+    webViewController?.evaluateJavascript(
+        source:
+        "var doc2 = iframe_109.contentDocument? win.contentDocument : win.contentWindow.document");
+    String temp = await webViewController?.evaluateJavascript(
+        source: 'doc2.getElementById("userBalanceBox").textContent');
+    Fimber.i("moneyTemp0 = $temp");
+    temp = temp.replaceAll(",", "");
+    temp = temp.replaceAll("NTD ", "");
+    double moneyTemp = double.parse(temp);
+    Fimber.i("moneyTemp1 = $moneyTemp");
+    return moneyTemp;
+  }
+
+  Future<double> wmCatchMoneyJS() async {
+    if(!isWmInGame){
+      Fimber.i("isWmInGame");
+      return -1;
+    }
+    try{
+      webViewController?.evaluateJavascript(
+          source: "var iframe_101 = document.getElementById('iframe_101')");
+      webViewController?.evaluateJavascript(
+          source:
+              "var doc1 = iframe_101.contentDocument? win.contentDocument : win.contentWindow.document");
+      webViewController?.evaluateJavascript(
+          source: "var iframe_109 = document.getElementById('iframe_109')");
+      webViewController?.evaluateJavascript(
+          source:
+              "var doc2 = iframe_109.contentDocument? win.contentDocument : win.contentWindow.document");
+      String temp = await webViewController?.evaluateJavascript(
+          source: 'doc1.getElementById("userBalanceBox").textContent');
+      if (temp.isEmpty) {
+        temp = await webViewController?.evaluateJavascript(
+            source: 'doc2.getElementById("userBalanceBox").textContent');
+      }
+
+      Fimber.i("moneyTemp0 = $temp");
+      temp = temp.replaceAll(",", "");
+      temp = temp.replaceAll("NTD ", "");
+      double moneyTemp = double.parse(temp);
+      Fimber.i("moneyTemp1 = $moneyTemp");
+      return moneyTemp;
+    }catch(error){
+      Fimber.i("error = $error");
+      return -1;
+    }
+  }
+
   Future<double> wmCatchMoney() async {
     if (html == null) {
       String? html = await webViewController?.getHtml();
       if (html != null) {
         final double? dollar = await compute(wmGetMoneyInIsolate, html);
         if (dollar != null) {
-          snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
+          // snackBarController.showRecognizeResult("現在金額:$dollar", 1500);
           html = null;
           return dollar;
         } else {
-          snackBarController.showRecognizeResult("讀取不到金額", 1500);
+          // snackBarController.showRecognizeResult("讀取不到金額", 1500);
           html = null;
           return -1;
         }
@@ -837,7 +1027,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       if (timeCount == 450) {
         apiHandler.routineCheck();
         wmCatchMoney().then((value) async {
-          if (value < 0) {
+          if (value < 0 || wmMoney == -1.0) {
             _stopWmProcess();
             return;
           }
@@ -899,7 +1089,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       apiHandler.isCalculatorRunning = 1;
       wmStartRoutineCheck();
       startTimer();
-
     }
     while (isUIDetectorRunning) {
       if (apiHandler.code != 1) {
@@ -969,13 +1158,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
             if (isLaunchCardDetector && !cardDetectLock) {
               if (wmUiDetector.winSide == "bank") {
-                snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+                Fimber.i("莊勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
               }
               if (wmUiDetector.winSide == "player") {
-                snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+                Fimber.i("閒勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
               }
               if (wmUiDetector.winSide == "draw") {
-                snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+                Fimber.i("和局，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
               }
 
               dataHandler.checkWinOrLose(wmUiDetector.winSide);
@@ -1007,7 +1199,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       if (timeCount == 450) {
         apiHandler.routineCheck();
         allbetCatchMoney().then((value) async {
-          if (value < 0) {
+          if (value < 0 || allbetMoney == -1.0) {
             _stopAllbetProcess();
             return;
           }
@@ -1036,8 +1228,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
 
   void _stopAllbetProcess() {
-    clickStartTimes = 0;
-    apiHandler.isCalculatorRunning = 0;
     apiHandler.routineCheck().then((value) {
       if (value == 0) {
         Fimber.i('routineCheck 2 returnMsg show');
@@ -1045,12 +1235,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       }
       apiHandler.returnMsg = "出錯了! 請聯繫客服";
     });
-    setState(() {
-      isUIDetectorRunning = false;
-    });
     snackBarController.showRecognizeResult("停止辨識", 2000);
-    stopTimer();
-    dataHandler.reset();
+    stop();
   }
 
   void allbetProcess() async {
@@ -1060,12 +1246,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       isUIDetectorRunning = !isUIDetectorRunning;
     });
     if (!isUIDetectorRunning) {
-      clickStartTimes = 0;
-      apiHandler.isCalculatorRunning = 0;
       apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
-      stopTimer();
-      dataHandler.reset();
+      stop();
     } else {
       apiHandler.isCalculatorRunning = 1;
       allbetStartRoutineCheck();
@@ -1157,10 +1340,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               List value = await allbetCardDetector.putImageIntoModel(imageData);
               String cardResult = allbetCardDetector.resultStr;
               dataHandler.insertCard(value);
-              if (cardResult == "card error") {
-                ImageGallerySaver.saveImage(data, quality: 100);
-              }
-              snackBarController.showRecognizeResult(cardResult, 2000);
+              // if (cardResult == "card error") {
+              //   ImageGallerySaver.saveImage(data, quality: 100);
+              // }
+              // snackBarController.showRecognizeResult(cardResult, 2000);
               cardDetectLock = true;
 
               // await ImageGallerySaver.saveImage(data, quality: 100);
