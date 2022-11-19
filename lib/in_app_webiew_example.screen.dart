@@ -111,14 +111,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
     config.compressFormat = CompressFormat.JPEG;
     snackBarController = SnackBarController(context: context);
-    // Fimber.i("apiHandler.defaultUrl = ${apiHandler.defaultUrl}");
+
 
     contextMenu = ContextMenu(
         menuItems: [
           ContextMenuItem(
               id: 1,
-              // androidId: 1,
-              // iosId: "1",
+
               title: "Special",
               action: () async {
                 Fimber.i("Menu item Special clicked!");
@@ -180,23 +179,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           onTapDown: (details) {
             Fimber.i("${details.globalPosition}");
           },
-          // child: WillPopScope(
-          //   onWillPop: () async {
-          //     if (_snackBarPresenting) {
-          //       EasyLoading.show(status: '與伺服器同步狀態中...');
-          //       await apiHandler.check2WhenCloseApp();
-          //       // await apiHandler.debtApiWhenCloseApp();
-          //       // EasyLoading.dismiss();
-          //       return true;
-          //     }
-          //     _snackBarPresenting = true;
-          //     var snackBar = const SnackBar(content: Text('再次點擊back關閉app'));
-          //     ScaffoldMessenger.of(context)
-          //         .showSnackBar(snackBar)
-          //         .closed
-          //         .then((_) => _snackBarPresenting = false);
-          //     return false;
-          //   },
+
             child: Column(children: <Widget>[
               TextField(
                 decoration:
@@ -226,37 +209,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       initialSettings: settings,
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
-                        // Fimber.i("onLoadResource");
-                        // Fimber.i("resource = ${resource.url}");
-
-                        // if (resource.url.toString().contains("iframe_101")) {
-                        //   wmCatchMoney().then((value) {
-                        //     wmMoney = value.toDouble();
-                        //     Fimber.i("value = $value");
-                        //     Fimber.i('set wmMoney');
-                        //     Fimber.i('wmMoney = $wmMoney');
-                        //   });
-                        // }
-                        //
-                        // if(resource.url.toString().contains("www.ab.games:8888/undefined")){
-                        //   Fimber.i("resource.url = ${resource.url}");
-                        //   allbetCatchMoney().then((value) {
-                        //     allbetMoney = value.toDouble();
-                        //     Fimber.i("value = $value");
-                        //     Fimber.i('set allbetMoney');
-                        //     Fimber.i('allbetMoney = $allbetMoney');
-                        //   });
-                        // }
                       },
-                      // onPageCommitVisible: (controller, url) {
-                      //   Fimber.i("onPageCommitVisible");
-                      // },
-                      // onWindowFocus: (controller) {
-                      //   Fimber.i("onWindowFocus");
-                      // },
-                      // onWindowBlur: (controller) {
-                      //   Fimber.i("onWindowBlur");
-                      // },
+
                       onWebViewCreated: (controller) {
                         webViewController = controller;
                         counter.initCount();
@@ -268,22 +222,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           urlController.text = this.url;
                         });
                       },
-                      // onAjaxProgress: (controller, ajaxRequest) async {
-                      //   // Fimber.i('onAjaxProgress');
-                      //   // Fimber.i('${ajaxRequest.status}');
-                      //   return AjaxRequestAction.PROCEED;
-                      // },
+
                       onPermissionRequest: (controller,request) async {
                         return PermissionResponse(resources: request.resources,action: PermissionResponseAction.GRANT);
                         }
                         ,
 
-                      // androidOnPermissionRequest:
-                      //     (controller, origin, resources) async {
-                      //   return PermissionRequestResponse(
-                      //       resources: resources,
-                      //       action: PermissionRequestResponseAction.GRANT);
-                      // },
+
                       shouldOverrideUrlLoading:
                           (controller, navigationAction) async {
                         var uri = navigationAction.request.url!;
@@ -320,11 +265,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       onReceivedError: (controller,request,error){
                         pullToRefreshController.endRefreshing();
                       },
-                      // onLoadError: (controller, url, code, message) {
-                      //   pullToRefreshController.endRefreshing();
-                      // },
+
                       onProgressChanged: (controller, progress) {
-                        // Fimber.i("onProgressChanged");
+
                         if (progress == 100) {
                           pullToRefreshController.endRefreshing();
                         }
@@ -335,7 +278,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       },
 
                       onTitleChanged: (controller, title) async {
-                        // Fimber.i("onTitleChanged");
+
                         Fimber.i("title = $title");
 
                         switch(title){
@@ -355,15 +298,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           break;
                         }
 
-                        // if(title=="WM" || title == "ALLBET"){
-                        //   casino = title;
-                        // }else{
-                        //   casino = null;
-                        // }
+
 
                         if (isUIDetectorRunning) {
-                          // apiHandler.isCalculatorRunning = 0;
-                          // apiHandler.routineCheck();
+
                           setState(() {
                             isUIDetectorRunning = false;
                           });
@@ -399,23 +337,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       },
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
-                        // Fimber.i('onConsoleMessage');
-                        Fimber.i(consoleMessage.message);
-                        // if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
-                        //   // Fimber.i('setup event');
-                        //   allbetCatchMoneyJS().then((value){
-                        //   allbetMoney = value;
-                        //   Fimber.i("value = $value");
-                        //   Fimber.i('set allbetMoney');
-                        //   Fimber.i('allbetMoney = $allbetMoney');
-                        //   });
-                        //   String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
-                        //   String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
-                        //   webViewController?.evaluateJavascript(source: 'var tapdown;');
-                        //   webViewController?.evaluateJavascript(source: 'var tapup;');
-                        //   webViewController?.evaluateJavascript(source: catchDown);
-                        //   webViewController?.evaluateJavascript(source: catchUp);
-                        // }
+
+                        // Fimber.i(consoleMessage.message);
+
                         
                       },
                       onCreateWindow: (controller, createWindowRequest) async {
@@ -426,372 +350,138 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                     progress < 1.0
                         ? LinearProgressIndicator(value: progress)
                         : Container(),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.8,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            ElevatedButton(
-                              child: const Icon(Icons.arrow_back),
-                              onPressed: () {
-                                webViewController?.goBack();
-                              },
+
+                    Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, MediaQuery.of(context).size.height*0.15),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height*0.15,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    child: const Icon(Icons.arrow_back),
+                                    onPressed: () {
+                                      webViewController?.goBack();
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    child: const Icon(Icons.refresh),
+                                    onPressed: () async {
+                                      webViewController?.reload();
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                            ElevatedButton(
-                              child: const Icon(Icons.refresh),
-                              onPressed: () async {
-                                webViewController?.reload();
-                              },
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
+                        const Spacer(),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, MediaQuery.of(context).size.height*0.15),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height*0.15,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    height: 35,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(3),
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.blue),
+                                            ),
+                                          ),
+                                          TextButton(
+                                              onPressed: () {
+                                                setState(() {
 
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.86,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            // SizedBox(
-                            //   height: 35,
-                            //   child: ClipRRect(
-                            //     borderRadius: BorderRadius.circular(3),
-                            //     child: Stack(
-                            //       children: [
-                            //         if (counter.count >= paidTime)
-                            //           Positioned.fill(
-                            //             child: Container(
-                            //               decoration: const BoxDecoration(
-                            //                   color: Colors.blue),
-                            //             ),
-                            //           )
-                            //         else
-                            //           Positioned.fill(
-                            //             child: Container(
-                            //               decoration: const BoxDecoration(
-                            //                   color: Colors.grey),
-                            //             ),
-                            //           ),
-                            //         TextButton(
-                            //             onPressed: () async {
-                            //               if (counter.count >= paidTime) {
-                            //
-                            //                 switch(casino){
-                            //                   case "WM":{
-                            //                     wmCatchMoney().then((value) async {
-                            //                       if (value < 0) {
-                            //                         final tempFee =
-                            //                         await selfEncryptedSharedPreference
-                            //                             .getFee();
-                            //                         if (tempFee != null) {
-                            //                           double lastFee =
-                            //                           double.parse(tempFee);
-                            //                           Fimber.i(
-                            //                               "lastFee = $lastFee");
-                            //                           fee += lastFee;
-                            //                         }
-                            //                       } else {
-                            //                         fee += (value - wmMoney) / 10;
-                            //                         final tempFee =
-                            //                         await selfEncryptedSharedPreference
-                            //                             .getFee();
-                            //                         Fimber.i("Fee = $fee");
-                            //                         if (tempFee != null) {
-                            //                           double lastFee =
-                            //                           double.parse(tempFee);
-                            //                           Fimber.i(
-                            //                               "lastFee = $lastFee");
-                            //                           fee += lastFee;
-                            //                         }
-                            //                       }
-                            //
-                            //                       Fimber.i("after calc fee =$fee");
-                            //                       if (fee >= 1000) {
-                            //                         _stopWmProcess();
-                            //                         await apiHandler.debtApi(fee.toInt()).then((value){
-                            //                           if(value){
-                            //                             selfEncryptedSharedPreference
-                            //                                 .setFee(0.0);
-                            //                           }
-                            //                         });
-                            //
-                            //                       } else if (fee <= 0) {
-                            //                         counter.resetTimer();
-                            //                         selfEncryptedSharedPreference
-                            //                             .setFee(0.0);
-                            //                         selfEncryptedSharedPreference
-                            //                             .saveRemainTime();
-                            //                       } else {
-                            //                         counter.resetTimer();
-                            //                         selfEncryptedSharedPreference
-                            //                             .setFee(fee);
-                            //                         Fimber.i("setFee = $fee");
-                            //                         selfEncryptedSharedPreference
-                            //                             .saveRemainTime();
-                            //                       }
-                            //
-                            //                       fee = 0;
-                            //                       wmMoney = value;
-                            //                     });
-                            //                   }
-                            //                   break;
-                            //
-                            //                   case "ALLBET":{
-                            //                     allbetCatchMoney().then((value) async {
-                            //                       if (value < 0) {
-                            //                         final tempFee =
-                            //                         await selfEncryptedSharedPreference
-                            //                             .getFee();
-                            //                         if (tempFee != null) {
-                            //                           double lastFee =
-                            //                           double.parse(tempFee);
-                            //                           Fimber.i(
-                            //                               "lastFee = $lastFee");
-                            //                           fee += lastFee;
-                            //                         }
-                            //                       } else {
-                            //                         fee += (value - allbetMoney) / 10;
-                            //                         final tempFee =
-                            //                         await selfEncryptedSharedPreference
-                            //                             .getFee();
-                            //                         Fimber.i("Fee = $fee");
-                            //                         if (tempFee != null) {
-                            //                           double lastFee =
-                            //                           double.parse(tempFee);
-                            //                           Fimber.i(
-                            //                               "lastFee = $lastFee");
-                            //                           fee += lastFee;
-                            //                         }
-                            //                       }
-                            //
-                            //                       Fimber.i("after calc fee =$fee");
-                            //                       if (fee >= 1000) {
-                            //                         _stopAllbetProcess();
-                            //                         await apiHandler.debtApi(fee.toInt()).then((value){
-                            //                           if(value){
-                            //                             selfEncryptedSharedPreference
-                            //                                 .setFee(0.0);
-                            //                           }
-                            //                         });
-                            //
-                            //                       } else if (fee <= 0) {
-                            //                         counter.resetTimer();
-                            //                         selfEncryptedSharedPreference
-                            //                             .setFee(0.0);
-                            //                         selfEncryptedSharedPreference
-                            //                             .saveRemainTime();
-                            //                       } else {
-                            //                         counter.resetTimer();
-                            //                         selfEncryptedSharedPreference
-                            //                             .setFee(fee);
-                            //                         Fimber.i("setFee = $fee");
-                            //                         selfEncryptedSharedPreference
-                            //                             .saveRemainTime();
-                            //                       }
-                            //
-                            //                       fee = 0;
-                            //                       allbetMoney = value;
-                            //                     });
-                            //                   }
-                            //                   break;
-                            //
-                            //                   default:{
-                            //                     snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                            //                     Fimber.i('casino = null');
-                            //                   }
-                            //                   break;
-                            //                 }
-                            //
-                            //
-                            //               }
-                            //             },
-                            //             child: const Text(
-                            //               "繳費",
-                            //               style: TextStyle(color: Colors.white),
-                            //             ))
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
-                            SizedBox(
-                              height: 35,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: Stack(
-                                  children: [
-                                    Positioned.fill(
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            color: Colors.blue),
-                                      ),
-                                    ),
-                                    TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            // if (apiHandler.userPassCode !=
-                                            //     null) {
-                                            //   if (apiHandler.code == 1) {
-                                            //     Fimber.i(
-                                            //         "code = ${apiHandler.code}");
-                                                if(casino!=null){
-                                                  // apiHandler.checkServeState().then((value) {
-                                                  //   if (value == "clear") {
+                                                  if(casino!=null){
 
-                                                      switch(casino){
-                                                        case "WM":{
-                                                          wmProcess();
-                                                        }
-                                                        break;
 
-                                                        case "ALLBET":{
-                                                          allbetProcess();
-                                                          Fimber.i('allbet process');
-                                                        }
-                                                        break;
-
-                                                        default:{
-                                                          snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                                                          Fimber.i('casino = null');
-                                                        }
-                                                        break;
+                                                    switch(casino){
+                                                      case "WM":{
+                                                        wmProcess();
                                                       }
+                                                      break;
 
-                                                  //   } else {
-                                                  //     Fimber.i(
-                                                  //         'checkServeState 0 returnMsg show');
-                                                  //     _showReturnMessageDialog(
-                                                  //         apiHandler.returnMsg);
-                                                  //   }
-                                                  // });
-                                                }else{
-                                                  snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                                                  Fimber.i('casino = null');
-                                                }
+                                                      case "ALLBET":{
+                                                        allbetProcess();
+                                                        Fimber.i('allbet process');
+                                                      }
+                                                      break;
 
-                                              // } else {
-                                              //   Fimber.i(
-                                              //       "code = ${apiHandler.code}");
-                                              //   apiHandler
-                                              //       .checkServeState()
-                                              //       .then((value) {
-                                              //     Fimber.i("value = $value");
-                                              //     if (value == "clear") {
-                                              //       switch(casino){
-                                              //         case "WM":{
-                                              //           wmProcess();
-                                              //         }
-                                              //         break;
-                                              //
-                                              //         case "ALLBET":{
-                                              //           Fimber.i('allbet process');
-                                              //         }
-                                              //         break;
-                                              //
-                                              //         default:{
-                                              //           snackBarController.showRecognizeResult("讀取不到場地", 1500);
-                                              //           Fimber.i('casino = null');
-                                              //         }
-                                              //         break;
-                                              //       }
-                                              //     } else {
-                                              //       Fimber.i(
-                                              //           'checkServeState 1 returnMsg show');
-                                              //       _showReturnMessageDialog(
-                                              //           apiHandler.returnMsg);
-                                              //     }
-                                              //   });
-                                              // }
-                                            // }
-                                            // else {
-                                            //   _displayTextInputDialog(context);
-                                            // }
-                                          });
-                                        },
-                                        child: (isUIDetectorRunning)
-                                            ? const Text("停止辨識",
-                                            style: TextStyle(
-                                                color: Colors.white))
-                                            : const Text("開始辨識",
-                                            style: TextStyle(
-                                                color: Colors.white)))
-                                  ],
-                                ),
-                              ),
-                            ),
-                            // ElevatedButton(
-                            //   child: const Icon(Icons.refresh),
-                            //   onPressed: () async {
-                            //     _showReturnMessageDialog(apiHandler.returnMsg);
-                            //   },
-                            // ),
-                            SizedBox(
-                              height: 35,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: Stack(
-                                  children: [
-                                    Positioned.fill(
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            color: Colors.blue),
+                                                      default:{
+                                                        snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                        Fimber.i('casino = null');
+                                                      }
+                                                      break;
+                                                    }
+
+
+                                                  }else{
+                                                    snackBarController.showRecognizeResult("讀取不到場地", 1500);
+                                                    Fimber.i('casino = null');
+                                                  }
+
+                                                });
+                                              },
+                                              child: (isUIDetectorRunning)
+                                                  ? const Text("停止辨識",
+                                                  style: TextStyle(
+                                                      color: Colors.white))
+                                                  : const Text("開始辨識",
+                                                  style: TextStyle(
+                                                      color: Colors.white)))
+                                        ],
                                       ),
                                     ),
-                                    TextButton(
-                                        onPressed: () async {
-                                          launchUrlString(
-                                              'https://line.me/ti/p/@516wvzjp');
-                                        },
-                                        child: const Text(
-                                          "聯繫客服",
-                                          style: TextStyle(color: Colors.white),
-                                        ))
-                                  ],
-                                ),
+                                  ),
+
+                                  SizedBox(
+                                    height: 35,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(3),
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.blue),
+                                            ),
+                                          ),
+                                          TextButton(
+                                              onPressed: () async {
+                                                launchUrlString(
+                                                    'https://line.me/ti/p/@516wvzjp');
+                                              },
+                                              child: const Text(
+                                                "聯繫客服",
+                                                style: TextStyle(color: Colors.white),
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            //test
-                            // SizedBox(
-                            //   height: 35,
-                            //   child: ClipRRect(
-                            //     borderRadius: BorderRadius.circular(3),
-                            //     child: Stack(
-                            //       children: [
-                            //         Positioned.fill(
-                            //           child: Container(
-                            //             decoration: const BoxDecoration(
-                            //                 color: Colors.blue),
-                            //           ),
-                            //         ),
-                            //         TextButton(
-                            //             onPressed: () async {
-                            //
-                            //               // config.compressFormat = CompressFormat.JPEG;
-                            //               // Uint8List? data = await webViewController?.takeScreenshot(
-                            //               //     screenshotConfiguration: config);
-                            //               // if(data!=null){
-                            //               //   await ImageGallerySaver.saveImage(data, quality: 100);
-                            //               // }
-                            //               // dataHandler.clickTest(webViewController!);
-                            //               await allbetCatchMoneyJS();
-                            //             },
-                            //             child: const Text(
-                            //               "test",
-                            //               style: TextStyle(color: Colors.white),
-                            //             )
-                            //         )
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
+
+
+
 
                     // IgnorePointer(
                     //   child: Align(
@@ -805,6 +495,49 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                     //                 fontSize: 20.0)),
                     //   ),
                     // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IgnorePointer(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child:
+                            // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                            Text('莊家機率:${(dataHandler.pointOfBank*100).toStringAsFixed(4)}%',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                    fontSize: 20.0)),
+                          ),
+                        ),
+                        IgnorePointer(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child:
+                            // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                            Text('閒家機率:${(dataHandler.pointOfPlayer*100).toStringAsFixed(4)}%',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                    fontSize: 20.0)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    IgnorePointer(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height*0.05, 0, 0),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Text('下注數:${dataHandler.betTimes}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                  fontSize: 20.0)),
+                        ),
+                      ),
+                    ),
+
                   ],
                 ),
               ),
@@ -1064,7 +797,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
               List value = await wmCardDetector.putImageIntoModel(imageData);
               String cardResult = wmCardDetector.resultStr;
-              dataHandler.insertCard(value);
+              setState(() {
+                dataHandler.insertCard(value);
+              });
               if (cardResult == "didn't find card") {
                 ImageGallerySaver.saveImage(data, quality: 100);
               }

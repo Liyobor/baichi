@@ -6,6 +6,14 @@ import 'package:untitled/utils/api_handler.dart';
 class DataHandler{
 
 
+  static final DataHandler _singleton = DataHandler._internal();
+  factory DataHandler() {
+    return _singleton;
+  }
+
+  DataHandler._internal();
+
+
   // double playerButtonX = -1.0;
   // double playerButtonY = -1.0;
   // double bankButtonX = -1.0;
@@ -29,6 +37,8 @@ class DataHandler{
 
   double pointOfPlayer = -0.23508/100;
   double pointOfBank = -0.05791/100;
+
+  double money = 0;
 
   var pointMap = <int,double>{
     0:0,
@@ -68,7 +78,7 @@ class DataHandler{
   //   9:0,
   // };
 
-  DataHandler();
+
 
   void insertCard(List cardList){
     for(var card in cardList){
@@ -77,6 +87,8 @@ class DataHandler{
       pointOfPlayer -= pointMap[card]!;
       // _point += pointMap[card]!;
     }
+
+    calculateBetTimes();
   }
 
   bool bar(){
@@ -175,7 +187,7 @@ class DataHandler{
       return;
     }
     if(pointOfBank>pointOfPlayer){
-      betTimes = (pointOfBank*0.76/1000).round();
+      betTimes = (money*pointOfBank*0.76/1000).round();
      return;
     }
 
