@@ -827,27 +827,35 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child:
-                            // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
-                            Text('使用時間剩餘:${(7200 - counter.count)}秒',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                    fontSize: 20.0)),
+                            Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white),
+                                  ),
+                                ),
+                                Text('使用時間剩餘:${(7200 - counter.count)}秒',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                      fontSize: 20.0)),],
+                            ),
                       ),
                     ),
 
-                    IgnorePointer(
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child:
-                        // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
-                        Text('手續費:${selfEncryptedSharedPreference.fee}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
-                                fontSize: 20.0)),
-                      ),
-                    ),
+                    // IgnorePointer(
+                    //   child: Align(
+                    //     alignment: Alignment.topCenter,
+                    //     child:
+                    //     // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                    //     Text('手續費:${selfEncryptedSharedPreference.fee}',
+                    //         style: const TextStyle(
+                    //             fontWeight: FontWeight.bold,
+                    //             color: Colors.red,
+                    //             fontSize: 20.0)),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -1186,7 +1194,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               if (cardResult == "didn't find card") {
                 // ImageGallerySaver.saveImage(data, quality: 100);
               }
-              snackBarController.showRecognizeResult(cardResult, 2000);
+              // snackBarController.showRecognizeResult(cardResult, 2000);
               cardDetectLock = true;
 
 
@@ -1332,13 +1340,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             }
             if (isLaunchCardDetector && !cardDetectLock) {
               if (allbetUiDetector.winSide == "bank") {
-                snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+                Fimber.i("莊勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
               }
               if (allbetUiDetector.winSide == "player") {
-                snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+                Fimber.i("閒勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
               }
               if (allbetUiDetector.winSide == "draw") {
-                snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+                Fimber.i("和局，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
               }
 
               dataHandler.checkWinOrLose(allbetUiDetector.winSide);
