@@ -434,23 +434,30 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         Align(
                           alignment: Alignment.bottomLeft,
                           child: SizedBox(
-                            height: MediaQuery.of(context).size.height*0.3,
+                            height: MediaQuery.of(context).size.height*0.25,
                             child: Padding(
-                              padding:EdgeInsets.fromLTRB(MediaQuery.of(context).size.height*0.015, 0, 0, 0),
+                              padding:EdgeInsets.fromLTRB(MediaQuery.of(context).size.width*0.01, 0, 0, MediaQuery.of(context).size.height*0.05),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  ElevatedButton(
-                                    child: const Icon(Icons.arrow_back),
-                                    onPressed: () {
-                                      webViewController?.goBack();
-                                    },
+                                  SizedBox(height: (MediaQuery.of(context).size.height*0.25/2)-70),
+                                  SizedBox(
+                                    height: 35,
+                                    child: ElevatedButton(
+                                      child: const Icon(Icons.arrow_back),
+                                      onPressed: () {
+                                        webViewController?.goBack();
+                                      },
+                                    ),
                                   ),
-                                  ElevatedButton(
-                                    child: const Icon(Icons.refresh),
-                                    onPressed: () async {
-                                      webViewController?.reload();
-                                    },
+                                  const SizedBox(height: 35/2),
+                                  SizedBox(
+                                    height: 35,
+                                    child: ElevatedButton(
+                                      child: const Icon(Icons.refresh),
+                                      onPressed: () async {
+                                        webViewController?.reload();
+                                      },
+                                    ),
                                   ),
                                   // Container()
                                 ],
@@ -464,9 +471,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         Align(
                           alignment: Alignment.bottomRight,
                           child: SizedBox(
-                            height: MediaQuery.of(context).size.height*0.3,
+                            height: MediaQuery.of(context).size.height*0.25,
                             child: Padding(
-                              padding:EdgeInsets.fromLTRB(0, 0, MediaQuery.of(context).size.height*0.015, 0),
+                              padding:EdgeInsets.fromLTRB(0, 0, MediaQuery.of(context).size.width*0.01, MediaQuery.of(context).size.height*0.05),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
