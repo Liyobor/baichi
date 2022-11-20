@@ -560,48 +560,88 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                     //                 fontSize: 20.0)),
                     //   ),
                     // ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        IgnorePointer(
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child:
-                            // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
-                            Text('莊家機率:${(dataHandler.pointOfBank*100).toStringAsFixed(4)}%',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                    fontSize: 20.0)),
-                          ),
-                        ),
-                        IgnorePointer(
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child:
-                            // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
-                            Text('閒家機率:${(dataHandler.pointOfPlayer*100).toStringAsFixed(4)}%',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                    fontSize: 20.0)),
-                          ),
-                        ),
-                      ],
-                    ),
                     IgnorePointer(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height*0.05, 0, 0),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Text('下注數:${dataHandler.betTimes}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
-                                  fontSize: 20.0)),
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height*0.1,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.05),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child:
+                                    // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                                    Stack(
+                                      children: [
+                                        Positioned.fill(child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white
+                                          ),
+                                        )),
+                                        Text('莊家機率:${(dataHandler.pointOfBank*100).toStringAsFixed(4)}%',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red,
+                                                fontSize: 20.0)),
+                                      ],
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child:
+                                    // Text('使用時間剩餘:${(7200- counter.count)~/60}分鐘',
+                                    Stack(
+                                      children: [
+                                        Positioned.fill(child: Container(
+                                          decoration: const BoxDecoration(
+                                              color: Colors.white
+                                          ),
+                                        )),
+                                        Text('閒家機率:${(dataHandler.pointOfPlayer*100).toStringAsFixed(4)}%',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red,
+                                                fontSize: 20.0)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height*0.09,
+                            width: MediaQuery.of(context).size.width*0.35,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height*0.05, 0, 0),
+                              child: Stack(
+                                children: [
+                                  Positioned.fill(child: Container(
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white
+                                    ),
+                                  )),
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Text('下注數:${dataHandler.betTimes}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.red,
+                                            fontSize: 20.0)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+
 
                   ],
                 ),
