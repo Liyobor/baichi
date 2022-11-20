@@ -20,6 +20,7 @@ class _InitPageState extends State<InitPage> {
 
 
   final TextEditingController _moneyTextFieldController = TextEditingController();
+  final TextEditingController  _baseQuantityEditingController = TextEditingController();
   late TextEditingController _urlTextController;
 
 
@@ -62,7 +63,21 @@ class _InitPageState extends State<InitPage> {
                 ),
               ),
             ),
-
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: TextFormField(
+                controller: _baseQuantityEditingController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                ],
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.money),
+                  labelText: "基數金額",
+                  hintText: "輸入提示(可改)",
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 24),
               child: Row(
@@ -116,8 +131,10 @@ class _InitPageState extends State<InitPage> {
                         } else{
                           DataHandler dataHandler = DataHandler();
                           dataHandler.money = double.parse(_moneyTextFieldController.text);
+                          dataHandler.baseQuantity = int.parse(_baseQuantityEditingController.text);
                           // apiHandler.userPassCode = _passCodeFieldController.text;
                           apiHandler.defaultUrl = urlStr;
+                          Fimber.i("dataHandler.baseQuantity = ${dataHandler.baseQuantity}");
 
                           // EasyLoading.show(status: '檢查代碼...');
                           // String? result = await apiHandler.checkServeState();

@@ -1,7 +1,6 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:untitled/utils/api_handler.dart';
 
 class DataHandler{
 
@@ -38,6 +37,8 @@ class DataHandler{
   double pointOfPlayer = -0.23508/100;
   double pointOfBank = -0.05791/100;
 
+  int baseQuantity = 1000;
+
   double money = 0;
 
   var pointMap = <int,double>{
@@ -52,7 +53,6 @@ class DataHandler{
     8:-0.0053/100,
     9:-0.0025/100,
   };
-
 
 
   /*
@@ -87,7 +87,6 @@ class DataHandler{
       pointOfPlayer -= pointMap[card]!;
       // _point += pointMap[card]!;
     }
-
     calculateBetTimes();
   }
 
@@ -102,7 +101,6 @@ class DataHandler{
     if(_state == state){
       return false;
     }
-
     _state =state;
     Fimber.i("state change to $_state");
     if(_state==2){
@@ -110,7 +108,6 @@ class DataHandler{
     }else if(_state == 1){
       _bet(webViewController,casino);
     }else if(_state==0){
-
       Fimber.i("stop betting!");
     }
     return true;
@@ -136,7 +133,7 @@ class DataHandler{
           clickBank(webViewController, casino);
         }
         betSide="bank";
-      }else if(pointOfPlayer>pointOfBank){
+      }else if(pointOfPlayer>=pointOfBank){
         Fimber.i('betPlayer');
         for (int i = 0; i < betTimes; i++) {
           clickPlayer(webViewController, casino);
@@ -186,9 +183,15 @@ class DataHandler{
       betTimes = 1;
       return;
     }
+
+
     if(pointOfBank>pointOfPlayer){
-      betTimes = (money*pointOfBank*0.76/1000).round();
-     return;
+      betTimes = (money*pointOfBank*0.76/baseQuantity).round();
+    }else{
+      betTimes = (money*pointOfPlayer*0.76/baseQuantity).round();
+    }
+    if(betTimes<0){
+      betTimes = 1;
     }
 
   }
