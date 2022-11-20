@@ -360,6 +360,25 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         }
 
                         switch(consoleMessage.message){
+                          case "console.groupEnd":{
+                            try{
+                              String catchDown =
+                                  "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
+                              String catchUp =
+                                  "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
+                              webViewController?.evaluateJavascript(
+                                  source: 'var tapdown;');
+                              webViewController?.evaluateJavascript(
+                                  source: 'var tapup;');
+                              webViewController?.evaluateJavascript(
+                                  source: catchDown);
+                              webViewController?.evaluateJavascript(
+                                  source: catchUp);
+                            }catch(error){
+                              Fimber.i("error = $error");
+                            }
+                          }
+                          break;
                           case "allbet_back":{
                             if (isUIDetectorRunning) {
                               apiHandler.routineCheck();
@@ -1084,7 +1103,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
               List value = await allbetCardDetector.putImageIntoModel(imageData);
               String cardResult = allbetCardDetector.resultStr;
-              dataHandler.insertCard(value);
+              setState(() {
+                dataHandler.insertCard(value);
+              });
               if (cardResult == "card error") {
                 Fimber.i("card error");
               }else{
