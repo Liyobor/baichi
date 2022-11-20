@@ -615,27 +615,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           ),
 
                           SizedBox(
-                            height: MediaQuery.of(context).size.height*0.09,
                             width: MediaQuery.of(context).size.width*0.35,
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height*0.05, 0, 0),
-                              child: Stack(
-                                children: [
-                                  Positioned.fill(child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.white
-                                    ),
-                                  )),
-                                  Align(
-                                    alignment: Alignment.topCenter,
-                                    child: Text('下注數:${dataHandler.betTimes}',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red,
-                                            fontSize: 20.0)),
+                            child: Stack(
+                              children: [
+                                Positioned.fill(child: Container(
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white
                                   ),
-                                ],
-                              ),
+                                )),
+                                Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Text('下注數:${dataHandler.betTimes}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                          fontSize: 20.0)),
+                                ),
+                              ],
                             ),
                           ),
                         ],
