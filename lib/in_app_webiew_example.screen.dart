@@ -39,7 +39,7 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     with WidgetsBindingObserver {
   final GlobalKey webViewKey = GlobalKey();
-  Timer? timer;
+  // Timer? timer;
   String? codeDialog;
   String? valueText;
 
@@ -102,7 +102,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
   String? casino;
 
+  int clickStartTimes = 0;
   int paidTime = 6000;
+
+  bool isWmInGame = false;
+  // bool isAllbetInGame = false;
+  int wmEnterPageConsoleLogTimes = 0;
 
   @override
   void initState() {
@@ -209,6 +214,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       initialSettings: settings,
                       pullToRefreshController: pullToRefreshController,
                       onLoadResource: (controller, resource) {
+
+
+                        if(resource.url.toString().contains("www.ab.games:8888/undefined")){
+
+                          webViewController?.evaluateJavascript(source: 'document.getElementById("backBtn").addEventListener("touchstart",function(e){console.log("allbet_back")})');
+                        }
                       },
 
                       onWebViewCreated: (controller) {
@@ -284,6 +295,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         switch(title){
                           case "WM":{
                             casino = title;
+                            webViewController?.evaluateJavascript(source: "document.getElementById('golobby_btn').addEventListener('click',function(e){console.log('wm_back')})");
                           }
                           break;
 
@@ -302,9 +314,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                         if (isUIDetectorRunning) {
 
-                          setState(() {
-                            isUIDetectorRunning = false;
-                          });
+
 
                           switch(title){
                             case "WM":{
@@ -321,8 +331,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                           snackBarController.showRecognizeResult(
                               "偵測到網頁跳轉，停止辨識", 2000);
-                          stopTimer();
-                          dataHandler.reset();
+
+                          stop();
+
                         }
                       },
                       onCloseWindow: (controller) {
@@ -336,9 +347,39 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         });
                       },
                       onConsoleMessage: (controller, consoleMessage) {
+                        Fimber.i("consoleMessage = ${consoleMessage.message}");
                         html = null;
 
-                        // Fimber.i(consoleMessage.message);
+                        switch(consoleMessage.message){
+                          case "allbet_back":{
+                            if (isUIDetectorRunning) {
+                              apiHandler.routineCheck();
+                              snackBarController.showRecognizeResult(
+                                  "偵測到網頁跳轉，停止辨識", 2000);
+                              stop();
+                            }
+                            // isAllbetInGame = false;
+                          }
+                          break;
+                          case "wm_back":{
+                            if (isUIDetectorRunning) {
+                              apiHandler.routineCheck();
+                              snackBarController.showRecognizeResult(
+                                  "偵測到網頁跳轉，停止辨識", 2000);
+                              stop();
+                            }
+                            isWmInGame = false;
+                          }
+                          break;
+
+                          case "[FLVDemuxer] > Parsed onMetaData":{
+                            Fimber.i("isWmInGame = true");
+                            isWmInGame = true;
+                          }
+                          break;
+
+
+                        }
 
                         
                       },
@@ -405,24 +446,47 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                               onPressed: () {
                                                 setState(() {
 
+                                                  if(!isUIDetectorRunning){
+                                                    if(clickStartTimes != 0){
+                                                      Fimber.i("return");
+                                                      return;
+                                                    }
+                                                    Fimber.i("+=1");
+                                                    clickStartTimes += 1;
+                                                  }
+
                                                   if(casino!=null){
 
 
                                                     switch(casino){
                                                       case "WM":{
-                                                        wmProcess();
+                                                        if(isWmInGame){
+                                                          wmProcess();
+                                                        }else{
+                                                          snackBarController.showRecognizeResult("偵測不到賭桌", 2000);
+                                                          stop();
+                                                        }
+
                                                       }
                                                       break;
 
                                                       case "ALLBET":{
-                                                        allbetProcess();
-                                                        Fimber.i('allbet process');
+                                                        webViewController?.evaluateJavascript(source: 'document.getElementById("amount")').then((value) {
+                                                          if(value==null){
+                                                            allbetProcess();
+                                                          }else{
+                                                            snackBarController.showRecognizeResult("偵測不到賭桌", 2000);
+                                                            stop();
+                                                          }
+                                                        });
+
                                                       }
                                                       break;
 
                                                       default:{
                                                         snackBarController.showRecognizeResult("讀取不到場地", 1500);
                                                         Fimber.i('casino = null');
+                                                        stop();
                                                       }
                                                       break;
                                                     }
@@ -431,6 +495,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                   }else{
                                                     snackBarController.showRecognizeResult("讀取不到場地", 1500);
                                                     Fimber.i('casino = null');
+                                                    stop();
                                                   }
 
                                                 });
@@ -546,37 +611,46 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         )));
   }
 
-  void startTimer() {
-    if (timer == null) {
-      Fimber.i('Start Timer');
-      timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        setState(() {
-          Provider.of<Counter>(context, listen: false).addCount();
-        });
-      });
-    } else {
-      Fimber.i('Stop Timer');
-      timer?.cancel();
-      timer = null;
-    }
-  }
-
-  void stopTimer() {
-    if (timer != null) {
-      Fimber.i('Stop Timer');
-      timer?.cancel();
-      timer = null;
-    }
-  }
-
-  // Future<double> allbetCatchMoneyJS() async {
-  //
-  //   String temp = await webViewController?.evaluateJavascript(source: 'document.getElementById("amount").textContent');
-  //   temp = temp.replaceAll(",", "");
-  //   double moneyTemp = double.parse(temp);
-  //   Fimber.i("moneyTemp = $moneyTemp");
-  //   return moneyTemp;
+  // void startTimer() {
+  //   if (timer == null) {
+  //     Fimber.i('Start Timer');
+  //     timer = Timer.periodic(const Duration(seconds: 1), (_) {
+  //       setState(() {
+  //         Provider.of<Counter>(context, listen: false).addCount();
+  //       });
+  //     });
+  //   } else {
+  //     Fimber.i('Stop Timer');
+  //     timer?.cancel();
+  //     timer = null;
+  //   }
   // }
+
+  // void stopTimer() {
+  //   if (timer != null) {
+  //     Fimber.i('Stop Timer');
+  //     timer?.cancel();
+  //     timer = null;
+  //   }
+  // }
+
+  void stop(){
+    setState(() {
+      isUIDetectorRunning = false;
+    });
+    // stopTimer();
+    dataHandler.reset();
+    clickStartTimes = 0;
+  }
+
+  Future<double> allbetCatchMoneyJS() async {
+
+    String temp = await webViewController?.evaluateJavascript(source: 'document.getElementById("amount").textContent');
+    temp = temp.replaceAll(",", "");
+    double moneyTemp = double.parse(temp);
+    Fimber.i("moneyTemp = $moneyTemp");
+    return moneyTemp;
+  }
 
   // Future<double> allbetCatchMoney() async {
   //   if (html == null) {
@@ -661,12 +735,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     //   }
     //   apiHandler.returnMsg = "出錯了! 請聯繫客服";
     // });
-    setState(() {
-      isUIDetectorRunning = false;
-    });
     snackBarController.showRecognizeResult("停止辨識", 2000);
-    stopTimer();
-    dataHandler.reset();
+    stop();
   }
 
   void wmProcess() async {
@@ -679,12 +749,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       // apiHandler.isCalculatorRunning = 0;
       // apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
-      stopTimer();
-      dataHandler.reset();
+      stop();
     } else {
       // apiHandler.isCalculatorRunning = 1;
       // wmStartRoutineCheck();
-      startTimer();
+      // startTimer();
       // apiHandler.routineCheck();
     }
     while (isUIDetectorRunning) {
@@ -783,13 +852,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
             if (isLaunchCardDetector && !cardDetectLock) {
               if (wmUiDetector.winSide == "bank") {
-                snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+                Fimber.i("莊勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
               }
               if (wmUiDetector.winSide == "player") {
-                snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+                Fimber.i("閒勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
               }
               if (wmUiDetector.winSide == "draw") {
-                snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+                Fimber.i("和局，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
               }
 
               dataHandler.checkWinOrLose(wmUiDetector.winSide);
@@ -800,10 +872,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               setState(() {
                 dataHandler.insertCard(value);
               });
-              if (cardResult == "didn't find card") {
-                ImageGallerySaver.saveImage(data, quality: 100);
+              if (cardResult == "card error") {
+                Fimber.i("card error");
+                // ImageGallerySaver.saveImage(data, quality: 100);
+              }else{
+                snackBarController.showRecognizeResult(cardResult, 2000);
               }
-              snackBarController.showRecognizeResult(cardResult, 2000);
+
               cardDetectLock = true;
 
               // await ImageGallerySaver.saveImage(data, quality: 100);
@@ -858,12 +933,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     //   }
     //   apiHandler.returnMsg = "出錯了! 請聯繫客服";
     // });
-    setState(() {
-      isUIDetectorRunning = false;
-    });
+
     snackBarController.showRecognizeResult("停止辨識", 2000);
-    stopTimer();
-    dataHandler.reset();
+    stop();
   }
 
   void allbetProcess() async {
@@ -876,12 +948,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       // apiHandler.isCalculatorRunning = 0;
       // apiHandler.routineCheck();
       snackBarController.showRecognizeResult("停止辨識ui", 2000);
-      stopTimer();
-      dataHandler.reset();
+      stop();
     } else {
       // apiHandler.isCalculatorRunning = 1;
       // allbetStartRoutineCheck();
-      startTimer();
+      // startTimer();
       // apiHandler.routineCheck();
     }
     while (isUIDetectorRunning) {
@@ -951,13 +1022,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
             }
             if (isLaunchCardDetector && !cardDetectLock) {
               if (allbetUiDetector.winSide == "bank") {
-                snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
+                Fimber.i("莊勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("莊勝，開始辨識撲克牌", 1200);
               }
               if (allbetUiDetector.winSide == "player") {
-                snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
+                Fimber.i("閒勝，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("閒勝，開始辨識撲克牌", 1200);
               }
               if (allbetUiDetector.winSide == "draw") {
-                snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
+                Fimber.i("和局，開始辨識撲克牌");
+                // snackBarController.showRecognizeResult("和局，開始辨識撲克牌", 1200);
               }
 
               dataHandler.checkWinOrLose(allbetUiDetector.winSide);
@@ -967,9 +1041,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               String cardResult = allbetCardDetector.resultStr;
               dataHandler.insertCard(value);
               if (cardResult == "card error") {
-                ImageGallerySaver.saveImage(data, quality: 100);
+                Fimber.i("card error");
+              }else{
+                snackBarController.showRecognizeResult(cardResult, 2000);
               }
-              snackBarController.showRecognizeResult(cardResult, 2000);
+
+
               cardDetectLock = true;
 
               // await ImageGallerySaver.saveImage(data, quality: 100);

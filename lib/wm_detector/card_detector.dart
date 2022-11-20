@@ -80,11 +80,11 @@ class WmCardDetector{
 
     List result = [];
 
-    Fimber.i('count = ${xList.length}');
+    // Fimber.i('count = ${xList.length}');
 
-    if(xList.isEmpty){
-      Fimber.i("didn't find card");
-      resultStr = "didn't find card";
+    if(xList.length<4 || xList.length>6){
+      Fimber.i("card error");
+      resultStr = "card error";
       // showRecognizeResult(ctx,"didn't find card");
     }else{
       resultStr = "";
@@ -95,7 +95,7 @@ class WmCardDetector{
         result.add(classList[i]);
 
 
-        cardClass += classList[i].toString()+",";
+        cardClass += "${classList[i]},";
         // carPos += xList[i].toString().substring(0,4)+",";
       }
 
