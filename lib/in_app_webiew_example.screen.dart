@@ -86,10 +86,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   double allbetMoney = -1;
   double fee = 0;
 
+
   String? casino;
 
   int clickStartTimes = 0;
-  int paidTime = 6000;
+  int paidTime = 0;
+  double billsThreshold = 10;
 
   bool isWmInGame = false;
 
@@ -1140,7 +1142,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         selfEncryptedSharedPreference.getFee().then((value) async {
           if (value != null) {
             final feeInt = int.parse(value);
-            if (feeInt >= 1000) {
+            if (feeInt >= billsThreshold) {
               _stopWmProcess();
               bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
               if(ifDebtApiSuccess){
@@ -1305,7 +1307,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         selfEncryptedSharedPreference.getFee().then((value) async {
           if (value != null) {
             final feeInt = int.parse(value);
-            if (feeInt >= 1000) {
+            if (feeInt >= billsThreshold) {
               _stopAllbetProcess();
               bool ifDebtApiSuccess = await apiHandler.debtApi(feeInt);
               if(ifDebtApiSuccess){
