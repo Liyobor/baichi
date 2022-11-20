@@ -350,6 +350,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                         Fimber.i("consoleMessage = ${consoleMessage.message}");
                         html = null;
 
+                        if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
+                          String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
+                          String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
+                          webViewController?.evaluateJavascript(source: 'var tapdown;');
+                          webViewController?.evaluateJavascript(source: 'var tapup;');
+                          webViewController?.evaluateJavascript(source: catchDown);
+                          webViewController?.evaluateJavascript(source: catchUp);
+                        }
+
                         switch(consoleMessage.message){
                           case "allbet_back":{
                             if (isUIDetectorRunning) {
