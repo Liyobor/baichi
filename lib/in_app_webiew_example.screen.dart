@@ -354,7 +354,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
                         // Fimber.i('onConsoleMessage');
-                        Fimber.i(consoleMessage.message);
+                        Fimber.i("consoleMessage.message = ${consoleMessage.message}");
                         if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
                           // Fimber.i('setup event');
                           allbetCatchMoneyJS().then((value){
@@ -374,6 +374,31 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
 
                         switch(consoleMessage.message){
+                          case "console.groupEnd":{
+                            try{
+                              allbetCatchMoneyJS().then((value) {
+                                allbetMoney = value;
+                                Fimber.i("value = $value");
+                                Fimber.i('set allbetMoney');
+                                Fimber.i('allbetMoney = $allbetMoney');
+                              });
+                              String catchDown =
+                                  "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
+                              String catchUp =
+                                  "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
+                              webViewController?.evaluateJavascript(
+                                  source: 'var tapdown;');
+                              webViewController?.evaluateJavascript(
+                                  source: 'var tapup;');
+                              webViewController?.evaluateJavascript(
+                                  source: catchDown);
+                              webViewController?.evaluateJavascript(
+                                  source: catchUp);
+                            }catch(error){
+                              Fimber.i("error = $error");
+                            }
+                          }
+                          break;
                           case "allbet_back":{
                             if (isUIDetectorRunning) {
                               apiHandler.routineCheck();
@@ -1191,7 +1216,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               List value = await wmCardDetector.putImageIntoModel(imageData);
               String cardResult = wmCardDetector.resultStr;
               dataHandler.insertCard(value);
-              if (cardResult == "didn't find card") {
+              if (cardResult != "didn't find card") {
+                snackBarController.showRecognizeResult(cardResult, 2000);
                 // ImageGallerySaver.saveImage(data, quality: 100);
               }
               // snackBarController.showRecognizeResult(cardResult, 2000);
@@ -1358,9 +1384,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
               List value = await allbetCardDetector.putImageIntoModel(imageData);
               String cardResult = allbetCardDetector.resultStr;
               dataHandler.insertCard(value);
-              // if (cardResult == "card error") {
-              //   ImageGallerySaver.saveImage(data, quality: 100);
-              // }
+              if (cardResult != "card error") {
+                // ImageGallerySaver.saveImage(data, quality: 100);
+                snackBarController.showRecognizeResult(cardResult, 2000);
+              }
+
+
               // snackBarController.showRecognizeResult(cardResult, 2000);
               cardDetectLock = true;
 

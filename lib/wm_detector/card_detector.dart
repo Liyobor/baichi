@@ -95,7 +95,7 @@ class WmCardDetector{
         result.add(classList[i]);
 
 
-        cardClass += classList[i].toString()+",";
+        cardClass += "${classList[i]},";
         // carPos += xList[i].toString().substring(0,4)+",";
       }
 
