@@ -90,8 +90,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   String? casino;
 
   int clickStartTimes = 0;
-  int paidTime = 0;
-  double billsThreshold = 10;
+  int paidTime = 6000;
+  double billsThreshold = 1000;
 
   bool isWmInGame = false;
 
