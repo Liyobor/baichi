@@ -84,7 +84,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
   double wmMoney = -1;
   double allbetMoney = -1;
-  double fee = 0;
+  // double fee = 0;
 
 
   String? casino;
@@ -674,7 +674,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                   if (tempFee != null) {
                                                     double lastFee = double.parse(tempFee);
                                                     Fimber.i("lastFee = $lastFee");
-                                                    if (lastFee >= 1000) {
+                                                    if (lastFee >= billsThreshold) {
                                                       switch(casino){
                                                         case "WM":{
                                                           _stopWmProcess();
@@ -927,30 +927,36 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     switch(casino){
       case "wm":{
         wmCatchMoney().then((value) async {
-          if(wmMoney!=-1.0){
-            fee += (value - wmMoney) / 10;
-            final tempFee = await selfEncryptedSharedPreference.getFee();
-            Fimber.i("Fee = $fee");
-            if (tempFee != null) {
-              double lastFee = double.parse(tempFee);
-              Fimber.i("lastFee = $lastFee");
-              fee += lastFee;
-            }
+
+
+          if(wmMoney>0){
+            calculateFee((value - wmMoney) / 10);
+            wmMoney=value;
+            // fee += (value - wmMoney) / 10;
+            // final tempFee = await selfEncryptedSharedPreference.getFee();
+            // Fimber.i("Fee = $fee");
+            // if (tempFee != null) {
+            //   double lastFee = double.parse(tempFee);
+            //   Fimber.i("lastFee = $lastFee");
+            //   fee += lastFee;
+            // }
           }
         });
       }
       break;
       case "ALLBET":{
         allbetCatchMoney().then((value) async {
-          if(allbetMoney!=-1.0){
-            fee += (value - allbetMoney) / 10;
-            final tempFee = await selfEncryptedSharedPreference.getFee();
-            Fimber.i("Fee = $fee");
-            if (tempFee != null) {
-              double lastFee = double.parse(tempFee);
-              Fimber.i("lastFee = $lastFee");
-              fee += lastFee;
-            }
+          if(allbetMoney>0){
+            calculateFee((value - allbetMoney) / 10);
+            allbetMoney=value;
+            // fee += (value - allbetMoney) / 10;
+            // final tempFee = await selfEncryptedSharedPreference.getFee();
+            // Fimber.i("Fee = $fee");
+            // if (tempFee != null) {
+            //   double lastFee = double.parse(tempFee);
+            //   Fimber.i("lastFee = $lastFee");
+            //   fee += lastFee;
+            // }
           }
         });
       }
@@ -1062,6 +1068,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     return -1;
   }
 
+  Future<void> calculateFee(double extraFee) async {
+    final tempFee = await selfEncryptedSharedPreference.getFee();
+    // Fimber.i("Fee = $fee");
+    if (tempFee != null) {
+      double lastFee = double.parse(tempFee);
+      Fimber.i("lastFee = $lastFee");
+      selfEncryptedSharedPreference.setFee(lastFee+extraFee);
+    }else{
+      selfEncryptedSharedPreference.setFee(extraFee);
+    }
+  }
+
   Future<void> wmStartRoutineCheck() async {
     var timeCount = 449;
     while (isUIDetectorRunning) {
@@ -1069,25 +1087,26 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       if (timeCount == 450) {
         apiHandler.routineCheck();
         wmCatchMoney().then((value) async {
-          if (value < 0 || wmMoney == -1.0) {
+          if (value < 0 || wmMoney < 0) {
             _stopWmProcess();
             return;
           }
           Fimber.i("wmMoney = $wmMoney");
           Fimber.i("value = $value");
-          fee += (value - wmMoney) / 10;
-          final tempFee = await selfEncryptedSharedPreference.getFee();
-          Fimber.i("Fee = $fee");
-          if (tempFee != null) {
-            double lastFee = double.parse(tempFee);
-            Fimber.i("lastFee = $lastFee");
-            fee += lastFee;
-          }
-          setState(() {
-            selfEncryptedSharedPreference.setFee(fee);
-          });
-          Fimber.i("setFee = $fee");
-          fee = 0;
+          calculateFee((value - wmMoney) / 10);
+          // fee += (value - wmMoney) / 10;
+          // final tempFee = await selfEncryptedSharedPreference.getFee();
+          // Fimber.i("Fee = $fee");
+          // if (tempFee != null) {
+          //   double lastFee = double.parse(tempFee);
+          //   Fimber.i("lastFee = $lastFee");
+          //   fee += lastFee;
+          // }
+          // setState(() {
+          //   selfEncryptedSharedPreference.setFee(fee);
+          // });
+          // Fimber.i("setFee = $fee");
+          // fee = 0;
           wmMoney = value;
           timeCount = 0;
         });
@@ -1242,25 +1261,27 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
       if (timeCount == 450) {
         apiHandler.routineCheck();
         allbetCatchMoney().then((value) async {
-          if (value < 0 || allbetMoney == -1.0) {
+          if (value < 0 || allbetMoney < 0) {
             _stopAllbetProcess();
             return;
           }
           Fimber.i("allbetMoney = $allbetMoney");
           Fimber.i("value = $value");
-          fee += (value - allbetMoney) / 10;
-          final tempFee = await selfEncryptedSharedPreference.getFee();
-          Fimber.i("Fee = $fee");
-          if (tempFee != null) {
-            double lastFee = double.parse(tempFee);
-            Fimber.i("lastFee = $lastFee");
-            fee += lastFee;
-          }
-          setState(() {
-            selfEncryptedSharedPreference.setFee(fee);
-          });
-          Fimber.i("setFee = $fee");
-          fee = 0;
+          calculateFee((value - allbetMoney) / 10);
+
+          // fee += (value - allbetMoney) / 10;
+          // final tempFee = await selfEncryptedSharedPreference.getFee();
+          // Fimber.i("Fee = $fee");
+          // if (tempFee != null) {
+          //   double lastFee = double.parse(tempFee);
+          //   Fimber.i("lastFee = $lastFee");
+          //   fee += lastFee;
+          // }
+          // setState(() {
+          //   selfEncryptedSharedPreference.setFee(fee);
+          // });
+          // Fimber.i("setFee = $fee");
+          // fee = 0;
           allbetMoney = value;
           timeCount = 0;
         });
