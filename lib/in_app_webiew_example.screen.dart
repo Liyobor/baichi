@@ -347,7 +347,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           }
                           break;
 
-                          case "ALLBET":{
+                          case "ALLBET":
+                          case "CaliBet":{
                             casino = title;
                           }
                           break;
@@ -569,7 +570,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                               }
                                                               break;
 
-                                                              case "ALLBET":{
+                                                              case "ALLBET":
+                                                              case "CaliBet":{
                                                                 allbetProcess();
                                                                 Fimber.i('allbet process');
                                                               }
@@ -584,6 +586,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                             }
 
                                                           } else {
+                                                            stop();
                                                             Fimber.i(
                                                                 'checkServeState 0 returnMsg show');
                                                             _showReturnMessageDialog(
@@ -610,7 +613,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                             }
                                                             break;
 
-                                                            case "ALLBET":{
+                                                            case "ALLBET":
+                                                            case "CaliBet":{
                                                               allbetProcess();
                                                               // Fimber.i('allbet process');
                                                             }
@@ -624,6 +628,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                             break;
                                                           }
                                                         } else {
+                                                          stop();
                                                           Fimber.i(
                                                               'checkServeState 1 returnMsg show');
                                                           _showReturnMessageDialog(
@@ -705,7 +710,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                           _stopWmProcess();
                                                         }
                                                         break;
-                                                        case "ALLBET":{
+                                                        case "ALLBET":
+                                                        case "CaliBet":{
                                                           _stopAllbetProcess();
                                                         }
                                                         break;
@@ -969,7 +975,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
         });
       }
       break;
-      case "ALLBET":{
+      case "ALLBET":
+      case "CaliBet":{
         allbetCatchMoney().then((value) async {
           if(allbetMoney>0){
             calculateFee((value - allbetMoney) / 10);
@@ -1145,6 +1152,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
     apiHandler.isCalculatorRunning = 0;
     apiHandler.routineCheck().then((value) {
       if (value == 0) {
+        stop();
         Fimber.i('routineCheck 2 returnMsg show');
         _showReturnMessageDialog(apiHandler.returnMsg);
       }
@@ -1319,6 +1327,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
   void _stopAllbetProcess() {
     apiHandler.routineCheck().then((value) {
       if (value == 0) {
+        stop();
         Fimber.i('routineCheck 2 returnMsg show');
         _showReturnMessageDialog(apiHandler.returnMsg);
       }
@@ -1510,6 +1519,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                     Navigator.pop(context);
                     apiHandler.checkServeState().then((value) {
                       if (apiHandler.code == 0) {
+                        stop();
                         Fimber.i('checkServeState 3 returnMsg show');
                         _showReturnMessageDialog(apiHandler.returnMsg);
                       }
@@ -1522,7 +1532,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           }
                           break;
 
-                          case "ALLBET":{
+                          case "ALLBET":
+                          case "CaliBet":{
                             allbetProcess();
                           }
                           break;
