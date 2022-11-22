@@ -264,6 +264,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                 source: catchDown);
                             webViewController?.evaluateJavascript(
                                 source: catchUp);
+
+                            webViewController?.evaluateJavascript(source: 'document.getElementById("topBar-target").addEventListener("touchstart",function(e){console.log("allbet_back")})');
                           }catch(error){
                             Fimber.i("error = $error");
                           }
@@ -422,6 +424,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                   source: catchDown);
                               webViewController?.evaluateJavascript(
                                   source: catchUp);
+                              webViewController?.evaluateJavascript(source: 'document.getElementById("topBar-target").addEventListener("touchstart",function(e){console.log("allbet_back")})');
                             }catch(error){
                               Fimber.i("error = $error");
                             }
