@@ -299,7 +299,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                           }
                           break;
 
-                          case "ALLBET":{
+                          case "ALLBET":
+                          case "CaliBet":{
                             casino = title;
                           }
                           break;
@@ -322,7 +323,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                             }
                             break;
 
-                            case "ALLBET":{
+                            case "ALLBET":
+                            case "CaliBet":{
                               _stopAllbetProcess();
                             }
                             break;
@@ -348,16 +350,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       },
                       onConsoleMessage: (controller, consoleMessage) {
                         Fimber.i("consoleMessage = ${consoleMessage.message}");
+
+                        // webViewController?.evaluateJavascript(source: 'document.getElementById("backBtn").addEventListener("touchstart",function(e){console.log("allbet_back")})');
                         html = null;
 
-                        if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
-                          String catchDown = "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
-                          String catchUp = "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
-                          webViewController?.evaluateJavascript(source: 'var tapdown;');
-                          webViewController?.evaluateJavascript(source: 'var tapup;');
-                          webViewController?.evaluateJavascript(source: catchDown);
-                          webViewController?.evaluateJavascript(source: catchUp);
-                        }
+                        // if(consoleM1
 
                         switch(consoleMessage.message){
                           case "console.groupEnd":{
@@ -374,6 +371,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                   source: catchDown);
                               webViewController?.evaluateJavascript(
                                   source: catchUp);
+                              // webViewController?.evaluateJavascript(source: 'document.getElementById("backBtn").addEventListener("touchstart",function(e){console.log("allbet_back")})');
+                              webViewController?.evaluateJavascript(source: 'document.getElementById("topBar-target").addEventListener("touchstart",function(e){console.log("allbet_back")})');
                             }catch(error){
                               Fimber.i("error = $error");
                             }
@@ -498,7 +497,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                                                       }
                                                       break;
 
-                                                      case "ALLBET":{
+                                                      case "ALLBET":
+                                                      case "CaliBet":{
                                                         webViewController?.evaluateJavascript(source: 'document.getElementById("amount")').then((value) {
                                                           if(value==null){
                                                             allbetProcess();

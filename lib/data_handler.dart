@@ -235,7 +235,8 @@ class DataHandler{
       }
       break;
 
-      case "ALLBET":{
+      case "ALLBET":
+      case "CaliBet":{
         webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown)');
         webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup)');
         // await betBank();
@@ -261,7 +262,8 @@ class DataHandler{
       }
       break;
 
-      case "ALLBET":{
+      case "ALLBET":
+      case "CaliBet":{
         webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapdown)');
         webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer player enabled")[0].dispatchEvent(tapup)');
         // await betPlayer();
@@ -286,7 +288,8 @@ class DataHandler{
       }
       break;
 
-      case "ALLBET":{
+      case "ALLBET":
+      case "CaliBet":{
         webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapdown)');
         webViewController.evaluateJavascript(source: 'document.getElementById("confirmBtn").dispatchEvent(tapup)');
         // bettingConfirm();
