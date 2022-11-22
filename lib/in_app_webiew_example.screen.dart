@@ -45,13 +45,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
-
     useOnLoadResource: true,
     javaScriptEnabled: true,
-    useShouldOverrideUrlLoading: true,
-    mediaPlaybackRequiresUserGesture: false,
     useHybridComposition: true,
     allowsInlineMediaPlayback: true,
+    useShouldOverrideUrlLoading: true,
+    mediaPlaybackRequiresUserGesture: false,
   );
 
 
@@ -244,6 +243,31 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
 
                           webViewController?.evaluateJavascript(source: 'document.getElementById("backBtn").addEventListener("touchstart",function(e){console.log("allbet_back")})');
                         }
+
+                        if(Platform.isIOS && resource.url.toString().contains("rpa/getActivityBanners/")){
+                          try{
+                            allbetCatchMoneyJS().then((value) {
+                              allbetMoney = value;
+                              Fimber.i("value = $value");
+                              Fimber.i('set allbetMoney');
+                              Fimber.i('allbetMoney = $allbetMoney');
+                            });
+                            String catchDown =
+                                "document.getElementsByClassName('mobile vue')[0].addEventListener('mousedown',function(e){tapdown = e})";
+                            String catchUp =
+                                "document.getElementsByClassName('mobile vue')[0].addEventListener('mouseup',function(e){tapup = e})";
+                            webViewController?.evaluateJavascript(
+                                source: 'var tapdown;');
+                            webViewController?.evaluateJavascript(
+                                source: 'var tapup;');
+                            webViewController?.evaluateJavascript(
+                                source: catchDown);
+                            webViewController?.evaluateJavascript(
+                                source: catchUp);
+                          }catch(error){
+                            Fimber.i("error = $error");
+                          }
+                        }
                       },
 
                       onWebViewCreated: (controller) {
@@ -356,7 +380,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       onConsoleMessage: (controller, consoleMessage) {
                         html = null;
                         // Fimber.i('onConsoleMessage');
-                        Fimber.i("consoleMessage.message = ${consoleMessage.message}");
+                        // Fimber.i("consoleMessage.message = ${consoleMessage.message}");
+                        Fimber.i("consoleMessage.message = $consoleMessage");
                         if(consoleMessage.message.contains("call start play url")&&casino=="ALLBET"){
                           // Fimber.i('setup event');
                           allbetCatchMoneyJS().then((value){
