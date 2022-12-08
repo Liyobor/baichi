@@ -140,15 +140,24 @@ class WmUIDetector{
     }
 
     if(classList.contains(1)){
+      Fimber.i("classList = $classList");
+      Fimber.i("xList = $xList");
+      Fimber.i("yList = $yList");
       winSide = "bank";
       return true;
     }
     if(classList.contains(4)){
+      Fimber.i("classList = $classList");
+      Fimber.i("xList = $xList");
+      Fimber.i("yList = $yList");
       winSide = "player";
       return true;
     }
 
     if(classList.contains(5)){
+      Fimber.i("classList = $classList");
+      Fimber.i("xList = $xList");
+      Fimber.i("yList = $yList");
       winSide = "draw";
       return true;
     }

@@ -73,6 +73,8 @@ class AllbetUIDetector{
     Fimber.i('Interpreter loaded successfully');
 
 
+
+
     _inputShape = _interpreter.getInputTensor(0).shape;
     _outputShape0 = _interpreter.getOutputTensor(0).shape;
     _outputShape1 = _interpreter.getOutputTensor(1).shape;
@@ -151,17 +153,18 @@ class AllbetUIDetector{
 
     if(classList.contains(1)){
       // Fimber.i("xList = $xList");
+      // Fimber.i("yList = $yList");
       winSide = "bank";
       return true;
     }
     if(classList.contains(4)){
-      // Fimber.i("xList = $xList");
+
       winSide = "player";
       return true;
     }
 
     if(classList.contains(5)){
-      // Fimber.i("xList = $xList");
+
       winSide = "draw";
       return true;
     }

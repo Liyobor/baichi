@@ -1285,7 +1285,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           }
         }
       }
-      await Future.delayed(const Duration(milliseconds: 3500));
+      await Future.delayed(const Duration(milliseconds: 3000));
     }
   }
 
@@ -1458,7 +1458,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
           }
         }
       }
-      await Future.delayed(const Duration(milliseconds: 3500));
+      await Future.delayed(const Duration(milliseconds: 3000));
     }
   }
 
