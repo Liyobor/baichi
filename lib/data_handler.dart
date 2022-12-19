@@ -233,7 +233,7 @@ class DataHandler extends ChangeNotifier{
         }else{
           betTimes = (money*pointOfPlayer*0.76/baseQuantity).round();
         }
-        if(betTimes<0){
+        if(betTimes<=1){
           betTimes = 1;
         }
       }
@@ -265,6 +265,17 @@ class DataHandler extends ChangeNotifier{
       break;
     }
 
+
+
+    if(pointOfBank>pointOfPlayer){
+      betTimes = (money*pointOfBank*0.76/baseQuantity).round();
+    }else{
+      betTimes = (money*pointOfPlayer*0.76/baseQuantity).round();
+    }
+
+    if(betTimes<=1){
+      betTimes = 1;
+    }
 
 
   }
