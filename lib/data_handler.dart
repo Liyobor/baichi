@@ -1,14 +1,25 @@
 import 'package:fimber/fimber.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:untitled/utils/self_encrypted_shared_preferences.dart';
 
-class DataHandler{
+
+enum Strategy{
+  base,
+  martingale,
+  keepOne,
+}
+class DataHandler extends ChangeNotifier{
 
 
   static final DataHandler _singleton = DataHandler._internal();
   factory DataHandler() {
     return _singleton;
   }
+
+
+
 
   DataHandler._internal();
 
@@ -28,6 +39,10 @@ class DataHandler{
   String? betSide;
   String? winSide;
   int betTimes = 1 ;
+  bool _isUiRunning = false;
+
+  int get betTime => betTimes;
+  bool get isUiRunning => _isUiRunning;
 
 
   bool isBetting = false;
@@ -80,6 +95,8 @@ class DataHandler{
 
 
 
+  Strategy betStrategy = Strategy.martingale;
+
   void insertCard(List cardList){
     for(var card in cardList){
       // Fimber.i("card = $card");
@@ -87,7 +104,13 @@ class DataHandler{
       pointOfPlayer -= pointMap[card]!;
       // _point += pointMap[card]!;
     }
-    calculateBetTimes();
+    calculateBetTimes(betStrategy);
+    notifyListeners();
+  }
+
+  void setUiRunning(bool isRunning){
+    _isUiRunning = isRunning;
+    notifyListeners();
   }
 
   bool bar(){
@@ -178,21 +201,71 @@ class DataHandler{
     }
   }
 
-  void calculateBetTimes(){
-    if(pointOfBank <0 && pointOfPlayer<0){
-      betTimes = 1;
-      return;
+
+  bool _keepOneMode = false;
+  bool get keepOneMode => _keepOneMode;
+  void swapKeepOneMode(){
+
+    _keepOneMode=!_keepOneMode;
+    notifyListeners();
+  }
+
+
+  void calculateBetTimes(Strategy strategy){
+
+
+    if(keepOneMode){
+      strategy = Strategy.keepOne;
+    }
+
+    switch(strategy){
+      case Strategy.keepOne:{
+        betTimes = 1;
+      }
+      break;
+      case Strategy.base:{
+        if(pointOfBank <0 && pointOfPlayer<0){
+          betTimes = 1;
+          return;
+        }
+        if(pointOfBank>pointOfPlayer){
+          betTimes = (money*pointOfBank*0.76/baseQuantity).round();
+        }else{
+          betTimes = (money*pointOfPlayer*0.76/baseQuantity).round();
+        }
+        if(betTimes<0){
+          betTimes = 1;
+        }
+      }
+      break;
+      case Strategy.martingale:{
+        if(winSide==null || betSide==null){
+          Fimber.i("winSide or betSide = null");
+          Fimber.i("betTimes didn't change!");
+          Fimber.i("betTimes = $betTimes");
+          return;
+        }
+        Fimber.i("winSide = $winSide");
+        Fimber.i("betSide = $betSide");
+        if(winSide == "draw"){
+          winSide = null;
+          betSide = null;
+          return;
+        }
+        if(winSide == betSide || betTimes > 32){
+          betTimes = 1;
+          Fimber.i("betTimes = 1");
+        }else{
+
+          Fimber.i("betTimes = ${betTimes * 2 + 1}");
+          betTimes = betTimes*2+1;
+        }
+        winSide=null;
+      }
+      break;
     }
 
 
-    if(pointOfBank>pointOfPlayer){
-      betTimes = (money*pointOfBank*0.76/baseQuantity).round();
-    }else{
-      betTimes = (money*pointOfPlayer*0.76/baseQuantity).round();
-    }
-    if(betTimes<0){
-      betTimes = 1;
-    }
 
   }
   void _reset(){
@@ -348,7 +421,69 @@ class DataHandler{
   //
   // }
 
-  void checkWinOrLose(String? winSide){
+
+  void setWinSide(String? side){
+    winSide = side;
+  }
+
+  // int winTimes = 0;
+  int limitedWinTimesDaily = 5 ;
+
+  Future<void> calculateWinTimes(bool isWin) async {
+    SelfEncryptedSharedPreference selfEncryptedSharedPreference = SelfEncryptedSharedPreference();
+    String? winTimesStr = await selfEncryptedSharedPreference.getWinTimes();
+    if (kDebugMode) {
+      print("winTimes = $winTimesStr");
+    }
+    if(isWin){
+
+
+      if(winTimesStr!=null){
+        int winTimes = int.parse(winTimesStr);
+        selfEncryptedSharedPreference.setWinTimes(winTimes+betTimes);
+        if (kDebugMode) {
+          print("set winTimes = ${winTimes+betTimes}");
+        }
+        return;
+      }
+      selfEncryptedSharedPreference.setWinTimes(betTimes);
+      if (kDebugMode) {
+        print("set winTimes = $betTimes");
+      }
+      return;
+    }else{
+
+      if(winTimesStr!=null){
+        int winTimes = int.parse(winTimesStr);
+        selfEncryptedSharedPreference.setWinTimes(winTimes-betTimes);
+        if (kDebugMode) {
+          print("set winTimes = ${winTimes-betTimes}");
+        }
+        return;
+
+      }
+      selfEncryptedSharedPreference.setWinTimes(-1*betTimes);
+      if (kDebugMode) {
+        print("set winTimes = ${-1*betTimes}");
+      }
+      return;
+    }
+
+
+  }
+
+  Future<bool> checkIfReachLimit() async {
+    SelfEncryptedSharedPreference selfEncryptedSharedPreference = SelfEncryptedSharedPreference();
+    String? winTimesStr = await selfEncryptedSharedPreference.getWinTimes();
+    if(winTimesStr!=null){
+      return int.parse(winTimesStr) >= limitedWinTimesDaily;
+    }
+
+    return false;
+
+  }
+
+  void checkWinOrLose(){
     if(winSide==null || betSide==null){
       Fimber.i("winSide or betSide = null");
       // Fimber.i("betTimes didn't change!");
@@ -362,6 +497,14 @@ class DataHandler{
       winSide = null;
       betSide = null;
       return;
+    }
+
+    if(winSide==betSide){
+      calculateWinTimes(true);
+    }
+
+    if(winSide!=betSide){
+      calculateWinTimes(false);
     }
 
 

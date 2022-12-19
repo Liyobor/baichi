@@ -1,4 +1,5 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled/utils/counter.dart';
 import 'package:uuid/uuid.dart';
@@ -60,5 +61,74 @@ class SelfEncryptedSharedPreference {
       return null;
     }
   }
+
+  Future<String?> getWinTimes() async {
+    if(pref.containsKey('WinTimes')){
+      return await encryptedSharedPreferences.getString('WinTimes');
+    }else{
+      return null;
+    }
+  }
+
+  void setWinTimes(int winTimes){
+    encryptedSharedPreferences.setString('WinTimes', winTimes.toString());
+  }
+
+
+  Future<void> setReachLimitation()async {
+
+    DateTime nowTime = DateTime.now();
+    if (kDebugMode) {
+      print("nowTime.year = ${nowTime.year}");
+      print("nowTime.month = ${nowTime.month}");
+      print("nowTime.day = ${nowTime.day}");
+    }
+    var str = "${nowTime.year}${nowTime.month}${nowTime.day}";
+    encryptedSharedPreferences.setString('Limitation',str);
+    setWinTimes(0);
+
+  }
+
+  void setLastPlayTimeDays(){
+    DateTime nowTime = DateTime.now();
+    encryptedSharedPreferences.setString('LastPlayTimeDay', nowTime.day.toString());
+  }
+
+  Future<int?> getLastPlayTimeDay() async {
+    if(pref.containsKey('LastPlayTimeDay')){
+      return int.parse(await encryptedSharedPreferences.getString('LastPlayTimeDay'));
+    }else{
+      return null;
+    }
+  }
+
+
+  Future<bool> checkIfReachLimitation()async {
+    DateTime nowTime = DateTime.now();
+    if(pref.containsKey('Limitation')){
+
+      String? day = await encryptedSharedPreferences.getString('Limitation');
+      if (kDebugMode) {
+        print("nowTime.year = ${nowTime.year}");
+        print("nowTime.month = ${nowTime.month}");
+        print("nowTime.day = ${nowTime.day}");
+      }
+      var str = "${nowTime.year}${nowTime.month}${nowTime.day}";
+      if(str == day){
+        return true;
+      }
+    }
+    int? lastPlayTimeDay = await getLastPlayTimeDay();
+    if(lastPlayTimeDay!=nowTime.day){
+      setWinTimes(0);
+    }
+    return false;
+  }
+
+  clear() {
+    pref.remove('Limitation');
+    setWinTimes(0);
+  }
+
 
 }

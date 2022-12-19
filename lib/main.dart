@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled/in_app_webiew_example.screen.dart';
 import 'package:untitled/initial_page.dart';
+import 'data_handler.dart';
 import 'utils/api_handler.dart';
 import 'utils/counter.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -85,7 +87,7 @@ Future main() async {
   // );
 
   ApiHandler apiHandler = ApiHandler();
-  await apiHandler.getDefaultUrl();
+  // await apiHandler.getDefaultUrl();
   runApp(const MyApp());
 }
 
@@ -103,60 +105,20 @@ Future main() async {
 // }
 
 
-// Drawer myDrawer({required BuildContext context}) {
-//   return Drawer(
-//     child: ListView(
-//       padding: EdgeInsets.zero,
-//       children: <Widget>[
-//         const DrawerHeader(
-//           decoration: BoxDecoration(
-//             color: Colors.blue,
-//           ),
-//           child: Text('flutter_inappbrowser example'),
-//         ),
-//         ListTile(
-//           title: const Text('InAppBrowser'),
-//           onTap: () {
-//             Navigator.pushReplacementNamed(context, '/InAppBrowser');
-//           },
-//         ),
-//         ListTile(
-//           title: const Text('ChromeSafariBrowser'),
-//           onTap: () {
-//             Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
-//           },
-//         ),
-//         ListTile(
-//           title: const Text('InAppWebView'),
-//           onTap: () {
-//             Navigator.pushReplacementNamed(context, '/');
-//           },
-//         ),
-//         ListTile(
-//           title: const Text('HeadlessInAppWebView'),
-//           onTap: () {
-//             Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
-//           },
-//         ),
-//       ],
-//     ),
-//   );
-// }
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => Counter(),
+      create: (_) => DataHandler(),
       child: MaterialApp(
         builder: EasyLoading.init(),
         debugShowCheckedModeBanner: false,
-          initialRoute: 'init',
+          initialRoute: '/',
           routes: {
         'init': (context) => const InitPage(),
-        // '/': (context) => const InAppWebViewExampleScreen(),
+        '/': (context) => const InAppWebViewExampleScreen(),
       }
       ),
     );
