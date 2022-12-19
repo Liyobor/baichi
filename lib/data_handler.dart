@@ -56,7 +56,7 @@ class DataHandler extends ChangeNotifier{
 
   double money = 0;
 
-  var pointMap = <int,double>{
+  var pointMapBase = <int,double>{
     0:0,
     1:0.0018/100,
     2:0.0045/100,
@@ -80,30 +80,43 @@ class DataHandler extends ChangeNotifier{
    */
   int _state = -1;
 
-  // var pointMap = <int,int>{
-  //   0:0,
-  //   1:1,
-  //   2:1,
-  //   3:2,
-  //   4:3,
-  //   5:-2,
-  //   6:-2,
-  //   7:-2,
-  //   8:-1,
-  //   9:0,
-  // };
+  var pointMapMartingale = <int,int>{
+    0:0,
+    1:1,
+    2:1,
+    3:2,
+    4:3,
+    5:-2,
+    6:-2,
+    7:-2,
+    8:-1,
+    9:0,
+  };
 
 
 
   Strategy betStrategy = Strategy.martingale;
 
   void insertCard(List cardList){
-    for(var card in cardList){
-      // Fimber.i("card = $card");
-      pointOfBank += pointMap[card]!;
-      pointOfPlayer -= pointMap[card]!;
-      // _point += pointMap[card]!;
+    switch(betStrategy){
+      case Strategy.base:
+        for(var card in cardList){
+          // Fimber.i("card = $card");
+          pointOfBank += pointMapBase[card]!;
+          pointOfPlayer -= pointMapBase[card]!;
+          // _point += pointMap[card]!;
+        }
+        break;
+      case Strategy.martingale:
+      case Strategy.keepOne:
+        for(var card in cardList){
+          // Fimber.i("card = $card");
+          _point += pointMapMartingale[card]!;
+        }
+        break;
     }
+
+
     calculateBetTimes(betStrategy);
     notifyListeners();
   }
@@ -138,12 +151,8 @@ class DataHandler extends ChangeNotifier{
 
   Future<void> _bet(InAppWebViewController webViewController,String casino) async {
     Fimber.i("bet");
-    // if(bankButtonY < 0 || bankButtonX<0 ||playerButtonY<0 || playerButtonX<0 || confirmButtonX<0 || confirmButtonY<0 || webViewHeight<0 || mobileHeight<0 || mobileWidth<0){
-    //   Fimber.i("Button pos error!");
-    //   return;
-    // }
+
     if(_state == 1){
-    //  do bet operation
 
       isBetting = true;
 
@@ -160,8 +169,6 @@ class DataHandler extends ChangeNotifier{
         Fimber.i('betPlayer');
         for (int i = 0; i < betTimes; i++) {
           clickPlayer(webViewController, casino);
-
-          // await betPlayer();
         }
         betSide = "player";
       }else{
@@ -169,34 +176,11 @@ class DataHandler extends ChangeNotifier{
         betSide = null;
       }
 
-      // if(_point>0){
-      //   Fimber.i('betBank');
-      //   for (int i = 0; i < betTimes; i++){
-      //     clickBank(webViewController, casino);
-      //
-      //     // await betBank();
-      //   }
-      //   betSide="bank";
-      // }else if(_point<0){
-      //   Fimber.i('betPlayer');
-      //   for (int i = 0; i < betTimes; i++) {
-      //     clickPlayer(webViewController, casino);
-      //
-      //     // await betPlayer();
-      //   }
-      //   betSide = "player";
-      // }else{
-      //   Fimber.i("_point = 0");
-      //   betSide = null;
-      // }
 
       if(betSide!=null){
         await Future.delayed(const Duration(milliseconds: 100));
         clickConfirm(webViewController, casino);
-        // await bettingConfirm();
       }
-
-      // betTimes = 31;
       isBetting = false;
     }
   }
@@ -283,18 +267,6 @@ class DataHandler extends ChangeNotifier{
     _state = -1;
   }
 
-  void clickTest(InAppWebViewController webViewController){
-    // webViewController.evaluateJavascript(source: "var win = document.getElementById('iframe_101');");
-    // webViewController.evaluateJavascript(source: "var doc = win.contentDocument? win.contentDocument : win.contentWindow.document;");
-    // webViewController.evaluateJavascript(source: "var form = doc.getElementById('playbetboxPlayer').click();");
-    // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("btn login-btn")[0].click()',contentWorld: );
-    webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapdown);');
-    webViewController.evaluateJavascript(source: 'document.getElementById("multiBetAreaBtn").dispatchEvent(tapup);');
-
-
-    // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapdown);');
-    // webViewController.evaluateJavascript(source: 'document.getElementsByClassName("betTypeAreaContainer banker enabled")[0].dispatchEvent(tapup);');
-  }
 
   void clickBank(InAppWebViewController webViewController,String casino) async {
     switch(casino){
@@ -373,53 +345,6 @@ class DataHandler extends ChangeNotifier{
       break;
     }
   }
-
-  // Future<void> betBank() async {
-  //   Fimber.i("betBank");
-  //
-  //   Fimber.i("bankButton pos :$bankButtonX,$bankButtonY");
-  //   await Future.delayed(const Duration(milliseconds: 50));
-  //   taper.handlePointerEvent(PointerDownEvent(
-  //     position: Offset(bankButtonX, bankButtonY),
-  //   ));
-  //   await Future.delayed(const Duration(milliseconds: 50));
-  //   taper.handlePointerEvent(PointerUpEvent(
-  //     position: Offset(bankButtonX, bankButtonY),
-  //   ));
-  //   betSide = "bank";
-  //
-  // }
-
-  // Future<void> betPlayer() async {
-  //   Fimber.i("betPlayer");
-  //
-  //   Fimber.i("playerButton pos :$playerButtonX,$playerButtonY");
-  //   await Future.delayed(const Duration(milliseconds: 50));
-  //   taper.handlePointerEvent(PointerDownEvent(
-  //     position: Offset(playerButtonX, playerButtonY),
-  //   ));
-  //   await Future.delayed(const Duration(milliseconds: 50));
-  //   taper.handlePointerEvent( PointerUpEvent(
-  //     position: Offset(playerButtonX, playerButtonY),
-  //   ));
-  //   betSide = "player";
-  // }
-
-  // Future<void> bettingConfirm() async {
-  //   Fimber.i("bettingConfirm");
-  //
-  //   await Future.delayed(const Duration(milliseconds: 300));
-  //
-  //   Fimber.i("confirmButton pos :$confirmButtonX,$confirmButtonY");
-  //   taper.handlePointerEvent(PointerDownEvent(
-  //     position: Offset(confirmButtonX, confirmButtonY),
-  //   ));
-  //   await Future.delayed(const Duration(milliseconds: 50));
-  //   taper.handlePointerEvent(PointerUpEvent(
-  //     position: Offset(confirmButtonX, confirmButtonY),
-  //   ));
-  //
-  // }
 
 
   void setWinSide(String? side){
@@ -508,14 +433,6 @@ class DataHandler extends ChangeNotifier{
     }
 
 
-    // if(winSide == betSide || betTimes > 32){
-    //   betTimes = 1;
-    //   Fimber.i("betTimes = 1");
-    // }else{
-    //
-    //   Fimber.i("betTimes = ${betTimes * 2 + 1}");
-    //   betTimes = betTimes*2+1;
-    // }
   }
 
   void noBet(){
