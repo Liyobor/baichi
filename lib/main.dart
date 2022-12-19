@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -9,9 +8,9 @@ import 'package:untitled/in_app_webiew_example.screen.dart';
 import 'package:untitled/initial_page.dart';
 import 'data_handler.dart';
 import 'utils/api_handler.dart';
-import 'utils/counter.dart';
+
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+
 Future<void> _checkPermissions() async {
   if (Platform.isAndroid) {
     Map<Permission, PermissionStatus> statuses = await [
@@ -32,11 +31,9 @@ Future<void> _checkPermissions() async {
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Permission.camera.request();
-  // await Permission.microphone.request();
-  // await Permission.storage.request();
-  Fimber.clearAll();
-  Fimber.plantTree(DebugTree());
+
+  // Fimber.clearAll();
+  // Fimber.plantTree(DebugTree());
   await _checkPermissions();
   WebView.debugLoggingSettings.enabled = false;
 
@@ -58,51 +55,14 @@ Future main() async {
     }
   }
 
-  // if (Platform.isAndroid) {
-  //   // await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-  //
-  //   // var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
-  //   //     AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-  //   // var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
-  //   //     AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
-  //
-  //   if (swAvailable && swInterceptAvailable) {
-  //     // AndroidServiceWorkerController serviceWorkerController =
-  //     // AndroidServiceWorkerController.instance();
-  //
-  //     await serviceWorkerController
-  //         .setServiceWorkerClient(AndroidServiceWorkerClient(
-  //       shouldInterceptRequest: (request) async {
-  //         // debugPrint("$request");
-  //         return null;
-  //       },
-  //     ));
-  //   }
-  // }
 
-  //
-  // Workmanager().initialize(
-  //     callbackDispatcher, // The top level function, aka callbackDispatcher
-  //     isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-  // );
 
   ApiHandler apiHandler = ApiHandler();
-  // await apiHandler.getDefaultUrl();
+  await apiHandler.getDefaultUrl();
   runApp(const MyApp());
 }
 
-// void callbackDispatcher() {
-//   ApiHandler apiHandler = ApiHandler();
-//   Workmanager().executeTask((task, inputData) async {
-//     switch(task){
-//       case "callApiWhenDispose" :
-//         debugPrint("callApiWhenDispose");
-//         apiHandler.check2WhenDispose();
-//         apiHandler.debtApiWhenDispose();
-//     }
-//     return Future.value(true);
-//   });
-// }
+
 
 
 class MyApp extends StatelessWidget {

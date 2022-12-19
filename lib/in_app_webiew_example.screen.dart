@@ -10,17 +10,11 @@ import 'package:untitled/custom_Button.dart';
 import 'package:untitled/logic.dart';
 import 'package:untitled/utils/api_handler.dart';
 import 'package:untitled/data_handler.dart';
-import 'package:untitled/utils/self_encrypted_shared_preferences.dart';
-import 'package:untitled/utils/snackbar_controller.dart';
 
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:provider/provider.dart';
 
-import 'allbet_detector/card_detector.dart';
-import 'allbet_detector/ui_detector.dart';
-import 'wm_detector/card_detector.dart';
-import 'wm_detector/ui_detector.dart';
 
 class InAppWebViewExampleScreen extends StatefulWidget {
   const InAppWebViewExampleScreen({Key? key}) : super(key: key);
