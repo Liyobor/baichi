@@ -12,6 +12,8 @@ import 'utils/api_handler.dart';
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
+import 'utils/self_encrypted_shared_preferences.dart';
+
 Future<void> _checkPermissions() async {
   if (Platform.isAndroid) {
     Map<Permission, PermissionStatus> statuses = await [
@@ -60,6 +62,11 @@ Future main() async {
 
   ApiHandler apiHandler = ApiHandler();
   await apiHandler.getDefaultUrl();
+  SelfEncryptedSharedPreference selfEncryptedSharedPreference = SelfEncryptedSharedPreference();
+  if(await selfEncryptedSharedPreference.checkIfReachLimitation()){
+    DataHandler dataHandler = DataHandler();
+    dataHandler.reachDailyLimitationRefreshUI();
+  }
   runApp(const MyApp());
 }
 

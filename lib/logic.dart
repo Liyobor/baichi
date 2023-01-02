@@ -245,6 +245,7 @@ class Logic{
 
   void wmProcess() async {
     if(await selfEncryptedSharedPreference.checkIfReachLimitation()){
+      dataHandler.reachDailyLimitationRefreshUI();
       snackBarController.showRecognizeResult("到達每日贏取上限", 2000);
       stop();
       return;
@@ -264,6 +265,7 @@ class Logic{
     while (isUIDetectorRunning) {
 
       if(await dataHandler.checkIfReachLimit()){
+        dataHandler.reachDailyLimitationRefreshUI();
         stop();
         snackBarController.showRecognizeResult("到達每日贏取上限", 2000);
         selfEncryptedSharedPreference.setReachLimitation();
@@ -362,6 +364,7 @@ class Logic{
   void allbetProcess() async {
 
     if(await selfEncryptedSharedPreference.checkIfReachLimitation()){
+      dataHandler.reachDailyLimitationRefreshUI();
       snackBarController.showRecognizeResult("到達每日贏取上限", 2000);
       stop();
       return;
@@ -382,6 +385,7 @@ class Logic{
     while (isUIDetectorRunning) {
 
       if(await dataHandler.checkIfReachLimit()){
+        dataHandler.reachDailyLimitationRefreshUI();
         stop();
         snackBarController.showRecognizeResult("到達每日贏取上限", 2000);
         selfEncryptedSharedPreference.setReachLimitation();

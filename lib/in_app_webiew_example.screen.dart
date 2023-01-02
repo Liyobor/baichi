@@ -338,74 +338,75 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                       ],
                     ) : Container(),
                   ),
-                  IgnorePointer(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: MediaQuery.of(context).size.height * 0.05),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                          child: Container(
-                                        decoration: const BoxDecoration(
-                                            color: Colors.white),
-                                      )),
-                                      Align(
-                                        alignment: Alignment.topCenter,
-                                        child: Consumer<DataHandler>(
-                                          builder: (context, dh, _) => Text(
+                  Consumer<DataHandler>(
+                    builder: (context, dh, _) => (!dh.isReachDailyLimit)
+                    ? IgnorePointer(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: MediaQuery.of(context).size.height * 0.05),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                            child: Container(
+                                          decoration: const BoxDecoration(
+                                              color: Colors.white),
+                                        )),
+                                        Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Text(
                                               '均注模式 : ${(dh.keepOneMode) ? "on" : "off"}',
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.red,
                                                   fontSize: 20.0)),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.35,
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                          child: Container(
-                                        decoration: const BoxDecoration(
-                                            color: Colors.white),
-                                      )),
-                                      Align(
-                                        alignment: Alignment.topCenter,
-                                        child: Consumer<DataHandler>(
-                                          builder: (context, dh, _) => Text(
-                                              '下注數:${dh.betTime}',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.red,
-                                                  fontSize: 20.0)),
+                                Align(
+                                  alignment: Alignment.topCenter,
+                                  child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.35,
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                            child: Container(
+                                          decoration: const BoxDecoration(
+                                              color: Colors.white),
+                                        )),
+                                        Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Consumer<DataHandler>(
+                                            builder: (context, dh, _) => Text(
+                                                '下注數:${dh.betTime}',
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.red,
+                                                    fontSize: 20.0)),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ) : Container()
                   ),
                 ],
               ),

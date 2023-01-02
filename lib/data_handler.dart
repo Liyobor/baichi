@@ -422,6 +422,12 @@ class DataHandler extends ChangeNotifier{
 
   }
 
+  void reachDailyLimitationRefreshUI(){
+    Fimber.i("reach limitation");
+    _isReachDailyLimit = true;
+    notifyListeners();
+  }
+
   Future<bool> checkIfReachLimit() async {
     SelfEncryptedSharedPreference selfEncryptedSharedPreference = SelfEncryptedSharedPreference();
     String? winTimesStr = await selfEncryptedSharedPreference.getWinTimes();
@@ -430,10 +436,9 @@ class DataHandler extends ChangeNotifier{
       notifyListeners();
       return int.parse(winTimesStr) >= limitedWinTimesDaily;
     }
-    notifyListeners();
     _isReachDailyLimit = false;
+    notifyListeners();
     return false;
-
   }
 
   void checkWinOrLose(){
