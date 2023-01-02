@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,8 +33,8 @@ Future<void> _checkPermissions() async {
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Fimber.clearAll();
-  // Fimber.plantTree(DebugTree());
+  Fimber.clearAll();
+  Fimber.plantTree(DebugTree());
   await _checkPermissions();
   WebView.debugLoggingSettings.enabled = false;
 

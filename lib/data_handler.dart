@@ -40,9 +40,11 @@ class DataHandler extends ChangeNotifier{
   String? winSide;
   int betTimes = 1 ;
   bool _isUiRunning = false;
+  bool _isReachDailyLimit = false;
 
   int get betTime => betTimes;
   bool get isUiRunning => _isUiRunning;
+  bool get isReachDailyLimit => _isReachDailyLimit;
 
 
   bool isBetting = false;
@@ -126,12 +128,7 @@ class DataHandler extends ChangeNotifier{
     notifyListeners();
   }
 
-  bool bar(){
-    if(_point>0){
-      return true;
-    }
-    return false;
-  }
+
 
   bool refreshState(int state,InAppWebViewController webViewController,String casino){
     if(_state == state){
@@ -159,22 +156,51 @@ class DataHandler extends ChangeNotifier{
 
       await Future.delayed(const Duration(milliseconds: 100));
 
-      if(pointOfPlayer<pointOfBank){
-        Fimber.i('betBank');
-        for (int i = 0; i < betTimes; i++){
-          clickBank(webViewController, casino);
-        }
-        betSide="bank";
-      }else if(pointOfPlayer>=pointOfBank){
-        Fimber.i('betPlayer');
-        for (int i = 0; i < betTimes; i++) {
-          clickPlayer(webViewController, casino);
-        }
-        betSide = "player";
-      }else{
-        Fimber.i("_point = 0");
-        betSide = null;
+      switch(betStrategy){
+        case Strategy.base:
+          if(pointOfPlayer<pointOfBank){
+            Fimber.i('betBank');
+            for (int i = 0; i < betTimes; i++){
+              clickBank(webViewController, casino);
+            }
+            betSide="bank";
+          }else if(pointOfPlayer>=pointOfBank){
+            Fimber.i('betPlayer');
+            for (int i = 0; i < betTimes; i++) {
+              clickPlayer(webViewController, casino);
+            }
+            betSide = "player";
+          }else{
+            Fimber.i("_point = 0");
+            betSide = null;
+          }
+          break;
+
+        case Strategy.martingale:
+        case Strategy.keepOne:
+          if(_point>0){
+            Fimber.i('betBank');
+            for (int i = 0; i < betTimes; i++){
+              clickBank(webViewController, casino);
+            // await betBank();
+            }
+            betSide="bank";
+          }else if(_point<0){
+            Fimber.i('betPlayer');
+            for (int i = 0; i < betTimes; i++) {
+              clickPlayer(webViewController, casino);
+            // await betPlayer();
+            }
+            betSide = "player";
+          } else{
+            Fimber.i("_point = 0");
+            betSide = null;
+          }
+          break;
+
       }
+
+
 
 
       if(betSide!=null){
@@ -189,7 +215,6 @@ class DataHandler extends ChangeNotifier{
   bool _keepOneMode = false;
   bool get keepOneMode => _keepOneMode;
   void swapKeepOneMode(){
-
     _keepOneMode=!_keepOneMode;
     notifyListeners();
   }
@@ -401,9 +426,12 @@ class DataHandler extends ChangeNotifier{
     SelfEncryptedSharedPreference selfEncryptedSharedPreference = SelfEncryptedSharedPreference();
     String? winTimesStr = await selfEncryptedSharedPreference.getWinTimes();
     if(winTimesStr!=null){
+      _isReachDailyLimit = int.parse(winTimesStr) >= limitedWinTimesDaily;
+      notifyListeners();
       return int.parse(winTimesStr) >= limitedWinTimesDaily;
     }
-
+    notifyListeners();
+    _isReachDailyLimit = false;
     return false;
 
   }

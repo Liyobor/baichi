@@ -243,100 +243,100 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen>
                   progress < 1.0
                       ? LinearProgressIndicator(value: progress)
                       : Container(),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                            0, 0, 0, MediaQuery.of(context).size.height * 0.15),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.15,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton(
-                                  child: const Icon(Icons.arrow_back),
-                                  onPressed: () {
-                                    webViewController?.goBack();
-                                  },
-                                ),
-                                ElevatedButton(
-                                  child: const Icon(Icons.refresh),
-                                  onPressed: () async {
-                                    webViewController?.reload();
-                                  },
-                                ),
-                              ],
+                  Consumer<DataHandler>(
+                    builder: (context, dh, _) => (!dh.isReachDailyLimit)
+                        ? Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                              0, 0, 0, MediaQuery.of(context).size.height * 0.15),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    child: const Icon(Icons.arrow_back),
+                                    onPressed: () {
+                                      webViewController?.goBack();
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    child: const Icon(Icons.refresh),
+                                    onPressed: () async {
+                                      webViewController?.reload();
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const Spacer(),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                            0, 0, 0, MediaQuery.of(context).size.height * 0.15),
-                        child: Align(
-                          alignment: Alignment.bottomLeft,
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(
-                                  height: 35,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(3),
-                                    child: Stack(
-                                      children: [
-                                        Positioned.fill(
-                                          child: Container(
-                                            decoration: const BoxDecoration(
-                                                color: Colors.blue),
+                        const Spacer(),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                              0, 0, 0, MediaQuery.of(context).size.height * 0.15),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    height: 35,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(3),
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.blue),
+                                            ),
                                           ),
-                                        ),
-                                        Consumer<DataHandler>(
-                                          builder: (context, dh, _) =>
-                                              TextButton(
-                                                  onPressed: () {
-                                                    logic.start();
-                                                  },
-                                                  child: (dh.isUiRunning)
-                                                      ? const Text("停止辨識",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white))
-                                                      : const Text("開始辨識",
-                                                          style: TextStyle(
-                                                              color: Colors
-                                                                  .white))),
-                                        )
-                                      ],
+                                          TextButton(
+                                              onPressed: () {
+                                                logic.start();
+                                              },
+                                              child: (dh.isUiRunning)
+                                                  ? const Text("停止辨識",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.white))
+                                                  : const Text("開始辨識",
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .white)))
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                CustomButton(
-                                    onPressed: () async {
-                                      launchUrlString(
-                                          'https://line.me/ti/p/@516wvzjp');
-                                    },
-                                    text: '聯繫客服'),
-                                CustomButton(
-                                    onPressed: () async {
-                                      logic.swapKeepOneMode();
-                                    },
-                                    text: '均注'),
-                                // CustomButton(
-                                //     onPressed: () async {
-                                //       selfEncryptedSharedPreference.clear();
-                                //     },
-                                //     text: 'reset'),
-                              ],
+                                  CustomButton(
+                                      onPressed: () async {
+                                        launchUrlString(
+                                            'https://line.me/ti/p/@516wvzjp');
+                                      },
+                                      text: '聯繫客服'),
+                                  CustomButton(
+                                      onPressed: () async {
+                                        logic.swapKeepOneMode();
+                                      },
+                                      text: '均注'),
+                                  // CustomButton(
+                                  //     onPressed: () async {
+                                  //       selfEncryptedSharedPreference.clear();
+                                  //     },
+                                  //     text: 'reset'),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ) : Container(),
                   ),
                   IgnorePointer(
                     child: Column(
